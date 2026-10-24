@@ -9,7 +9,7 @@
 namespace gb::ui {
 
 void Panel(App& app, Rectangle r, Color accent, float alpha) {
-    DrawRectangleRec(r, WithAlpha(palette::kUiPanel, 0.88f * alpha));
+    DrawRectangleRec(r, WithAlpha(palette::kUiPanel, 0.96f * alpha));
     NeonRenderer& neon = app.Gfx().Neon();
     neon.Begin();
     const std::array<Vector2, 4> corners{Vector2{r.x, r.y}, Vector2{r.x + r.width, r.y},

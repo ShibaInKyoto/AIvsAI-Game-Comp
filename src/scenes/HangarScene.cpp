@@ -182,6 +182,9 @@ void HangarScene::Update(float dt) {
                 ship_ = id;
                 app_.Audio().Play(SfxId::PickupCache, 0.9f);
                 purchaseFlash_ = 1.0f;
+                if (profile.AllShipsUnlocked()) {
+                    profile.CompleteChallenge(ChallengeId::FleetCommander);
+                }
             } else {
                 app_.Audio().Play(SfxId::UiDeny, 0.8f);
                 denyFlash_ = 1.0f;

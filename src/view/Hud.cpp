@@ -14,6 +14,8 @@ namespace gb {
 
 namespace {
 
+constexpr float kToastDuration = 3.6f;
+
 void Hexagon(NeonRenderer& neon, Vector2 c, float r, Color color, bool filled, float width = 2.0f) {
     std::array<Vector2, 6> pts{};
     for (int i = 0; i < 6; ++i) {
@@ -44,6 +46,12 @@ const char* KeyHint(const App& app, const char* keyboard, const char* pad) {
 
 void Hud::Update(const GameView& view, float dt) {
     time_ += dt;
+    if (!toasts_.empty()) {
+        toasts_.front().time += dt;
+        if (toasts_.front().time > kToastDuration) {
+            toasts_.pop_front();
+        }
+    }
     const World& world = view.GetWorld();
     const auto score = static_cast<float>(world.Record().score);
     displayedScore_ = score < displayedScore_ ? score : Damp(displayedScore_, score, 0.08f, dt);
@@ -78,6 +86,29 @@ void Hud::Update(const GameView& view, float dt) {
     bossLag_ = bossFill_ > bossLag_ ? bossFill_ : Damp(bossLag_, bossFill_, 0.35f, dt);
 }
 
+void Hud::Toast(std::string title, std::string detail, Color color) {
+    toasts_.push_back({std::move(title), std::move(detail), color, 0.0f});
+}
+
+void Hud::DrawToasts(App& app) const {
+    if (toasts_.empty()) {
+        return;
+    }
+    const ToastMessage& toast = toasts_.front();
+    const Vector2 ui = app.Gfx().UiSize();
+    const float in = EaseOutBack(Saturate(toast.time / 0.4f));
+    const float out = Saturate((kToastDuration - toast.time) / 0.4f);
+    const float a = Saturate(in) * out;
+    const float width = 560.0f;
+    const Rectangle r{ui.x * 0.5f - width * 0.5f, 92.0f - (1.0f - in) * 40.0f, width, 74.0f};
+    DrawRectangleRec(r, WithAlpha(palette::kUiPanel, 0.9f * a));
+    DrawRectangleRec({r.x, r.y, 6.0f, r.height}, WithAlpha(toast.color, a));
+    TextRenderer& text = app.Gfx().Text();
+    text.Draw(FontId::Heading, toast.title, {r.x + 26.0f, r.y + 10.0f}, 18.0f, WithAlpha(toast.color, a), Align::Left,
+              0.2f);
+    text.Draw(FontId::BodyBold, toast.detail, {r.x + 26.0f, r.y + 34.0f}, 28.0f, WithAlpha(WHITE, a));
+}
+
 void Hud::Draw(App& app, const GameView& view) {
     DrawIndicators(app, view);
     DrawFloatingText(app, view);
@@ -88,6 +119,7 @@ void Hud::Draw(App& app, const GameView& view) {
     DrawNova(app, view);
     DrawModules(app, view);
     DrawBanners(app, view);
+    DrawToasts(app);
 }
 
 void Hud::DrawVitals(App& app, const GameView& view) const {

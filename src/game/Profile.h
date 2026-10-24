@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/Challenges.h"
 #include "game/Ships.h"
 #include "game/World.h"
 
@@ -64,6 +65,12 @@ public:
     int BossKills() const { return bossKills_; }
     float PlayTime() const { return playTime_; }
 
+    bool ChallengeCompleted(ChallengeId id) const { return (challenges_ >> static_cast<unsigned>(id)) & 1u; }
+    // Marks a challenge complete and pays out its reward; false if already done.
+    bool CompleteChallenge(ChallengeId id);
+    int CompletedChallengeCount() const;
+    bool AllShipsUnlocked() const;
+
     bool TutorialSeen() const { return tutorialSeen_; }
     void SetTutorialSeen() { tutorialSeen_ = true; }
 
@@ -98,6 +105,7 @@ private:
     Difficulty lastDifficulty_ = Difficulty::Standard;
     int dailyDate_ = 0;
     long long dailyBest_ = 0;
+    std::uint32_t challenges_ = 0;
 };
 
 // Today's date as YYYYMMDD in local time, and a seed derived from it.

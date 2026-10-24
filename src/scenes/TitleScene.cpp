@@ -22,6 +22,7 @@ enum TitleItem { ItemPlay, ItemDaily, ItemHangar, ItemRecords, ItemSettings, Ite
 TitleScene::TitleScene(App& app) : Scene(app) {
     menu_.SetItems({{"PLAY"}, {"DAILY RUN"}, {"HANGAR"}, {"RECORDS"}, {"SETTINGS"}, {"QUIT"}});
     ResetDemo();
+    showRecords_ = app.Options().startScene == "records";  // debug entry point for screenshots
 }
 
 void TitleScene::OnEnter() {
@@ -157,11 +158,13 @@ void TitleScene::DrawLogo(Vector2 center, float scale) {
 void TitleScene::DrawRecords() {
     const Vector2 ui = app_.Gfx().UiSize();
     const Profile& p = app_.Progress();
-    ui::Dim(app_, 0.55f);
-    const Rectangle panel{ui.x * 0.5f - 420.0f, ui.y * 0.5f - 300.0f, 840.0f, 600.0f};
+    ui::Dim(app_, 0.6f);
+    const float width = std::min(1500.0f, ui.x - 80.0f);
+    const Rectangle panel{ui.x * 0.5f - width * 0.5f, ui.y * 0.5f - 400.0f, width, 800.0f};
     ui::Panel(app_, panel, palette::kUiAccent);
     TextRenderer& text = app_.Gfx().Text();
-    text.Draw(FontId::Heading, "RECORDS", {panel.x + 40.0f, panel.y + 32.0f}, 36.0f, WHITE, Align::Left, 0.15f);
+    NeonRenderer& neon = app_.Gfx().Neon();
+    text.Draw(FontId::Heading, "RECORDS", {panel.x + 40.0f, panel.y + 30.0f}, 34.0f, WHITE, Align::Left, 0.15f);
     const int minutes = static_cast<int>(p.PlayTime() / 60.0f);
     struct Row {
         const char* label;
@@ -174,19 +177,48 @@ void TitleScene::DrawRecords() {
         {"ENEMIES DESTROYED", FormatThousands(p.TotalKills())},
         {"GUARDIANS DESTROYED", std::to_string(p.BossKills())},
         {"TIME PLAYED", std::to_string(minutes / 60) + "h " + std::to_string(minutes % 60) + "m"},
-        {"BEST SCORE - RELAXED", FormatThousands(p.BestScore(Difficulty::Relaxed))},
-        {"BEST SCORE - STANDARD", FormatThousands(p.BestScore(Difficulty::Standard))},
-        {"BEST SCORE - OVERCLOCKED", FormatThousands(p.BestScore(Difficulty::Overclocked))},
+        {"BEST - RELAXED", FormatThousands(p.BestScore(Difficulty::Relaxed))},
+        {"BEST - STANDARD", FormatThousands(p.BestScore(Difficulty::Standard))},
+        {"BEST - OVERCLOCKED", FormatThousands(p.BestScore(Difficulty::Overclocked))},
     }};
+    const float leftWidth = width * 0.38f;
     for (std::size_t i = 0; i < rows.size(); ++i) {
-        const float y = panel.y + 110.0f + static_cast<float>(i) * 48.0f;
-        text.Draw(FontId::BodyBold, rows[i].label, {panel.x + 50.0f, y}, 28.0f, palette::kUiDim);
-        text.Draw(FontId::Heading, rows[i].value, {panel.x + panel.width - 50.0f, y + 2.0f}, 26.0f, palette::kUiText,
-                  Align::Right);
+        const float y = panel.y + 100.0f + static_cast<float>(i) * 50.0f;
+        text.Draw(FontId::BodyBold, rows[i].label, {panel.x + 40.0f, y}, 26.0f, palette::kUiDim);
+        text.Draw(FontId::BodyBold, rows[i].value, {panel.x + leftWidth, y - 2.0f}, 30.0f, palette::kUiText, Align::Right);
     }
     if (p.DailyDate() == TodayStamp() && p.DailyBest() > 0) {
-        text.Draw(FontId::BodyBold, TextFormat("TODAY'S DAILY BEST: %lld", p.DailyBest()),
-                  {panel.x + panel.width * 0.5f, panel.y + panel.height - 50.0f}, 24.0f, palette::kUiWarn, Align::Center);
+        text.Draw(FontId::BodyBold, TextFormat("TODAY'S DAILY BEST: %s", FormatThousands(p.DailyBest()).c_str()),
+                  {panel.x + 40.0f, panel.y + 570.0f}, 24.0f, palette::kUiWarn);
+    }
+
+    // Challenges column.
+    const float cx = panel.x + leftWidth + 70.0f;
+    const float columnWidth = panel.x + width - 40.0f - cx;
+    text.Draw(FontId::Heading, TextFormat("CHALLENGES  %d / %d", p.CompletedChallengeCount(),
+                                          static_cast<int>(AllChallenges().size())),
+              {cx, panel.y + 34.0f}, 26.0f, palette::kCache, Align::Left, 0.1f);
+    const auto challenges = AllChallenges();
+    const float rowHeight = 41.0f;
+    neon.Begin();
+    for (std::size_t i = 0; i < challenges.size(); ++i) {
+        const bool done = p.ChallengeCompleted(challenges[i].id);
+        const Vector2 c{cx + 12.0f, panel.y + 100.0f + static_cast<float>(i) * rowHeight + 13.0f};
+        neon.RegularPolygon(c, 4, 9.0f, kPi * 0.25f, 2.0f, done ? palette::kCache : WithAlpha(palette::kUiFaint, 0.8f));
+        if (done) {
+            neon.Glow(c, 10.0f, palette::kCache);
+        }
+    }
+    neon.End();
+    for (std::size_t i = 0; i < challenges.size(); ++i) {
+        const ChallengeInfo& info = challenges[i];
+        const bool done = p.ChallengeCompleted(info.id);
+        const float y = panel.y + 100.0f + static_cast<float>(i) * rowHeight;
+        text.Draw(FontId::Heading, info.name, {cx + 36.0f, y}, 19.0f, done ? WHITE : palette::kUiDim, Align::Left, 0.08f);
+        text.Draw(FontId::Body, info.description, {cx + 300.0f, y - 2.0f}, 23.0f,
+                  done ? palette::kUiText : palette::kUiFaint);
+        text.Draw(FontId::BodyBold, TextFormat("%d CR", info.reward), {cx + columnWidth, y - 2.0f}, 22.0f,
+                  done ? palette::kUiFaint : palette::kCache, Align::Right);
     }
 }
 

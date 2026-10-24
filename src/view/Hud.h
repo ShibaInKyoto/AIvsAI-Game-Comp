@@ -2,6 +2,9 @@
 
 #include <raylib.h>
 
+#include <deque>
+#include <string>
+
 namespace gb {
 
 class App;
@@ -14,6 +17,8 @@ class Hud {
 public:
     void Update(const GameView& view, float dt);
     void Draw(App& app, const GameView& view);
+    // Queues a notification banner (challenges, unlocks).
+    void Toast(std::string title, std::string detail, Color color);
 
 private:
     void DrawVitals(App& app, const GameView& view) const;
@@ -25,6 +30,15 @@ private:
     void DrawBanners(App& app, const GameView& view) const;
     void DrawIndicators(App& app, const GameView& view) const;
     void DrawFloatingText(App& app, const GameView& view) const;
+    void DrawToasts(App& app) const;
+
+    struct ToastMessage {
+        std::string title;
+        std::string detail;
+        Color color;
+        float time = 0.0f;
+    };
+    std::deque<ToastMessage> toasts_;
 
     float displayedScore_ = 0.0f;
     float xpFill_ = 0.0f;

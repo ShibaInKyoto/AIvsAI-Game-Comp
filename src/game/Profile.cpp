@@ -66,6 +66,7 @@ bool Profile::Load() {
     }
     dailyDate_ = static_cast<int>(doc.GetInt("daily_date", 0));
     dailyBest_ = doc.GetInt("daily_best", 0);
+    challenges_ = static_cast<std::uint32_t>(doc.GetInt("challenges", 0));
     return true;
 }
 
@@ -95,6 +96,7 @@ bool Profile::Save() const {
     doc.SetInt("last_difficulty", static_cast<int>(lastDifficulty_));
     doc.SetInt("daily_date", dailyDate_);
     doc.SetInt("daily_best", dailyBest_);
+    doc.SetInt("challenges", challenges_);
     return storage::WriteTextFileAtomic(storage::DataDirectory() / kFileName, doc.Serialize());
 }
 
@@ -106,6 +108,35 @@ bool Profile::TryUnlockShip(ShipId id) {
     credits_ -= cost;
     unlockedShips_[static_cast<std::size_t>(id)] = true;
     Save();
+    return true;
+}
+
+bool Profile::CompleteChallenge(ChallengeId id) {
+    if (ChallengeCompleted(id)) {
+        return false;
+    }
+    challenges_ |= 1u << static_cast<unsigned>(id);
+    const int reward = GetChallengeInfo(id).reward;
+    credits_ += reward;
+    lifetimeCredits_ += reward;
+    Save();
+    return true;
+}
+
+int Profile::CompletedChallengeCount() const {
+    int count = 0;
+    for (const ChallengeInfo& info : AllChallenges()) {
+        count += ChallengeCompleted(info.id) ? 1 : 0;
+    }
+    return count;
+}
+
+bool Profile::AllShipsUnlocked() const {
+    for (bool unlocked : unlockedShips_) {
+        if (!unlocked) {
+            return false;
+        }
+    }
     return true;
 }
 

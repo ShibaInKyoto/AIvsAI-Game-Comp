@@ -129,6 +129,11 @@ void GameScene::Update(float dt) {
 
     view_.Update(dt, ReadPlayerInput(), true);
     UpdateMusic(dt);
+    challengeTimer_ -= dt;
+    if (challengeTimer_ <= 0.0f) {
+        challengeTimer_ = 0.5f;
+        CheckChallenges();
+    }
     if (showTutorial_) {
         tutorialTime_ += dt;
         if (tutorialTime_ > kTutorialDuration) {
@@ -363,11 +368,26 @@ void GameScene::UpdateMusic(float dt) {
     music.SetIntensity(overlay_ == Overlay::None ? musicIntensity_ : musicIntensity_ * 0.6f);
 }
 
+void GameScene::CheckChallenges() {
+    if (autopilot_) {
+        return;
+    }
+    Profile& profile = app_.Progress();
+    for (const ChallengeInfo& info : AllChallenges()) {
+        if (!profile.ChallengeCompleted(info.id) && ChallengeMet(info.id, view_.GetWorld()) &&
+            profile.CompleteChallenge(info.id)) {
+            hud_.Toast("CHALLENGE COMPLETE", TextFormat("%s   +%d CR", info.name, info.reward), palette::kCache);
+            app_.Audio().Play(SfxId::Combo, 0.8f, 0.8f);
+        }
+    }
+}
+
 void GameScene::FinishRun(bool victory) {
     if (finished_) {
         return;
     }
     finished_ = true;
+    CheckChallenges();
     const World& world = view_.GetWorld();
     RunSummary summary;
     summary.stats = world.Record();

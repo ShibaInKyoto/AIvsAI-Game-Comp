@@ -36,6 +36,7 @@ private:
     void OpenSectorChoice();
     void UpdateMusic(float dt);
     void FinishRun(bool victory);
+    void CheckChallenges();
     Vector2 MouseWorld() const;
 
     void DrawPause();
@@ -61,6 +62,7 @@ private:
     float deathTimer_ = 0.0f;
     float musicIntensity_ = 0.3f;
     float tutorialTime_ = 0.0f;
+    float challengeTimer_ = 0.0f;
     bool showTutorial_ = false;
     bool finished_ = false;
     bool victoryShown_ = false;

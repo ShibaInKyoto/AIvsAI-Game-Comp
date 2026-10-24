@@ -142,6 +142,9 @@ void World::AddScore(long long amount) { runStats_.score += amount; }
 
 void World::OnSectorCleared() {
     runStats_.sectorsCleared++;
+    if (runStats_.hitsTaken == hitsAtSectorStart_) {
+        runStats_.flawlessSectors++;
+    }
     pendingCaches_++;
     // Hoover up every remaining shard so nothing is lost to the transition.
     for (Pickup& p : pickups_) {
@@ -158,9 +161,13 @@ void World::ChooseSectorModifier(SectorModifier modifier) {
     default: break;
     }
     director_.AdvanceSector(modifier);
+    hitsAtSectorStart_ = runStats_.hitsTaken;
 }
 
-void World::ContinueEndless() { director_.ContinueEndless(); }
+void World::ContinueEndless() {
+    director_.ContinueEndless();
+    hitsAtSectorStart_ = runStats_.hitsTaken;
+}
 
 // ---------------------------------------------------------------------------
 // Main loop
@@ -861,6 +868,7 @@ void World::KillEnemy(Enemy& e, bool dropLoot) {
     }
     if (IsBoss(e.kind)) {
         runStats_.bossesKilled++;
+        runStats_.bossMask |= 1u << static_cast<unsigned>(e.kind);
         Emit(EventType::BossDefeated, e.position, info.color, e.radius, {}, 0, e.kind);
     }
     Emit(EventType::EnemyKilled, e.position, info.color, e.radius, e.velocity + e.knockback, e.elite ? 1 : 0, e.kind);

@@ -54,6 +54,8 @@ struct RunStats {
     int shardsCollected = 0;
     double damageDealt = 0.0;
     int sectorsCleared = 0;
+    int flawlessSectors = 0;      // sectors cleared without taking a hit
+    std::uint32_t bossMask = 0;   // bit per EnemyKind of defeated bosses
     bool victory = false;
 };
 
@@ -277,6 +279,7 @@ private:
     float lanceTimer_ = 0.0f;
     float shardMergeTimer_ = 0.0f;
     float baseDamage_ = 10.0f;
+    int hitsAtSectorStart_ = 0;
 };
 
 } // namespace gb
