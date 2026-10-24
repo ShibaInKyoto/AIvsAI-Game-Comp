@@ -22,6 +22,8 @@ struct WorldDrawContext {
     Color arenaColor{};
     Vector2 reticle{};
     bool showReticle = false;
+    int motif = 0;           // which sector's backdrop motif to draw (0..4)
+    float motifAlpha = 1.0f; // cross-fades motifs between sectors
 };
 
 // Draws the simulation state with neon primitives. Purely a view: it never
@@ -34,6 +36,7 @@ public:
 
 private:
     void DrawBackdrop(NeonRenderer& neon, const WorldDrawContext& ctx) const;
+    void DrawSectorMotif(NeonRenderer& neon, const WorldDrawContext& ctx) const;
     void DrawArena(NeonRenderer& neon, const WorldDrawContext& ctx) const;
     void DrawPickups(NeonRenderer& neon, const World& world, const WorldDrawContext& ctx) const;
     void DrawEnemies(NeonRenderer& neon, const World& world, const WorldDrawContext& ctx) const;

@@ -106,7 +106,9 @@ Prompts adapt automatically to whichever device you used last.
 
 * HDR rendering with a six-level physically inspired bloom chain, tone mapping,
   chromatic aberration, vignette and film grain, all built on raylib.
-* Spring-mass warp grid that ripples under explosions, bullets and gravity wells.
+* Spring-mass warp grid that ripples under explosions, bullets and gravity wells,
+  over a parallax backdrop with its own motif per sector (radar sweeps, data
+  rain, an accretion disk, a firewall lattice, the Core's heartbeat).
 * Thousands of particles, hit-stop, slow motion, screen shake and flashes, all
   tunable in Settings (with a *Reduce flashing* option).
 * 100% procedural audio: every sound effect is synthesised at startup, and the

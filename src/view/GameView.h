@@ -49,6 +49,8 @@ private:
     WorldRenderer renderer_;
     Color gridColor_{};
     Color accent_{};
+    int motif_ = 0;
+    float motifAlpha_ = 0.0f;
     float time_ = 0.0f;
     float updateMs_ = 0.0f;
     float drawMs_ = 0.0f;

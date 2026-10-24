@@ -24,6 +24,7 @@ GameView::GameView(App& app, const RunConfig& config)
     camera_.SetBounds(World::kArena, 140.0f);
     camera_.SnapTo(world_->GetPlayer().position);
     gridColor_ = world_->GetDirector().Info().gridColor;
+    motif_ = world_->GetDirector().Sector() % Director::kCampaignSectors;
     accent_ = world_->GetDirector().Info().accentColor;
 }
 
@@ -44,6 +45,17 @@ void GameView::Update(float dt, const PlayerInput& input, bool simulate) {
     const Director& director = world_->GetDirector();
     gridColor_ = DampColor(gridColor_, director.Info().gridColor, dt);
     accent_ = DampColor(accent_, director.Info().accentColor, dt);
+    // The backdrop motif fades out, swaps to the new sector's, and fades in.
+    const int motif = director.Sector() % Director::kCampaignSectors;
+    if (motif != motif_) {
+        motifAlpha_ -= dt * 1.5f;
+        if (motifAlpha_ <= 0.0f) {
+            motifAlpha_ = 0.0f;
+            motif_ = motif;
+        }
+    } else {
+        motifAlpha_ = std::min(1.0f, motifAlpha_ + dt * 0.6f);
+    }
 
     const Player& p = world_->GetPlayer();
     const Vector2 lookAhead = FromAngle(p.aimAngle, 70.0f) + p.velocity * 0.12f;
@@ -82,6 +94,8 @@ void GameView::DrawWorld(Vector2 reticle, bool showReticle) {
     ctx.arenaColor = accent_;
     ctx.reticle = reticle;
     ctx.showReticle = showReticle;
+    ctx.motif = motif_;
+    ctx.motifAlpha = motifAlpha_;
     renderer_.Draw(app_.Gfx().Neon(), *world_, grid_, particles_, ctx);
     EndMode2D();
     drawMs_ = static_cast<float>((GetTime() - start) * 1000.0);

@@ -108,6 +108,7 @@ void WorldRenderer::DrawBackdrop(NeonRenderer& neon, const WorldDrawContext& ctx
         const Color tint = i % 2 == 0 ? nebula : LerpColor(nebula, Color{120, 60, 255, 255}, 0.5f);
         neon.Glow(p, n.z, WithAlpha(tint, 0.055f * pulse));
     }
+    DrawSectorMotif(neon, ctx);
     for (const Star& star : stars_) {
         const Vector2 p = star.position + ctx.cameraCenter * (1.0f - star.depth);
         if (!Visible(p, 8.0f, ctx.visible)) {
@@ -115,6 +116,132 @@ void WorldRenderer::DrawBackdrop(NeonRenderer& neon, const WorldDrawContext& ctx
         }
         const float twinkle = 0.6f + 0.4f * std::sin(ctx.time * (0.8f + star.depth * 2.0f) + star.phase);
         neon.Glow(p, star.size * 2.0f, WithAlpha(Color{180, 200, 255, 255}, 0.25f * twinkle * (0.4f + star.depth)));
+    }
+}
+
+void WorldRenderer::DrawSectorMotif(NeonRenderer& neon, const WorldDrawContext& ctx) const {
+    // Each sector paints one huge, faint, slowly animated shape far behind the
+    // grid (parallax < 1), so sectors read differently at a glance.
+    const float fade = ctx.motifAlpha;
+    if (fade <= 0.01f) {
+        return;
+    }
+    const float t = ctx.time;
+    const Color c = ctx.arenaColor;
+    auto tint = [&](float alpha) { return WithAlpha(c, alpha * fade); };
+    // Layer origin for a parallax factor: the layer drifts with the camera.
+    auto layer = [&](float parallax) { return ctx.cameraCenter * parallax; };
+    // The visible rectangle expressed in a layer's own coordinates.
+    auto layerView = [&](Vector2 origin) {
+        return Rectangle{ctx.visible.x - origin.x, ctx.visible.y - origin.y, ctx.visible.width, ctx.visible.height};
+    };
+
+    switch (ctx.motif) {
+    case 0: { // PERIMETER: radar rings with a rotating sweep and contacts
+        const Vector2 center = layer(0.75f);
+        for (int i = 1; i <= 4; ++i) {
+            neon.Circle(center, 450.0f * static_cast<float>(i), 2.0f, tint(0.07f), 128);
+        }
+        const float sweep = t * 0.4f;
+        for (int i = 0; i < 16; ++i) {
+            const float a = sweep - static_cast<float>(i) * 0.025f;
+            neon.Line(center, center + FromAngle(a, 1900.0f), 3.0f,
+                      tint(0.09f * (1.0f - static_cast<float>(i) / 16.0f)));
+        }
+        for (std::uint32_t i = 0; i < 9; ++i) {
+            const float a = HashFloat(i * 7u + 1u) * kTau;
+            const float r = 300.0f + HashFloat(i * 7u + 2u) * 1500.0f;
+            const float since = std::fmod(sweep - a + kTau * 8.0f, kTau); // radians since the sweep passed
+            const float glow = std::max(0.0f, 1.0f - since / 1.6f);
+            if (glow > 0.0f) {
+                neon.Glow(center + FromAngle(a, r), 26.0f, tint(0.35f * glow));
+            }
+        }
+        break;
+    }
+    case 1: { // DATA STREAM: columns of falling data
+        const Vector2 origin = layer(0.6f);
+        const Rectangle view = layerView(origin);
+        constexpr float kColumn = 110.0f;
+        constexpr float kPeriod = 1200.0f;
+        const int first = static_cast<int>(std::floor(view.x / kColumn)) - 1;
+        const int last = static_cast<int>(std::ceil((view.x + view.width) / kColumn)) + 1;
+        for (int col = first; col <= last; ++col) {
+            const auto seed = static_cast<std::uint32_t>(col + 10000);
+            const float speed = 90.0f + HashFloat(seed) * 160.0f;
+            const float x = origin.x + static_cast<float>(col) * kColumn + HashFloat(seed + 1u) * 30.0f;
+            const float offset = std::fmod(t * speed + HashFloat(seed + 2u) * kPeriod, kPeriod);
+            const float startY = std::floor(view.y / kPeriod) * kPeriod - kPeriod;
+            for (float base = startY; base < view.y + view.height + kPeriod; base += kPeriod) {
+                for (int j = 0; j < 3; ++j) {
+                    const float y = origin.y + base + offset + static_cast<float>(j) * kPeriod / 3.0f;
+                    const float length = 50.0f + HashFloat(seed + 3u + static_cast<std::uint32_t>(j)) * 90.0f;
+                    neon.Line({x, y - length}, {x, y}, 2.5f, tint(0.07f));
+                    neon.Glow({x, y}, 9.0f, tint(0.28f));
+                }
+            }
+        }
+        break;
+    }
+    case 2: { // EVENT HORIZON: a tilted accretion disk with orbiting motes
+        const Vector2 center = layer(0.85f) + Vector2{0.0f, -120.0f};
+        constexpr float kTilt = -0.28f;
+        auto diskPoint = [&](float angle, float rx) {
+            return center + Rotated(Vector2{std::cos(angle) * rx, std::sin(angle) * rx * 0.3f}, kTilt);
+        };
+        std::array<Vector2, 97> ring{};
+        for (int k = 0; k < 5; ++k) {
+            const float rx = 650.0f + 240.0f * static_cast<float>(k);
+            for (std::size_t i = 0; i < ring.size(); ++i) {
+                ring[i] = diskPoint(kTau * static_cast<float>(i) / 96.0f, rx);
+            }
+            neon.Polyline(ring, false, 2.0f, tint(0.075f - 0.01f * static_cast<float>(k)));
+        }
+        for (std::uint32_t i = 0; i < 48; ++i) {
+            const float rx = 650.0f + HashFloat(i + 50u) * 960.0f;
+            const float angle = HashFloat(i + 99u) * kTau + t * (180.0f / rx);
+            neon.Glow(diskPoint(angle, rx), 14.0f, tint(0.3f));
+        }
+        neon.Circle(center, 170.0f, 5.0f, tint(0.09f), 64);
+        neon.Glow(center, 520.0f, tint(0.05f));
+        break;
+    }
+    case 3: { // FIREWALL: a hex lattice with a scan band sweeping down
+        const Vector2 origin = layer(0.7f);
+        const Rectangle view = layerView(origin);
+        constexpr float kRadius = 230.0f;
+        const float dx = kRadius * 1.5f;
+        const float dy = kRadius * 1.7320508f;
+        const float scan = std::fmod(t * 140.0f, 2400.0f) - 1200.0f; // layer-space y of the band
+        const int col0 = static_cast<int>(std::floor(view.x / dx)) - 1;
+        const int col1 = static_cast<int>(std::ceil((view.x + view.width) / dx)) + 1;
+        const int row0 = static_cast<int>(std::floor(view.y / dy)) - 1;
+        const int row1 = static_cast<int>(std::ceil((view.y + view.height) / dy)) + 1;
+        for (int col = col0; col <= col1; ++col) {
+            for (int row = row0; row <= row1; ++row) {
+                const float y = static_cast<float>(row) * dy + ((col & 1) != 0 ? dy * 0.5f : 0.0f);
+                const Vector2 p = origin + Vector2{static_cast<float>(col) * dx, y};
+                const float wrapped = std::fmod(std::fabs(y - scan), 2400.0f);
+                const float lit = std::max(0.0f, 1.0f - std::min(wrapped, 2400.0f - wrapped) / 260.0f);
+                neon.RegularPolygon(p, 6, kRadius * 0.9f, 0.0f, 3.0f, tint(0.08f + 0.16f * lit));
+            }
+        }
+        break;
+    }
+    default: { // THE CORE: octagonal heartbeat waves from the centre
+        const Vector2 center = layer(0.8f);
+        constexpr float kPeriod = 2.6f;
+        for (int i = 0; i < 4; ++i) {
+            const float age = std::fmod(t + static_cast<float>(i) * kPeriod / 4.0f, kPeriod) / kPeriod;
+            neon.RegularPolygon(center, 8, 120.0f + age * 2100.0f, t * 0.05f, 3.0f, tint(0.11f * (1.0f - age)));
+        }
+        for (int i = 1; i <= 3; ++i) {
+            neon.RegularPolygon(center, 8, 260.0f * static_cast<float>(i), -t * 0.03f * static_cast<float>(i), 1.5f,
+                                tint(0.05f));
+        }
+        neon.Glow(center, 380.0f, tint(0.06f + 0.03f * std::sin(t * kTau / kPeriod)));
+        break;
+    }
     }
 }
 
