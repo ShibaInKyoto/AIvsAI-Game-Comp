@@ -119,6 +119,36 @@ jobs:
           path: smoke/
           if-no-files-found: ignore
 
+  sanitizers:
+    name: Linux (ASan + UBSan) tests + simulations
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libx11-dev libxrandr-dev \
+            libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libasound2-dev
+
+      - name: Configure
+        run: >
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DGB_BUILD_TOOLS=ON
+          "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=undefined"
+          "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+
+      - name: Build
+        run: cmake --build build --parallel --target gridbreaker_tests gridbreaker_balance
+
+      - name: Unit tests
+        run: ./build/tests/gridbreaker_tests
+
+      - name: Bot simulations (campaign, boss rush, endless)
+        run: |
+          ./build/gridbreaker_balance 1 600 1 0.45
+          ./build/gridbreaker_balance 1 300 1 0.45 bossrush
+          ./build/gridbreaker_balance 1 300 2 0.6 endless
+
   release:
     name: Publish release
     needs: [windows, linux]

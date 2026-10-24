@@ -167,6 +167,8 @@ Every push is built by GitHub Actions:
 * **Linux (GCC):** warnings as errors, a `clang-format` style check (see
   `.clang-format`), unit tests, and a 90-second bot smoke test under a virtual
   display.
+* **Sanitizers:** the unit tests and headless bot runs of every mode are also
+  built with AddressSanitizer and UndefinedBehaviorSanitizer.
 * A rolling *nightly* pre-release is published from the latest build; tagged
   versions publish a proper release.
 
