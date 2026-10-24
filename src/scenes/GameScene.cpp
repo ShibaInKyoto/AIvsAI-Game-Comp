@@ -149,12 +149,16 @@ void GameScene::Update(float dt) {
         return;
     }
 
-    // Pause on request, and automatically when the window loses focus
-    // (only on the transition, so a window that never had focus still plays).
+    // Pause on request, and automatically when the window loses focus or the
+    // gamepad being played with disconnects (only on the transition, so a
+    // window that never had focus still plays).
     const bool focused = IsWindowFocused();
     const bool focusLost = wasFocused_ && !focused && !autopilot_;
     wasFocused_ = focused;
-    if (!autopilot_ && (app_.In().Pressed(Action::Pause) || focusLost) && world.PlayerAlive()) {
+    const bool padConnected = app_.In().GamepadConnected();
+    const bool padLost = padWasConnected_ && !padConnected && app_.In().LastDevice() == InputDevice::Gamepad;
+    padWasConnected_ = padConnected;
+    if (!autopilot_ && (app_.In().Pressed(Action::Pause) || focusLost || padLost) && world.PlayerAlive()) {
         OpenPause();
         return;
     }

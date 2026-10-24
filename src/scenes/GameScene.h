@@ -78,6 +78,7 @@ private:
     bool finished_ = false;
     bool victoryShown_ = false;
     bool wasFocused_ = false;
+    bool padWasConnected_ = false;
     bool debugNovaPending_ = false;
     Vector2 lastAim_{1.0f, 0.0f};
 };
