@@ -212,9 +212,22 @@ void World::HandlePlayerContacts() {
             return;
         }
         if (e.contactDamage && distSq < reach * reach) {
-            DamagePlayer(e.position, e.kind);
+            DamagePlayer(e.position, ChainHeadKind(e));
         }
     });
+}
+
+EnemyKind World::ChainHeadKind(const Enemy& e) const {
+    // Tail segments belong to whatever leads the chain (a Weaver or the Hydra).
+    const Enemy* walker = &e;
+    for (int guard = 0; walker->kind == EnemyKind::WeaverBody && guard < 64; ++guard) {
+        const Enemy* leader = FindEnemy(walker->leader);
+        if (leader == nullptr) {
+            break;
+        }
+        walker = leader;
+    }
+    return walker->kind;
 }
 
 // ---------------------------------------------------------------------------

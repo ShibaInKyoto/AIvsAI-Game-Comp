@@ -145,6 +145,21 @@ TEST_CASE("Player takes damage, gets invulnerability and can die") {
     CHECK(world.Record().killedBy == EnemyKind::Lancer);
 }
 
+TEST_CASE("Tail segments are attributed to the head of their chain") {
+    World world(RunConfig{});
+    world.SpawnEnemy(EnemyKind::Weaver, {300.0f, 0.0f}, 0.0f);
+    world.Update(0.1f, PlayerInput{}); // the head grows its tail on its first update
+    world.Update(0.1f, PlayerInput{});
+    int segments = 0;
+    for (const Enemy& e : world.Enemies()) {
+        if (e.alive && e.kind == EnemyKind::WeaverBody) {
+            ++segments;
+            CHECK(world.ChainHeadKind(e) == EnemyKind::Weaver);
+        }
+    }
+    CHECK(segments > 0);
+}
+
 TEST_CASE("Bosses can be spawned and defeated") {
     for (EnemyKind boss : {EnemyKind::BossWarden, EnemyKind::BossHydra, EnemyKind::BossSingularity,
                            EnemyKind::BossArchitect, EnemyKind::BossCore}) {

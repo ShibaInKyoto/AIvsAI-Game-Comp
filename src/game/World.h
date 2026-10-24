@@ -126,6 +126,8 @@ public:
     bool DamageEnemy(Enemy& enemy, float amount, bool crit, Vector2 direction, float knockback = 0.0f);
     void KillEnemy(Enemy& enemy, bool dropLoot);
     void DamagePlayer(Vector2 source, EnemyKind cause = EnemyKind::Count);
+    // The kind leading a segment chain (the enemy's own kind for non-segments).
+    EnemyKind ChainHeadKind(const Enemy& e) const;
     void ClearEnemyBullets(Vector2 center, float radius);
     // Removes every non-boss enemy (used before boss fights); optionally pays out loot.
     void PurgeEnemies(bool dropLoot);
