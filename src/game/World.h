@@ -114,7 +114,7 @@ public:
     Shockwave& AddShockwave(Vector2 position, float maxRadius, float speed, float damage, float knockback,
                             bool clearsBullets);
     void Emit(EventType type, Vector2 position, Color color = WHITE, float magnitude = 1.0f, Vector2 direction = {},
-              int value = 0, EnemyKind enemy = EnemyKind::Drifter);
+              int value = 0, EnemyKind enemy = EnemyKind::Drifter, EntityId source = kInvalidId);
 
     // --- Damage ------------------------------------------------------------
     // Returns true if the enemy died from this hit.

@@ -78,6 +78,40 @@ void EffectsDirector::AddText(Vector2 position, const char* text, Color color, f
     texts_.push_back(t);
 }
 
+void EffectsDirector::AddDamage(EntityId enemy, Vector2 position, float amount, bool crit) {
+    // Merge into a recent number on the same enemy so streams of small hits
+    // (beams, blades, drones) read as one climbing total instead of a cloud.
+    constexpr float kMergeWindow = 0.45f;
+    if (enemy != kInvalidId) {
+        for (auto it = texts_.rbegin(); it != texts_.rend(); ++it) {
+            FloatingText& t = *it;
+            if (t.owner != enemy || t.maxLife - t.life > kMergeWindow) {
+                continue;
+            }
+            t.total += amount;
+            std::snprintf(t.text.data(), t.text.size(), "%d", static_cast<int>(std::round(t.total)));
+            t.life = t.maxLife;
+            t.pop = 1.0f;
+            t.position = Vector2Lerp(t.position, position + Vector2{0.0f, -18.0f}, 0.5f);
+            t.velocity.y = std::min(t.velocity.y, -40.0f);
+            const float grown = 18.0f + 2.2f * std::log2(1.0f + t.total / std::max(amount, 1.0f));
+            t.size = std::max(t.size, std::min(30.0f, grown));
+            if (crit) {
+                t.color = palette::kPlayerBulletCrit;
+            }
+            return;
+        }
+    }
+    char buffer[16];
+    std::snprintf(buffer, sizeof(buffer), "%d", static_cast<int>(std::round(amount)));
+    AddText(position + Vector2{particles_.Random().Range(-10.0f, 10.0f), -14.0f}, buffer,
+            crit ? palette::kPlayerBulletCrit : Color{230, 235, 255, 210}, crit ? 26.0f : 18.0f);
+    FloatingText& t = texts_.back();
+    t.owner = enemy;
+    t.total = amount;
+    t.pop = crit ? 1.0f : 0.0f;
+}
+
 void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& events) {
     Rng& rng = particles_.Random();
     for (const GameEvent& ev : events) {
@@ -107,10 +141,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             grid_.ApplyDirectedForce(ev.direction * 4.0f, ev.position, 70.0f);
             PlaySfx(crit ? SfxId::HitCrit : SfxId::Hit, crit ? 0.5f : 0.32f, rng.Range(0.9f, 1.15f), pan);
             if (settings_.damageNumbers) {
-                char buffer[16];
-                std::snprintf(buffer, sizeof(buffer), crit ? "%d!" : "%d", static_cast<int>(std::round(ev.magnitude)));
-                AddText(ev.position + Vector2{rng.Range(-10.0f, 10.0f), -14.0f}, buffer,
-                        crit ? palette::kPlayerBulletCrit : Color{230, 235, 255, 210}, crit ? 26.0f : 18.0f);
+                AddDamage(ev.source, ev.position, ev.magnitude, crit);
             }
             break;
         }
@@ -362,6 +393,7 @@ void EffectsDirector::Update(const World& world, float realDt) {
 
     for (FloatingText& t : texts_) {
         t.life -= realDt;
+        t.pop = std::max(0.0f, t.pop - realDt * 6.0f);
         t.position += t.velocity * realDt;
         t.velocity *= std::exp(-3.0f * realDt);
     }

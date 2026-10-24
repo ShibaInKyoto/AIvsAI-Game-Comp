@@ -223,6 +223,7 @@ struct GameEvent {
     float magnitude = 1.0f;
     int value = 0;
     EnemyKind enemy = EnemyKind::Drifter;
+    EntityId source = kInvalidId;  // entity the event is about, when there is one
 };
 
 } // namespace gb

@@ -306,8 +306,8 @@ Enemy* World::NearestEnemy(Vector2 position, float maxRange, EntityId exclude) {
 }
 
 void World::Emit(EventType type, Vector2 position, Color color, float magnitude, Vector2 direction, int value,
-                 EnemyKind enemy) {
-    events_.push_back(GameEvent{type, position, direction, color, magnitude, value, enemy});
+                 EnemyKind enemy, EntityId source) {
+    events_.push_back(GameEvent{type, position, direction, color, magnitude, value, enemy, source});
 }
 
 // ---------------------------------------------------------------------------
@@ -837,7 +837,7 @@ bool World::DamageEnemy(Enemy& e, float amount, bool crit, Vector2 direction, fl
     e.hp -= amount;
     e.hitFlash = 1.0f;
     e.knockback += direction * (knockback / GetEnemyInfo(e.kind).mass);
-    Emit(EventType::EnemyHit, e.position, GetEnemyInfo(e.kind).color, amount, direction, crit ? 1 : 0, e.kind);
+    Emit(EventType::EnemyHit, e.position, GetEnemyInfo(e.kind).color, amount, direction, crit ? 1 : 0, e.kind, e.id);
     if (e.hp <= 0.0f) {
         KillEnemy(e, true);
         return true;

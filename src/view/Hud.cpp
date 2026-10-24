@@ -464,15 +464,18 @@ void Hud::DrawFloatingText(App& app, const GameView& view) const {
         const Vector2 p = view.WorldToUi(t.position);
         const float life = t.life / t.maxLife;
         const float alpha = Saturate(life * 3.0f);
-        const float pop = t.big ? 1.0f + 0.4f * EaseOutCubic(Saturate((1.0f - life) * 6.0f)) - 0.4f : 1.0f;
+        const float pop = t.big ? 1.0f + 0.4f * EaseOutCubic(Saturate((1.0f - life) * 6.0f)) - 0.4f
+                                : 1.0f + 0.35f * t.pop;
         const float size = t.size * pop;
         if (t.big) {
             text.DrawGlow(FontId::Heading, t.text.data(), p, size, WithAlpha(WHITE, alpha), WithAlpha(t.color, alpha),
                           Align::Center, 0.08f);
         } else {
-            text.Draw(FontId::Heading, t.text.data(), {p.x + 1.5f, p.y + 1.5f}, size, WithAlpha(BLACK, alpha * 0.6f),
-                      Align::Center);
-            text.Draw(FontId::Heading, t.text.data(), p, size, WithAlpha(t.color, alpha), Align::Center);
+            // Rajdhani reads better than Orbitron for small, fast numbers.
+            const float numSize = size * 1.2f;
+            text.Draw(FontId::BodyBold, t.text.data(), {p.x + 1.5f, p.y + 1.5f}, numSize,
+                      WithAlpha(BLACK, alpha * 0.6f), Align::Center);
+            text.Draw(FontId::BodyBold, t.text.data(), p, numSize, WithAlpha(t.color, alpha), Align::Center);
         }
     }
 }

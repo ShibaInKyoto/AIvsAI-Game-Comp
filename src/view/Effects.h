@@ -25,6 +25,9 @@ struct FloatingText {
     float life = 1.0f;
     float maxLife = 1.0f;
     float size = 22.0f;
+    float pop = 0.0f;           // brief scale bump when a merged number grows
+    float total = 0.0f;         // accumulated damage for merged numbers
+    EntityId owner = kInvalidId;  // enemy whose hits merge into this number
     bool big = false;
 };
 
@@ -57,6 +60,8 @@ public:
     const std::vector<Distortion>& Distortions() const { return distortions_; }
 
     void AddText(Vector2 position, const char* text, Color color, float size, bool big = false);
+    // Damage numbers: rapid hits on the same enemy merge into one growing number.
+    void AddDamage(EntityId enemy, Vector2 position, float amount, bool crit);
     // Muted directors still render everything but stay silent (attract mode).
     void SetMuted(bool muted) { muted_ = muted; }
     void Flash(Color color, float amount);
