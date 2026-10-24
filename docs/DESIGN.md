@@ -74,8 +74,10 @@ Implemented:
   Windows Mesa llvmpipe), dependency check, rolling nightly release.
 
 Balance targets (tools/BalanceSim, bot skill = reaction speed):
-- Standard @ skill 0.45 ≈ 50–60 % wins; Relaxed @ 0.2 ≈ 90 %;
-  Overclocked @ 0.6 ≈ 30–50 %, punishing for weak-start ships.
+- Standard @ skill 0.45 ≈ 85 % wins, losses split between the Warden and
+  the Architect (difficulty should rise through the run, not peak at boss 1);
+  Relaxed @ 0.2 ≈ 95 %; Overclocked @ 0.6 ≈ 55 %, punishing for fragile ships.
+- A run's first sector event is always a Data Storm (teaches events safely).
 
 Testing helpers:
 - `--scene title|game|draft|evolution|pause|hangar|firmware|results|records|codex`

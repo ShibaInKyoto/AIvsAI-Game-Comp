@@ -99,7 +99,8 @@ void World::UpdateBossWarden(Enemy& e, float dt) {
 
     const bool charging = attack == 4 && !run.Recovering();
     if (!charging) {
-        const Vector2 anchor = player_.position - Normalized(toPlayer) * 400.0f;
+        // Hover at a readable distance: the first guardian teaches, it should not crowd.
+        const Vector2 anchor = player_.position - Normalized(toPlayer) * 480.0f;
         const float arrive = std::min(1.0f, Distance(anchor, e.position) / 200.0f);
         SteerToward(e, anchor, e.speed * (1.0f + 0.3f * static_cast<float>(phase)) * arrive, 0.7f, dt);
     }
@@ -113,7 +114,7 @@ void World::UpdateBossWarden(Enemy& e, float dt) {
     case 0: // rings
         if (run.ShotReady(dt)) {
             e.timer2 = 0.5f;
-            FireRing(e.position, 16 + 4 * phase, 220.0f + 30.0f * static_cast<float>(phase), e.param,
+            FireRing(e.position, 14 + 5 * phase, 210.0f + 35.0f * static_cast<float>(phase), e.param,
                      EnemyBulletStyle::Orb, bullet);
             e.param += 0.19f;
             Emit(EventType::EnemyShot, e.position, bullet, 2.0f);
@@ -125,7 +126,7 @@ void World::UpdateBossWarden(Enemy& e, float dt) {
     case 1: // aimed volleys
         if (run.ShotReady(dt)) {
             e.timer2 = 0.32f;
-            FireFan(e.position, AngleOf(toPlayer), 5, 0.16f, 360.0f, EnemyBulletStyle::Needle, color);
+            FireFan(e.position, AngleOf(toPlayer), 3 + phase, 0.16f, 360.0f, EnemyBulletStyle::Needle, color);
             Emit(EventType::EnemyShot, e.position, color, 1.5f, Normalized(toPlayer));
             if (++e.counter >= 4 + phase) {
                 run.Finish(0.9f);

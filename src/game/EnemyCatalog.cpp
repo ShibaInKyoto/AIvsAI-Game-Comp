@@ -25,7 +25,7 @@ constexpr std::array<EnemyInfo, static_cast<std::size_t>(EnemyKind::Count)> kEne
     {"Bomber",           70.0f, 230.0f, 22.0f, {60, 255, 200, 255},     3,  200,    3.0f,  2.0f},
     {"Mine",             10.0f,   0.0f, 14.0f, {60, 255, 200, 255},     0,   10,    0.0f, 50.0f},
     // Bosses: hp is scaled by the director per sector/difficulty.
-    {"WARDEN",        13000.0f,  90.0f, 70.0f, {80, 220, 255, 255},   120, 10000,   0.0f, 999.0f},
+    {"WARDEN",        10500.0f,  90.0f, 70.0f, {80, 220, 255, 255},   120, 10000,   0.0f, 999.0f},
     {"HYDRA",         17000.0f, 300.0f, 34.0f, {255, 220, 70, 255},   150, 15000,   0.0f, 999.0f},
     {"EVENT HORIZON", 22000.0f,  60.0f, 64.0f, {255, 60, 80, 255},    180, 20000,   0.0f, 999.0f},
     {"ARCHITECT",     27000.0f, 160.0f, 56.0f, {200, 120, 255, 255},  210, 25000,   0.0f, 999.0f},

@@ -315,6 +315,10 @@ void Director::SpawnGroup(World& world, EnemyKind kind, bool elite) {
 }
 
 SectorEvent Director::PickEvent(World& world) const {
+    // A run's first event is a gift: it introduces events without a threat.
+    if (lastEvent_ == SectorEvent::None) {
+        return SectorEvent::DataStorm;
+    }
     // Weights per event (index = SectorEvent - 1). Crossfire waits for sector 2;
     // the same event never fires twice in a row.
     std::array<float, static_cast<std::size_t>(SectorEvent::Count) - 1> weights{1.0f, sector_ >= 1 ? 1.0f : 0.0f, 0.6f};
