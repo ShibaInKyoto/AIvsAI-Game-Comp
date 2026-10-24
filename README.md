@@ -5,13 +5,14 @@ way out of a corrupted mainframe, one sector at a time. Blast through waves of
 geometric viruses, scoop up data shards, draft upgrades into an absurd build, and
 take down five guardian bosses on a living, warping grid.
 
-![Title screen](docs/screenshots/title.jpg)
+![Gameplay: a data storm in sector 5](docs/screenshots/gameplay.jpg)
 
 | | |
 |---|---|
-| ![Event Horizon boss](docs/screenshots/event-horizon.jpg) | ![The Core boss](docs/screenshots/the-core.jpg) |
-| ![Level-up draft](docs/screenshots/level-up.jpg) | ![Hangar](docs/screenshots/hangar.jpg) |
-| ![Codex](docs/screenshots/codex.jpg) | ![Run results](docs/screenshots/results.jpg) |
+| ![Title screen](docs/screenshots/title.jpg) | ![Event Horizon boss](docs/screenshots/event-horizon.jpg) |
+| ![The Core boss](docs/screenshots/the-core.jpg) | ![Level-up draft](docs/screenshots/level-up.jpg) |
+| ![Hangar](docs/screenshots/hangar.jpg) | ![Codex](docs/screenshots/codex.jpg) |
+| ![Sector 3 firefight](docs/screenshots/sector3.jpg) | ![Run results](docs/screenshots/results.jpg) |
 
 ---
 
