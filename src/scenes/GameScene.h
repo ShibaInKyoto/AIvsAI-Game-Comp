@@ -29,6 +29,7 @@ public:
 private:
     enum class Overlay { None, Draft, Pause, Settings, SectorChoice, Victory };
 
+    void ApplyDebugLaunchOptions();
     PlayerInput ReadPlayerInput();
     void UpdateOverlays(float dt);
     void UpdateAutopilotOverlays();

@@ -38,6 +38,12 @@ void GameScene::OnEnter() {
     }
     app_.Audio().Music().SetMood(MusicMood::Game, 0);
 
+    ApplyDebugLaunchOptions();
+}
+
+// Developer entry points ("--sector", "--boss", "--scene draft|pause") used
+// for testing encounters and capturing UI screenshots.
+void GameScene::ApplyDebugLaunchOptions() {
     const LaunchOptions& options = app_.Options();
     if (options.startSector > 0 || options.startAtBoss) {
         World& world = view_.GetWorld();
