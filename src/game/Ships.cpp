@@ -17,7 +17,7 @@ constexpr std::array<ShipInfo, static_cast<std::size_t>(ShipId::Count)> kShips{{
     {ShipId::Bruiser, "BRUISER", "Close-range scattergun",
      "A wide shotgun blast and a thick hull. Get in close and stay there.", {255, 160, 60, 255}, 450,
      UpgradeId::Count, 0},
-    {ShipId::Warden, "WARDEN", "Orbital defender",
+    {ShipId::Bastion, "BASTION", "Orbital defender",
      "Starts with Orbit Blades. Weaker gun, sturdier frame.", {110, 255, 140, 255}, 550,
      UpgradeId::OrbitBlades, 2},
     {ShipId::Specter, "SPECTER", "Phase assassin",
@@ -63,7 +63,7 @@ PlayerStats ShipBaseStats(ShipId id) {
         s.bulletSpeed = 1250.0f;
         s.bulletLifetime = 0.36f;
         break;
-    case ShipId::Warden:
+    case ShipId::Bastion:
         s.maxHp = 6;
         s.damage = 9.0f;
         s.fireRate = 7.0f;

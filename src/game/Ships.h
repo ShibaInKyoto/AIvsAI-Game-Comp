@@ -13,7 +13,7 @@ enum class ShipId : std::uint8_t {
     Vector,
     Lancer,
     Bruiser,
-    Warden,
+    Bastion,
     Specter,
     Hivemind,
     Count

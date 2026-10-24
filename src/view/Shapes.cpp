@@ -17,7 +17,7 @@ constexpr std::array<Vector2, 8> kLancer{{{1.35f, 0.0f}, {0.15f, 0.2f}, {-0.45f,
                                           {-0.75f, 0.0f}, {-0.3f, -0.14f}, {-0.45f, -0.62f}, {0.15f, -0.2f}}};
 constexpr std::array<Vector2, 6> kBruiser{{{0.95f, 0.0f}, {0.45f, 0.65f}, {-0.65f, 0.8f}, {-0.4f, 0.0f},
                                            {-0.65f, -0.8f}, {0.45f, -0.65f}}};
-constexpr std::array<Vector2, 6> kWarden{{{1.05f, 0.0f}, {0.4f, 0.72f}, {-0.55f, 0.72f}, {-0.85f, 0.0f},
+constexpr std::array<Vector2, 6> kBastion{{{1.05f, 0.0f}, {0.4f, 0.72f}, {-0.55f, 0.72f}, {-0.85f, 0.0f},
                                           {-0.55f, -0.72f}, {0.4f, -0.72f}}};
 constexpr std::array<Vector2, 6> kSpecter{{{1.15f, 0.0f}, {-0.15f, 0.32f}, {-0.95f, 0.95f}, {-0.5f, 0.0f},
                                            {-0.95f, -0.95f}, {-0.15f, -0.32f}}};
@@ -63,7 +63,7 @@ std::span<const Vector2> ShipOutline(ShipId ship) {
     case ShipId::Vector: return kVector;
     case ShipId::Lancer: return kLancer;
     case ShipId::Bruiser: return kBruiser;
-    case ShipId::Warden: return kWarden;
+    case ShipId::Bastion: return kBastion;
     case ShipId::Specter: return kSpecter;
     case ShipId::Hivemind: return kHivemind;
     case ShipId::Count: break;
