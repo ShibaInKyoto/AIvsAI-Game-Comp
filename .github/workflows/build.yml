@@ -30,6 +30,38 @@ jobs:
       - name: Unit tests
         run: ctest --test-dir build -C Release --output-on-failure
 
+      - name: Check runtime dependencies
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vswhere -latest -property installationPath
+          $dumpbin = Get-ChildItem -Path "$vs\VC\Tools\MSVC" -Recurse -Filter dumpbin.exe | Where-Object { $_.FullName -match "Hostx64\\x64" } | Select-Object -First 1
+          $deps = & $dumpbin.FullName /dependents build/bin/Gridbreaker.exe
+          $deps
+          if ($deps -match "VCRUNTIME|MSVCP") { throw "Executable depends on the VC++ redistributable" }
+
+      - name: Smoke test with software OpenGL
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $url = "https://github.com/pal1000/mesa-dist-win/releases/download/24.2.8/mesa3d-24.2.8-release-msvc.7z"
+          Invoke-WebRequest -Uri $url -OutFile mesa.7z
+          7z x mesa.7z -omesa | Out-Null
+          New-Item -ItemType Directory -Force smoke | Out-Null
+          Copy-Item build/bin/Gridbreaker.exe smoke/
+          Copy-Item mesa/x64/*.dll smoke/
+          $env:GALLIUM_DRIVER = "llvmpipe"
+          $p = Start-Process -FilePath smoke/Gridbreaker.exe -ArgumentList "--windowed","--size","1280x720","--no-audio","--data-dir","smoke/data","--autotest","40","--screenshot","smoke/windows.png","--screenshot-at","30" -PassThru -Wait
+          Write-Host "Exit code: $($p.ExitCode)"
+          if (-not (Test-Path smoke/windows.png)) { throw "Smoke test produced no screenshot" }
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-smoke-test
+          path: smoke/windows.png
+          if-no-files-found: ignore
+
       - name: Package
         shell: pwsh
         run: |

@@ -15,6 +15,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Ship a single self-contained executable on Windows: no VC++ redistributable needed.
+# The policy default makes dependencies with old cmake_minimum_required honour it too.
+set(CMAKE_POLICY_DEFAULT_CMP0091 NEW)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 option(GB_BUILD_TESTS "Build the unit test executable" ON)
@@ -113,6 +115,10 @@ if(WIN32)
 endif()
 add_executable(gridbreaker WIN32 ${GB_EXE_SOURCES})
 target_link_libraries(gridbreaker PRIVATE gridbreaker_lib)
+if(MSVC)
+    # GUI subsystem (no console window) but a standard main() entry point.
+    target_link_options(gridbreaker PRIVATE /ENTRY:mainCRTStartup)
+endif()
 gb_set_warnings(gridbreaker)
 set_target_properties(gridbreaker PROPERTIES
     OUTPUT_NAME "Gridbreaker"

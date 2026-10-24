@@ -52,13 +52,64 @@ PlayerInput Bot::Think(World& world, float dt) {
     if (!p.alive) {
         return input;
     }
+
+    // Movement decisions refresh at a human-ish reaction rate; aiming is
+    // continuous (mouse aim is easy for people).
+    reactionTimer_ -= dt;
+    if (reactionTimer_ <= 0.0f) {
+        reactionTimer_ = LerpF(0.28f, 0.02f, Saturate(skill_));
+        emergency_ = false;
+        move_ = Steer(world, emergency_);
+    }
+    wanderTimer_ -= dt;
+    if (wanderTimer_ <= 0.0f) {
+        wanderTimer_ = 1.5f;
+        wander_ = world.Random().UnitVector() * 0.35f;
+    }
+    input.move = move_;
+
+    const Enemy* target = nullptr;
+    float bestScore = 1e9f;
+    for (const Enemy& e : world.Enemies()) {
+        if (!e.Active() || e.invulnerable || e.kind == EnemyKind::Mine) {
+            continue;
+        }
+        const float score = Distance(e.position, p.position) - (IsBoss(e.kind) ? 300.0f : 0.0f);
+        if (score < bestScore) {
+            bestScore = score;
+            target = &e;
+        }
+    }
+    if (target != nullptr) {
+        const Vector2 lead = target->position + target->velocity * 0.12f;
+        input.aim = Normalized(lead - p.position);
+        input.fire = true;
+    } else {
+        input.aim = FromAngle(p.aimAngle);
+    }
+
+    dashCooldown_ -= dt;
+    if (emergency_ && dashCooldown_ <= 0.0f && p.dashCharges > 0) {
+        input.dash = true;
+        dashCooldown_ = 0.4f;
+        emergency_ = false;
+    }
+    int nearby = 0;
+    for (const Enemy& e : world.Enemies()) {
+        if (e.Active() && DistanceSq(e.position, p.position) < 400.0f * 400.0f) {
+            ++nearby;
+        }
+    }
+    input.nova = p.novaCharge >= 1.0f && (nearby > 12 || p.hp <= 1 || world.EnemyBullets().size() > 120);
+    return input;
+}
+
+Vector2 Bot::Steer(World& world, bool& emergency) {
+    const Player& p = world.GetPlayer();
     const Rectangle arena = World::kArena;
     Vector2 force{};
 
     // Enemies: keep a healthy distance, scaled by how close they are.
-    const Enemy* target = nullptr;
-    float bestTargetScore = 1e9f;
-    int nearby = 0;
     for (const Enemy& e : world.Enemies()) {
         if (!e.alive) {
             continue;
@@ -69,20 +120,9 @@ PlayerInput Bot::Think(World& world, float dt) {
         if (dist < danger && e.contactDamage) {
             force += d / dist * ((danger - dist) / danger) * 3.0f;
         }
-        if (dist < 400.0f) {
-            ++nearby;
-        }
-        if (e.Active() && !e.invulnerable && e.kind != EnemyKind::Mine) {
-            const float score = dist - (IsBoss(e.kind) ? 300.0f : 0.0f);
-            if (score < bestTargetScore) {
-                bestTargetScore = score;
-                target = &e;
-            }
-        }
     }
 
     // Bullets: dodge perpendicular to their path when they are headed our way.
-    bool emergency = false;
     for (const EnemyBullet& b : world.EnemyBullets()) {
         const Vector2 d = p.position - b.position;
         const float distSq = LengthSq(d);
@@ -110,8 +150,7 @@ PlayerInput Bot::Think(World& world, float dt) {
     for (const Beam& beam : world.Beams()) {
         const Vector2 dir = FromAngle(beam.angle);
         const Vector2 rel = p.position - beam.origin;
-        const float along = Dot(rel, dir);
-        if (along < 0.0f) {
+        if (Dot(rel, dir) < 0.0f) {
             continue;
         }
         const float side = Cross(dir, rel);
@@ -146,32 +185,8 @@ PlayerInput Bot::Think(World& world, float dt) {
             force += Normalized(nearest->position - p.position) * 0.8f;
         }
     }
-
-    // Gentle wander so the bot never stands still.
-    wanderTimer_ -= dt;
-    if (wanderTimer_ <= 0.0f) {
-        wanderTimer_ = 1.5f;
-        wander_ = world.Random().UnitVector() * 0.35f;
-    }
     force += wander_;
-
-    input.move = LengthSq(force) > 0.01f ? Normalized(force) : Vector2{};
-
-    if (target != nullptr) {
-        const Vector2 lead = target->position + target->velocity * 0.12f;
-        input.aim = Normalized(lead - p.position);
-        input.fire = true;
-    } else {
-        input.aim = FromAngle(p.aimAngle);
-    }
-
-    dashCooldown_ -= dt;
-    if (emergency && dashCooldown_ <= 0.0f && p.dashCharges > 0) {
-        input.dash = true;
-        dashCooldown_ = 0.4f;
-    }
-    input.nova = p.novaCharge >= 1.0f && (nearby > 12 || p.hp <= 1 || world.EnemyBullets().size() > 120);
-    return input;
+    return LengthSq(force) > 0.01f ? Normalized(force) : Vector2{};
 }
 
 } // namespace gb

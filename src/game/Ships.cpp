@@ -20,7 +20,7 @@ constexpr std::array<ShipInfo, static_cast<std::size_t>(ShipId::Count)> kShips{{
      "Starts with Orbit Blades. Weaker gun, sturdier frame.", {110, 255, 140, 255}, 550,
      UpgradeId::OrbitBlades, 2},
     {ShipId::Specter, "SPECTER", "Phase assassin",
-     "Two dash charges with Phase Blade. Rapid fire, paper-thin hull.", {180, 120, 255, 255}, 700,
+     "Two dash charges with Phase Blade. Rapid fire, fragile hull.", {180, 120, 255, 255}, 700,
      UpgradeId::PhaseBlade, 1},
     {ShipId::Hivemind, "HIVEMIND", "Drone carrier",
      "Starts with two Wingmen drones. Let the swarm do the work.", {255, 225, 80, 255}, 850, UpgradeId::Drones, 2},
@@ -42,7 +42,7 @@ PlayerStats ShipBaseStats(ShipId id) {
         break;
     case ShipId::Lancer:
         s.maxHp = 4;
-        s.fireRate = 2.6f;
+        s.fireRate = 3.0f;
         s.damage = 38.0f;
         s.pierce = 3;
         s.bulletSpeed = 2600.0f;
@@ -67,7 +67,7 @@ PlayerStats ShipBaseStats(ShipId id) {
         s.fireRate = 6.0f;
         break;
     case ShipId::Specter:
-        s.maxHp = 3;
+        s.maxHp = 4;
         s.moveSpeed = 480.0f;
         s.fireRate = 10.0f;
         s.damage = 8.0f;
@@ -75,8 +75,8 @@ PlayerStats ShipBaseStats(ShipId id) {
         s.dashCooldown = 0.75f;
         break;
     case ShipId::Hivemind:
-        s.damage = 8.0f;
-        s.fireRate = 5.5f;
+        s.damage = 9.0f;
+        s.fireRate = 6.5f;
         break;
     case ShipId::Count: break;
     }

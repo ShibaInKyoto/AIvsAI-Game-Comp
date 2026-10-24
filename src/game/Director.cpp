@@ -24,20 +24,20 @@ Weights MakeWeights(std::initializer_list<std::pair<EnemyKind, float>> entries) 
 const std::array<SectorInfo, Director::kCampaignSectors>& Sectors() {
     using K = EnemyKind;
     static const std::array<SectorInfo, Director::kCampaignSectors> sectors{{
-        {"SECTOR 01", "PERIMETER", {40, 90, 220, 255}, {80, 220, 255, 255}, 110.0f, 1.7f, K::BossWarden,
+        {"SECTOR 01", "PERIMETER", {40, 90, 220, 255}, {80, 220, 255, 255}, 110.0f, 2.5f, K::BossWarden,
          MakeWeights({{K::Drifter, 10.0f}, {K::Pinwheel, 5.0f}, {K::Dart, 3.0f}, {K::Swarmer, 2.0f}})},
-        {"SECTOR 02", "DATA STREAM", {150, 40, 200, 255}, {255, 90, 220, 255}, 130.0f, 2.4f, K::BossHydra,
+        {"SECTOR 02", "DATA STREAM", {150, 40, 200, 255}, {255, 90, 220, 255}, 130.0f, 3.5f, K::BossHydra,
          MakeWeights({{K::Drifter, 6.0f}, {K::Pinwheel, 4.0f}, {K::Dart, 4.0f}, {K::Swarmer, 3.0f},
                       {K::Splitter, 4.0f}, {K::Gunner, 3.0f}, {K::Weaver, 0.8f}})},
-        {"SECTOR 03", "EVENT HORIZON", {200, 90, 30, 255}, {255, 170, 60, 255}, 145.0f, 3.1f, K::BossSingularity,
+        {"SECTOR 03", "EVENT HORIZON", {200, 90, 30, 255}, {255, 170, 60, 255}, 145.0f, 4.6f, K::BossSingularity,
          MakeWeights({{K::Drifter, 5.0f}, {K::Dart, 3.0f}, {K::Swarmer, 3.0f}, {K::Splitter, 3.0f},
                       {K::Gunner, 3.0f}, {K::Singularity, 1.0f}, {K::Bomber, 2.0f}, {K::Hive, 0.8f},
                       {K::Weaver, 1.0f}})},
-        {"SECTOR 04", "FIREWALL", {30, 160, 90, 255}, {110, 255, 140, 255}, 155.0f, 3.8f, K::BossArchitect,
+        {"SECTOR 04", "FIREWALL", {30, 160, 90, 255}, {110, 255, 140, 255}, 155.0f, 5.6f, K::BossArchitect,
          MakeWeights({{K::Drifter, 4.0f}, {K::Dart, 3.0f}, {K::Pinwheel, 2.0f}, {K::Swarmer, 3.0f},
                       {K::Splitter, 2.0f}, {K::Gunner, 3.0f}, {K::Shielder, 3.0f}, {K::Lancer, 2.5f},
                       {K::Weaver, 1.2f}, {K::Bomber, 1.5f}})},
-        {"SECTOR 05", "THE CORE", {200, 30, 60, 255}, {255, 90, 90, 255}, 165.0f, 4.6f, K::BossCore,
+        {"SECTOR 05", "THE CORE", {200, 30, 60, 255}, {255, 90, 90, 255}, 165.0f, 6.8f, K::BossCore,
          MakeWeights({{K::Drifter, 3.0f}, {K::Dart, 3.0f}, {K::Pinwheel, 2.0f}, {K::Swarmer, 3.0f},
                       {K::Splitter, 2.5f}, {K::Gunner, 3.0f}, {K::Shielder, 2.5f}, {K::Lancer, 2.5f},
                       {K::Weaver, 1.5f}, {K::Bomber, 1.5f}, {K::Singularity, 0.8f}, {K::Hive, 1.0f}})},
@@ -110,21 +110,23 @@ float Director::WaveProgress() const {
 
 float Director::EnemyHpMultiplier() const {
     const float loopScale = 1.0f + 0.9f * static_cast<float>(Loop());
-    const float sectorScale = 1.0f + 0.55f * static_cast<float>(sector_ % kCampaignSectors);
-    const float rampWithinSector = 1.0f + 0.5f * WaveProgress();
+    const float sectorScale = 1.0f + 0.75f * static_cast<float>(sector_ % kCampaignSectors);
+    const float rampWithinSector = 1.0f + 0.8f * WaveProgress();
     return sectorScale * loopScale * rampWithinSector * hpMultiplier_;
 }
 
 float Director::EnemySpeedMultiplier() const {
-    return (1.0f + 0.03f * static_cast<float>(sector_)) * speedMultiplier_;
+    return (1.0f + 0.05f * static_cast<float>(sector_)) * speedMultiplier_;
 }
 
 float Director::CurrentThreatRate() const {
     const float loopScale = 1.0f + 0.5f * static_cast<float>(Loop());
-    return Info().threatRate * (1.0f + 1.3f * WaveProgress()) * loopScale * spawnMultiplier_;
+    // The very first sector eases in so new players can learn the controls.
+    const float warmup = sector_ == 0 ? 0.55f + 0.45f * Saturate(waveTime_ / 25.0f) : 1.0f;
+    return Info().threatRate * (1.0f + 1.3f * WaveProgress()) * loopScale * spawnMultiplier_ * warmup;
 }
 
-int Director::EnemyCap() const { return std::min(World::kMaxEnemies, 110 + 45 * sector_); }
+int Director::EnemyCap() const { return std::min(World::kMaxEnemies, 140 + 55 * sector_); }
 
 void Director::Update(World& world, float dt) {
     phaseTime_ += dt;

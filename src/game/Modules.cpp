@@ -60,7 +60,7 @@ void World::UpdateModules(float dt) {
 
     // --- Drones ------------------------------------------------------------
     if (const int level = ModuleLevel(stats_, ModuleId::Drones); level > 0 && !drones_.empty()) {
-        const float interval = level >= 3 ? 0.36f : 0.55f;
+        const float interval = level >= 3 ? 0.3f : 0.45f;
         for (std::size_t i = 0; i < drones_.size(); ++i) {
             Drone& d = drones_[i];
             const float slotAngle = player_.aimAngle + kPi + (static_cast<float>(i) - (drones_.size() - 1) * 0.5f) * 1.1f;
@@ -86,7 +86,7 @@ void World::UpdateModules(float dt) {
                     b.position = d.position;
                     b.velocity = FromAngle(d.angle + spread, 1350.0f);
                     b.radius = 4.5f;
-                    b.damage = stats_.damage * 0.75f * stats_.powerMultiplier;
+                    b.damage = stats_.damage * stats_.powerMultiplier;
                     b.life = 0.6f;
                     b.pierce = level >= 5 ? 2 : 0;
                     bullets_.push_back(b);
