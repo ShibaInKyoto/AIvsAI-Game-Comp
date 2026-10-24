@@ -40,6 +40,17 @@ struct RunSummary {
     bool victory = false;
 };
 
+// One-time contextual hints shown during a player's first runs.
+enum class TipId : std::uint8_t {
+    IncomingFire,
+    Elite,
+    NovaReady,
+    CriticalIntegrity,
+    Guardian,
+    ModuleMaxed,
+    Count
+};
+
 // One line of the run history shown in Records.
 struct RunRecord {
     ShipId ship = ShipId::Vector;
@@ -101,6 +112,9 @@ public:
         viewedUpgrades_ = seenUpgrades_;
     }
 
+    bool TipSeen(TipId id) const { return (tipsSeen_ >> static_cast<unsigned>(id)) & 1u; }
+    void MarkTipSeen(TipId id) { tipsSeen_ |= 1u << static_cast<unsigned>(id); }
+
     bool TutorialSeen() const { return tutorialSeen_; }
     void SetTutorialSeen() { tutorialSeen_ = true; }
 
@@ -146,6 +160,7 @@ private:
     std::uint32_t challenges_ = 0;
     std::uint32_t seenEnemies_ = 0;
     std::uint64_t seenUpgrades_ = 0;
+    std::uint32_t tipsSeen_ = 0;
     std::uint32_t viewedEnemies_ = 0;
     std::uint64_t viewedUpgrades_ = 0;
     std::vector<RunRecord> recentRuns_;

@@ -172,6 +172,7 @@ void GameScene::Update(float dt) {
     if (challengeTimer_ <= 0.0f) {
         challengeTimer_ = 0.5f;
         CheckChallenges();
+        CheckTips();
     }
     if (showTutorial_) {
         tutorialTime_ += dt;
@@ -431,6 +432,70 @@ void GameScene::CheckChallenges() {
             profile.CompleteChallenge(info.id)) {
             hud_.Toast("CHALLENGE COMPLETE", TextFormat("%s   +%d CR", info.name, info.reward), palette::kCache);
             app_.Audio().Play(SfxId::Combo, 0.8f, 0.8f);
+        }
+    }
+}
+
+void GameScene::CheckTips() {
+    if (autopilot_) {
+        return;
+    }
+    Profile& profile = app_.Progress();
+    const World& world = view_.GetWorld();
+    const Player& player = world.GetPlayer();
+    const Director& director = world.GetDirector();
+    const bool pad = app_.In().LastDevice() == InputDevice::Gamepad;
+    auto tip = [&](TipId id, auto&& condition, const char* title, const char* detail) {
+        if (!profile.TipSeen(id) && condition()) {
+            profile.MarkTipSeen(id);
+            hud_.Toast(title, detail, palette::kUiAccent, 6.5f, true);
+        }
+    };
+
+    tip(
+        TipId::IncomingFire,
+        [&] {
+            return std::any_of(world.EnemyBullets().begin(), world.EnemyBullets().end(), [&](const EnemyBullet& b) {
+                return b.alive && DistanceSq(b.position, player.position) < 420.0f * 420.0f;
+            });
+        },
+        "TIP  //  INCOMING FIRE",
+        pad ? "Dashing (LT) makes you briefly invulnerable: dash through bullets, not around them."
+            : "Dashing (SPACE) makes you briefly invulnerable: dash through bullets, not around them.");
+    tip(
+        TipId::Elite,
+        [&] {
+            return std::any_of(world.Enemies().begin(), world.Enemies().end(),
+                               [](const Enemy& e) { return e.Active() && e.elite; });
+        },
+        "TIP  //  ELITE", "Golden elites are tough, but each one drops a data cache: a bonus draft with better odds.");
+    tip(
+        TipId::NovaReady, [&] { return player.novaCharge >= 1.0f; }, "TIP  //  NOVA READY",
+        pad ? "Press RB to wipe out enemy bullets and blast everything around you."
+            : "Press Q to wipe out enemy bullets and blast everything around you.");
+    tip(
+        TipId::CriticalIntegrity, [&] { return player.alive && player.hp == 1 && world.Stats().maxHp > 1; },
+        "TIP  //  CRITICAL INTEGRITY",
+        "One hit left. Elites and guardians drop repairs, and the Respite protocol restores two integrity.");
+    tip(
+        TipId::Guardian, [&] { return director.Phase() == SectorPhase::Boss && director.PhaseTime() > 4.5f; },
+        "TIP  //  GUARDIAN",
+        "Guardians change tactics at two thirds and one third of their health. Big attacks are always telegraphed.");
+
+    // A maxed module whose catalyst is missing: name the catalyst.
+    if (!profile.TipSeen(TipId::ModuleMaxed)) {
+        const UpgradeInventory& inventory = world.Inventory();
+        for (const UpgradeInfo& info : AllUpgrades()) {
+            const EvolutionRecipe* recipe = EvolutionForModule(info.id);
+            if (recipe != nullptr && inventory.Stacks(info.id) >= info.maxStacks &&
+                inventory.Stacks(recipe->catalyst) == 0 && inventory.Stacks(recipe->evolution) == 0) {
+                profile.MarkTipSeen(TipId::ModuleMaxed);
+                hud_.Toast("TIP  //  MODULE MAXED",
+                           TextFormat("%s is maxed. Draft %s to unlock its legendary evolution.", info.name,
+                                      GetUpgradeInfo(recipe->catalyst).name),
+                           palette::kUiAccent, 6.5f, true);
+                break;
+            }
         }
     }
 }

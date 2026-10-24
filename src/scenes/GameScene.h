@@ -46,6 +46,7 @@ private:
     void UpdateMusic(float dt);
     void FinishRun(bool victory);
     void CheckChallenges();
+    void CheckTips();
     Vector2 MouseWorld() const;
 
     void DrawPause();

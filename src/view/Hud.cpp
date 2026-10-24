@@ -14,8 +14,6 @@ namespace gb {
 
 namespace {
 
-constexpr float kToastDuration = 3.6f;
-
 void Hexagon(NeonRenderer& neon, Vector2 c, float r, Color color, bool filled, float width = 2.0f) {
     std::array<Vector2, 6> pts{};
     for (int i = 0; i < 6; ++i) {
@@ -48,7 +46,7 @@ void Hud::Update(const GameView& view, float dt) {
     time_ += dt;
     if (!toasts_.empty()) {
         toasts_.front().time += dt;
-        if (toasts_.front().time > kToastDuration) {
+        if (toasts_.front().time > toasts_.front().duration) {
             toasts_.pop_front();
         }
     }
@@ -93,8 +91,13 @@ void Hud::Update(const GameView& view, float dt) {
     bossLag_ = bossFill_ > bossLag_ ? bossFill_ : Damp(bossLag_, bossFill_, 0.35f, dt);
 }
 
-void Hud::Toast(std::string title, std::string detail, Color color) {
-    toasts_.push_back({std::move(title), std::move(detail), color, 0.0f});
+void Hud::Toast(std::string title, std::string detail, Color color, float duration, bool urgent) {
+    ToastMessage message{std::move(title), std::move(detail), color, duration, 0.0f};
+    if (urgent && !toasts_.empty()) {
+        toasts_.insert(toasts_.begin() + 1, std::move(message));
+    } else {
+        toasts_.push_back(std::move(message));
+    }
 }
 
 void Hud::DrawToasts(App& app) const {
@@ -104,16 +107,22 @@ void Hud::DrawToasts(App& app) const {
     const ToastMessage& toast = toasts_.front();
     const Vector2 ui = app.Gfx().UiSize();
     const float in = EaseOutBack(Saturate(toast.time / 0.4f));
-    const float out = Saturate((kToastDuration - toast.time) / 0.4f);
+    const float out = Saturate((toast.duration - toast.time) / 0.4f);
     const float a = Saturate(in) * out;
-    const float width = 560.0f;
-    const Rectangle r{ui.x * 0.5f - width * 0.5f, 92.0f - (1.0f - in) * 40.0f, width, 74.0f};
+    TextRenderer& text = app.Gfx().Text();
+    // Short details sit on one large line; longer ones (tips) wrap smaller.
+    const bool wraps = text.Measure(FontId::BodyBold, toast.detail, 28.0f).x > 508.0f;
+    const float width = wraps ? 640.0f : 560.0f;
+    const float detailSize = wraps ? 24.0f : 28.0f;
+    const float detailHeight =
+        wraps ? text.MeasureWrapped(FontId::BodyBold, toast.detail, width - 52.0f, detailSize) : detailSize * 1.1f;
+    const Rectangle r{ui.x * 0.5f - width * 0.5f, 92.0f - (1.0f - in) * 40.0f, width, 44.0f + detailHeight};
     DrawRectangleRec(r, WithAlpha(palette::kUiPanel, 0.9f * a));
     DrawRectangleRec({r.x, r.y, 6.0f, r.height}, WithAlpha(toast.color, a));
-    TextRenderer& text = app.Gfx().Text();
     text.Draw(FontId::Heading, toast.title, {r.x + 26.0f, r.y + 10.0f}, 18.0f, WithAlpha(toast.color, a), Align::Left,
               0.2f);
-    text.Draw(FontId::BodyBold, toast.detail, {r.x + 26.0f, r.y + 34.0f}, 28.0f, WithAlpha(WHITE, a));
+    text.DrawWrapped(FontId::BodyBold, toast.detail, {r.x + 26.0f, r.y + 34.0f}, width - 52.0f, detailSize,
+                     WithAlpha(WHITE, a));
 }
 
 void Hud::Draw(App& app, const GameView& view) {

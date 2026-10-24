@@ -17,8 +17,9 @@ class Hud {
 public:
     void Update(const GameView& view, float dt);
     void Draw(App& app, const GameView& view);
-    // Queues a notification banner (challenges, unlocks).
-    void Toast(std::string title, std::string detail, Color color);
+    // Queues a notification banner (challenges, unlocks, tips). Long details wrap.
+    // Urgent toasts jump the queue (right after the one on screen).
+    void Toast(std::string title, std::string detail, Color color, float duration = 3.6f, bool urgent = false);
 
 private:
     void DrawVitals(App& app, const GameView& view) const;
@@ -36,6 +37,7 @@ private:
         std::string title;
         std::string detail;
         Color color;
+        float duration;
         float time = 0.0f;
     };
     std::deque<ToastMessage> toasts_;
