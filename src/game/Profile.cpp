@@ -63,6 +63,11 @@ bool Profile::Load() {
         std::clamp(static_cast<int>(doc.GetInt("last_ship", 0)), 0, static_cast<int>(ShipId::Count) - 1));
     lastDifficulty_ = static_cast<Difficulty>(
         std::clamp(static_cast<int>(doc.GetInt("last_difficulty", 1)), 0, static_cast<int>(Difficulty::Count) - 1));
+    lastMode_ = static_cast<GameMode>(
+        std::clamp(static_cast<int>(doc.GetInt("last_mode", 0)), 0, static_cast<int>(GameMode::Count) - 1));
+    if (lastMode_ == GameMode::Daily) {
+        lastMode_ = GameMode::Campaign; // the daily run is started from the title screen
+    }
     if (!ShipUnlocked(lastShip_)) {
         lastShip_ = ShipId::Vector;
     }
@@ -99,6 +104,7 @@ bool Profile::Save() const {
     doc.SetBool("tutorial_seen", tutorialSeen_);
     doc.SetInt("last_ship", static_cast<int>(lastShip_));
     doc.SetInt("last_difficulty", static_cast<int>(lastDifficulty_));
+    doc.SetInt("last_mode", static_cast<int>(lastMode_));
     doc.SetInt("daily_date", dailyDate_);
     doc.SetInt("daily_best", dailyBest_);
     doc.SetInt("boss_rush_best", bossRushBest_);

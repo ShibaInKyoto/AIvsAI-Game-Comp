@@ -65,6 +65,7 @@ HangarScene::HangarScene(App& app, bool openFirmware) : Scene(app), firmwareOpen
     const Profile& profile = app.Progress();
     ship_ = previewShip_ = profile.LastShip();
     difficulty_ = profile.LastDifficulty();
+    mode_ = profile.LastMode();
     RefreshMenu();
     menu_.SetSelected(ItemLaunch);
     std::vector<ui::Menu::Item> firmware;
@@ -111,7 +112,7 @@ void HangarScene::RefreshMenu() {
 
 void HangarScene::Launch() {
     Profile& profile = app_.Progress();
-    profile.SetLastSelection(ship_, difficulty_);
+    profile.SetLastSelection(ship_, difficulty_, mode_);
     profile.Save();
     RunConfig config;
     config.ship = ship_;

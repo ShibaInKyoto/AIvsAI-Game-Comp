@@ -84,9 +84,11 @@ public:
 
     ShipId LastShip() const { return lastShip_; }
     Difficulty LastDifficulty() const { return lastDifficulty_; }
-    void SetLastSelection(ShipId ship, Difficulty difficulty) {
+    GameMode LastMode() const { return lastMode_; }
+    void SetLastSelection(ShipId ship, Difficulty difficulty, GameMode mode) {
         lastShip_ = ship;
         lastDifficulty_ = difficulty;
+        lastMode_ = mode;
     }
 
     // Daily challenge bookkeeping (date as YYYYMMDD).
@@ -111,6 +113,7 @@ private:
     bool tutorialSeen_ = false;
     ShipId lastShip_ = ShipId::Vector;
     Difficulty lastDifficulty_ = Difficulty::Standard;
+    GameMode lastMode_ = GameMode::Campaign;
     int dailyDate_ = 0;
     long long dailyBest_ = 0;
     long long bossRushBest_ = 0;
