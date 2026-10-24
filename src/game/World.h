@@ -96,6 +96,8 @@ public:
     std::vector<UpgradeId> RollOffers(int count, std::span<const UpgradeId> banned = {}, float luckBonus = 0.0f);
     const PlayerStats& Stats() const { return stats_; }
     int Rerolls() const { return rerolls_; }
+    // Sector protocols chosen so far, in order.
+    const std::vector<SectorModifier>& Protocols() const { return protocols_; }
     bool UseReroll();
 
     int PendingLevelUps() const { return pendingLevelUps_; }
@@ -268,6 +270,7 @@ private:
     std::vector<EnemyBullet> enemyBullets_;
     std::vector<Beam> beams_;
     std::vector<Pickup> pickups_;
+    std::vector<SectorModifier> protocols_;
     std::vector<Drone> drones_;
     std::vector<Missile> missiles_;
     std::vector<PlayerMine> playerMines_;

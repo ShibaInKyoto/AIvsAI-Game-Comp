@@ -594,13 +594,15 @@ void GameScene::DrawPause() {
             owned.emplace_back(info.id, stacks);
         }
     }
+    const auto& protocols = world.Protocols();
+    const float listBottom = panel.y + panel.height - (protocols.empty() ? 30.0f : 120.0f);
     const float rowHeight = 34.0f;
     const int columns = 2;
     for (const auto& [id, stacks] : owned) {
         const int col = row % columns;
         const int line = row / columns;
         const Vector2 c{panel.x + 48.0f + static_cast<float>(col) * 245.0f, panel.y + 200.0f + line * rowHeight};
-        if (c.y > panel.y + panel.height - 30.0f) {
+        if (c.y > listBottom) {
             break;
         }
         shapes::DrawUpgradeIcon(neon, id, c, 24.0f, RarityColor(GetUpgradeInfo(id).rarity), overlayTime_);
@@ -612,7 +614,7 @@ void GameScene::DrawPause() {
         const int col = row % columns;
         const int line = row / columns;
         const Vector2 c{panel.x + 48.0f + static_cast<float>(col) * 245.0f, panel.y + 200.0f + line * rowHeight};
-        if (c.y > panel.y + panel.height - 30.0f) {
+        if (c.y > listBottom) {
             break;
         }
         const char* label =
@@ -622,6 +624,30 @@ void GameScene::DrawPause() {
     }
     if (owned.empty()) {
         text.Draw(FontId::Body, "No upgrades yet.", {panel.x + 30.0f, panel.y + 190.0f}, 22.0f, palette::kUiFaint);
+    }
+
+    // Protocols stack for the rest of the run, so list them (with repeats counted).
+    if (!protocols.empty()) {
+        const float y = panel.y + panel.height - 96.0f;
+        text.Draw(FontId::Heading, "PROTOCOLS", {panel.x + 30.0f, y}, 20.0f, palette::kUiAccent, Align::Left, 0.2f);
+        std::array<int, static_cast<std::size_t>(SectorModifier::Count)> counts{};
+        for (SectorModifier m : protocols) {
+            counts[static_cast<std::size_t>(m)]++;
+        }
+        Vector2 at{panel.x + 30.0f, y + 32.0f};
+        for (std::size_t i = 0; i < counts.size(); ++i) {
+            if (counts[i] == 0) {
+                continue;
+            }
+            const SectorModifierInfo& info = GetSectorModifierInfo(static_cast<SectorModifier>(i));
+            const char* label = counts[i] > 1 ? TextFormat("%s x%d", info.name, counts[i]) : info.name;
+            const float labelWidth = text.Measure(FontId::BodyBold, label, 21.0f).x;
+            if (at.x + labelWidth > panel.x + panel.width - 30.0f) {
+                at = {panel.x + 30.0f, at.y + 28.0f};
+            }
+            text.Draw(FontId::BodyBold, label, at, 21.0f, info.color);
+            at.x += labelWidth + 22.0f;
+        }
     }
 }
 

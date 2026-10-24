@@ -182,6 +182,7 @@ void World::ChooseSectorModifier(SectorModifier modifier) {
     case SectorModifier::Respite: player_.hp = std::min(player_.hp + 2, stats_.maxHp); break;
     default: break;
     }
+    protocols_.push_back(modifier);
     director_.AdvanceSector(modifier);
     hitsAtSectorStart_ = runStats_.hitsTaken;
 }
