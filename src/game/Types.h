@@ -46,6 +46,12 @@ inline constexpr bool IsBoss(EnemyKind kind) {
     return kind >= EnemyKind::BossWarden && kind <= EnemyKind::BossCore;
 }
 
+// Pieces spawned by another enemy; they share their parent's codex entry.
+inline constexpr bool IsSubPart(EnemyKind kind) {
+    return kind == EnemyKind::SplitterMini || kind == EnemyKind::WeaverBody || kind == EnemyKind::Mine ||
+           kind == EnemyKind::BossMinion;
+}
+
 enum class EnemyBulletStyle : std::uint8_t { Orb, Needle, BigOrb };
 
 enum class PickupKind : std::uint8_t { Xp, Health, Cache, Magnet };

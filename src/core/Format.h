@@ -1,6 +1,9 @@
 #pragma once
 
+#include <algorithm>
+#include <cctype>
 #include <string>
+#include <string_view>
 
 namespace gb {
 
@@ -18,6 +21,14 @@ inline std::string FormatThousands(long long value) {
         }
     }
     return negative ? "-" + out : out;
+}
+
+// ASCII upper-casing for display names.
+inline std::string ToUpper(std::string_view text) {
+    std::string out(text);
+    std::transform(out.begin(), out.end(), out.begin(),
+                   [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+    return out;
 }
 
 } // namespace gb

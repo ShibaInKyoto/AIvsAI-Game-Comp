@@ -2,6 +2,8 @@
 
 #include "audio/AudioSystem.h"
 #include "core/App.h"
+#include "core/Format.h"
+#include "game/EnemyCatalog.h"
 #include "game/Profile.h"
 #include "scenes/ResultsScene.h"
 #include "scenes/TitleScene.h"
@@ -395,6 +397,19 @@ void GameScene::CheckChallenges() {
         return;
     }
     Profile& profile = app_.Progress();
+    // First ever encounter with a regular hostile: point the player at the codex.
+    // (Guardians get their own entrance banner.)
+    const std::uint32_t fresh = view_.GetWorld().Record().enemiesSeen & ~announcedEnemies_;
+    for (int i = 0; i < static_cast<int>(EnemyKind::Count); ++i) {
+        const auto kind = static_cast<EnemyKind>(i);
+        if ((fresh >> i) & 1u) {
+            announcedEnemies_ |= 1u << i;
+            if (!profile.EnemyDiscovered(kind) && !IsBoss(kind) && !IsSubPart(kind)) {
+                const EnemyInfo& info = GetEnemyInfo(kind);
+                hud_.Toast("NEW CODEX ENTRY", ToUpper(info.name), info.color);
+            }
+        }
+    }
     for (const ChallengeInfo& info : AllChallenges()) {
         if (!profile.ChallengeCompleted(info.id) && ChallengeMet(info.id, view_.GetWorld()) &&
             profile.CompleteChallenge(info.id)) {

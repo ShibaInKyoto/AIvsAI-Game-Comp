@@ -2,6 +2,7 @@
 
 #include "audio/AudioSystem.h"
 #include "core/App.h"
+#include "core/Format.h"
 #include "game/EnemyCatalog.h"
 #include "game/Profile.h"
 #include "ui/Widgets.h"
@@ -10,9 +11,7 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cmath>
-#include <string>
 
 namespace gb {
 
@@ -63,13 +62,6 @@ const EnemyEntry& EntryFor(EnemyKind kind) {
         }
     }
     return kEnemyEntries.front();
-}
-
-std::string Uppercase(std::string_view s) {
-    std::string out(s);
-    std::transform(out.begin(), out.end(), out.begin(),
-                   [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
-    return out;
 }
 
 // Enemy previews are sized by their collision radius; scale them so they
@@ -338,7 +330,7 @@ void CodexPanel::DrawEnemyDetail(App& app, const Layout& layout, EnemyKind kind,
                          d.width - 80.0f, 26.0f, palette::kUiFaint, 1.12f, Align::Center);
         return;
     }
-    text.DrawGlow(FontId::Heading, Uppercase(info.name), {center.x, y}, 34.0f, WHITE, info.color,
+    text.DrawGlow(FontId::Heading, ToUpper(info.name), {center.x, y}, 34.0f, WHITE, info.color,
                   Align::Center, 0.08f);
     y += 50.0f;
     const char* role = boss ? TextFormat("SECTOR %02d GUARDIAN", entry.sector) : "HOSTILE";

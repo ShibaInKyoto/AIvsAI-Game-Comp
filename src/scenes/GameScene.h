@@ -10,6 +10,7 @@
 #include "view/Hud.h"
 
 #include <array>
+#include <cstdint>
 
 namespace gb {
 
@@ -65,6 +66,7 @@ private:
     float musicIntensity_ = 0.3f;
     float tutorialTime_ = 0.0f;
     float challengeTimer_ = 0.0f;
+    std::uint32_t announcedEnemies_ = 0;  // EnemyKind bits already toasted this run
     bool showTutorial_ = false;
     bool finished_ = false;
     bool victoryShown_ = false;
