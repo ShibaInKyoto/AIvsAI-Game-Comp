@@ -24,6 +24,7 @@ struct WorldDrawContext {
     bool showReticle = false;
     int motif = 0;           // which sector's backdrop motif to draw (0..4)
     float motifAlpha = 1.0f; // cross-fades motifs between sectors
+    float warp = 0.0f;       // 0..1 hyperspace streaks between sectors
 };
 
 // Draws the simulation state with neon primitives. Purely a view: it never

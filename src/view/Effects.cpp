@@ -17,6 +17,7 @@ namespace gb {
 namespace {
 
 constexpr std::size_t kMaxTexts = 90;
+constexpr float kWarpDuration = 1.4f;
 
 } // namespace
 
@@ -362,6 +363,21 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
                 PlaySfx(SfxId::BossRoar, 0.6f, 1.3f, pan);
             }
             break;
+        case EventType::SectorWarp:
+            warpTimer_ = kWarpDuration;
+            // Speed lines racing outward from the ship sell the jump.
+            particles_.Burst(ev.position, 160, LerpColor(ev.color, WHITE, 0.5f), 1600.0f, 3800.0f, 0.3f, 0.75f, 110.0f,
+                             2.5f);
+            particles_.Burst(ev.position, 90, ev.color, 900.0f, 2400.0f, 0.4f, 0.9f, 70.0f, 3.0f);
+            PlaySfx(SfxId::Dash, 0.9f, 0.45f, 0.0f);
+            PlaySfx(SfxId::Nova, 0.35f, 0.6f, 0.0f);
+            Flash(ev.color, 0.3f);
+            Ripple(ev.position, 1400.0f, 1600.0f, 0.03f);
+            grid_.ApplyExplosiveForce(220.0f, ev.position, 1400.0f);
+            camera_.SetZoomPunch(0.12f);
+            aberration_ = std::max(aberration_, 0.03f);
+            Vibrate(0.3f, 0.3f, 0.4f);
+            break;
         case EventType::SectorCleared: PlaySfx(SfxId::SectorClear, 0.9f, 1.0f, 0.0f); break;
         case EventType::SectorEvent:
             if (static_cast<SectorEvent>(ev.value) == SectorEvent::DataStorm) {
@@ -383,8 +399,18 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
     }
 }
 
+float EffectsDirector::Warp() const {
+    if (warpTimer_ <= 0.0f) {
+        return 0.0f;
+    }
+    // Fast in, slow out.
+    const float x = 1.0f - warpTimer_ / kWarpDuration;
+    return x < 0.15f ? x / 0.15f : 1.0f - EaseOutCubic((x - 0.15f) / 0.85f);
+}
+
 void EffectsDirector::Update(const World& world, float realDt) {
     hitStop_ = std::max(0.0f, hitStop_ - realDt);
+    warpTimer_ = std::max(0.0f, warpTimer_ - realDt);
     slowMo_ = std::max(0.0f, slowMo_ - realDt);
     aberration_ = Damp(aberration_, 0.0f, 0.12f, realDt);
     flashAmount_ = Damp(flashAmount_, 0.0f, 0.08f, realDt);

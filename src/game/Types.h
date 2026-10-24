@@ -121,6 +121,7 @@ enum class EventType : std::uint8_t {
     BossDefeated,
     SectorCleared,
     SectorEvent, // value = SectorEvent
+    SectorWarp,  // jumping to the next sector (position = player)
     ComboMilestone,
 };
 

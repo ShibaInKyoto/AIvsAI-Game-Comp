@@ -167,7 +167,7 @@ ctest --test-dir build --output-on-failure      # unit + simulation tests
 | `--seed N` | Fixed run seed |
 | `--data-dir PATH` | Override the save/settings directory |
 | `--sector N`, `--boss` | Start runs at a later sector, or straight at its guardian |
-| `--scene NAME` | Jump to `title`, `game`, `bossrush`, `hangar`, `codex`, `records`, `results`, `draft`, `pause`... |
+| `--scene NAME` | Jump to `title`, `game`, `bossrush`, `warp`, `hangar`, `codex`, `records`, `results`, `draft`, `pause`... |
 | `--perf` | Show the performance overlay (toggle in game with `F3`) |
 
 ## Continuous integration

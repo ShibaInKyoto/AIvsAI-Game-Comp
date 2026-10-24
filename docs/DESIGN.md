@@ -92,7 +92,7 @@ Balance targets (tools/BalanceSim, bot skill = reaction speed):
   far better than people, so endless pacing is tuned by design, not by sim.
 
 Testing helpers:
-- `--scene title|game|bossrush|draft|evolution|pause|hangar|firmware|results|records|codex`
+- `--scene title|game|bossrush|warp|draft|evolution|pause|hangar|firmware|results|records|codex`
 - `--sector N --boss`, `--autotest S`, `--screenshot P --screenshot-at S`, `--perf`
 - xdotool scripts under Xvfb drive real key presses through the menus.
 

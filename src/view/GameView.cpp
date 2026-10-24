@@ -96,6 +96,7 @@ void GameView::DrawWorld(Vector2 reticle, bool showReticle) {
     ctx.showReticle = showReticle;
     ctx.motif = motif_;
     ctx.motifAlpha = motifAlpha_;
+    ctx.warp = effects_.Warp();
     renderer_.Draw(app_.Gfx().Neon(), *world_, grid_, particles_, ctx);
     EndMode2D();
     drawMs_ = static_cast<float>((GetTime() - start) * 1000.0);

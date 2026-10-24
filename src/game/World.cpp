@@ -185,11 +185,13 @@ void World::ChooseSectorModifier(SectorModifier modifier) {
     protocols_.push_back(modifier);
     director_.AdvanceSector(modifier);
     hitsAtSectorStart_ = runStats_.hitsTaken;
+    Emit(EventType::SectorWarp, player_.position, director_.Info().accentColor);
 }
 
 void World::ContinueEndless() {
     director_.ContinueEndless();
     hitsAtSectorStart_ = runStats_.hitsTaken;
+    Emit(EventType::SectorWarp, player_.position, director_.Info().accentColor);
 }
 
 // ---------------------------------------------------------------------------

@@ -115,7 +115,16 @@ void WorldRenderer::DrawBackdrop(NeonRenderer& neon, const WorldDrawContext& ctx
             continue;
         }
         const float twinkle = 0.6f + 0.4f * std::sin(ctx.time * (0.8f + star.depth * 2.0f) + star.phase);
-        neon.Glow(p, star.size * 2.0f, WithAlpha(Color{180, 200, 255, 255}, 0.25f * twinkle * (0.4f + star.depth)));
+        const Color starColor = WithAlpha(Color{180, 200, 255, 255}, 0.25f * twinkle * (0.4f + star.depth));
+        if (ctx.warp > 0.0f) {
+            // Hyperspace: stars stretch away from the screen centre.
+            const Vector2 out = p - ctx.cameraCenter;
+            const float length = ctx.warp * (60.0f + 520.0f * star.depth) * std::min(1.0f, Length(out) / 600.0f);
+            neon.Streak(p, Normalized(out), length, star.size * (2.0f + 2.0f * ctx.warp),
+                        LerpColor(starColor, WithAlpha(WHITE, 0.8f), ctx.warp * 0.7f));
+            continue;
+        }
+        neon.Glow(p, star.size * 2.0f, starColor);
     }
 }
 

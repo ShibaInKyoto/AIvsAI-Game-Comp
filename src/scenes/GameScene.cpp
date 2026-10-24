@@ -80,6 +80,8 @@ void GameScene::ApplyDebugLaunchOptions() {
         world.ApplyUpgrade(UpgradeId::Drones);
         draft_.Open(app_, world, false);
         overlay_ = Overlay::Draft;
+    } else if (debugScene == "warp") {
+        view_.GetWorld().ChooseSectorModifier(SectorModifier::Respite);
     } else if (debugScene == "nova") {
         view_.GetWorld().GetPlayer().novaCharge = 1.0f;
         debugNovaPending_ = true;

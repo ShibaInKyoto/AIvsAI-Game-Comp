@@ -45,6 +45,8 @@ public:
     // Simulation time scale (hit-stop and slow motion).
     float TimeScale() const;
     float Aberration() const { return aberration_; }
+    // 0..1 strength of the hyperspace jump between sectors.
+    float Warp() const;
     Color FlashColor() const { return flashColor_; }
     float FlashAmount() const { return flashAmount_; }
     const std::vector<FloatingText>& Texts() const { return texts_; }
@@ -91,6 +93,7 @@ private:
     std::vector<Distortion> distortions_;
     std::vector<FloatingText> texts_;
     float hitStop_ = 0.0f;
+    float warpTimer_ = 0.0f;
     float slowMo_ = 0.0f;
     float slowMoScale_ = 1.0f;
     float aberration_ = 0.0f;
