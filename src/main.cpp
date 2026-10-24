@@ -26,6 +26,7 @@ void PrintUsage() {
         "  --seed N                fixed run seed\n"
         "  --sector N              (debug) start runs in sector N\n"
         "  --boss                  (debug) start runs at the sector boss\n"
+        "  --perf                  show the performance overlay (toggle with F3)\n"
         "  --data-dir PATH         override the settings/save directory\n");
 }
 
@@ -60,6 +61,8 @@ gb::LaunchOptions ParseArgs(int argc, char** argv) {
             options.startSector = std::max(0, std::atoi(argv[++i]) - 1);
         } else if (arg == "--boss") {
             options.startAtBoss = true;
+        } else if (arg == "--perf") {
+            options.perfOverlay = true;
         } else if (arg == "--data-dir" && hasValue) {
             options.dataDirectory = argv[++i];
         } else if (arg == "--help" || arg == "-h") {

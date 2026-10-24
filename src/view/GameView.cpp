@@ -29,6 +29,7 @@ GameView::GameView(App& app, const RunConfig& config)
 }
 
 void GameView::Update(float dt, const PlayerInput& input, bool simulate) {
+    const double start = GetTime();
     time_ += dt;
     const float simDt = dt * effects_.TimeScale();
     if (simulate) {
@@ -50,6 +51,7 @@ void GameView::Update(float dt, const PlayerInput& input, bool simulate) {
     camera_.SetShakeScale(app_.Prefs().screenShake);
     camera_.Update(dt, p.position, lookAhead, static_cast<float>(GetRenderWidth()),
                    static_cast<float>(GetRenderHeight()));
+    updateMs_ = static_cast<float>((GetTime() - start) * 1000.0);
 }
 
 Camera2D GameView::CurrentCamera() const {
@@ -63,6 +65,7 @@ Vector2 GameView::WorldToUi(Vector2 world) const {
 }
 
 void GameView::DrawWorld(Vector2 reticle, bool showReticle) {
+    const double start = GetTime();
     const float w = static_cast<float>(GetRenderWidth());
     const float h = static_cast<float>(GetRenderHeight());
     BeginMode2D(CurrentCamera());
@@ -77,6 +80,7 @@ void GameView::DrawWorld(Vector2 reticle, bool showReticle) {
     ctx.showReticle = showReticle;
     renderer_.Draw(app_.Gfx().Neon(), *world_, grid_, particles_, ctx);
     EndMode2D();
+    drawMs_ = static_cast<float>((GetTime() - start) * 1000.0);
 }
 
 } // namespace gb

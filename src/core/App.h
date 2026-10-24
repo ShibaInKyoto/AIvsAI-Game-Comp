@@ -32,6 +32,7 @@ struct LaunchOptions {
     std::uint64_t seed = 0;
     int startSector = 0;     // debug: begin runs in this sector (0-based)
     bool startAtBoss = false;  // debug: skip straight to the sector boss
+    bool perfOverlay = false;  // show the F3 performance overlay from the start
 };
 
 using SceneFactory = std::function<std::unique_ptr<Scene>(App&)>;
@@ -63,6 +64,8 @@ public:
     void Quit() { quitRequested_ = true; }
 
     Vector2 UiMouse() const { return graphics_.ScreenToUi(input_.MousePosition()); }
+    // F3 toggles the performance overlay.
+    bool DebugOverlay() const { return debugOverlay_; }
     float RealTime() const { return realTime_; }
     float FrameTimeMs() const { return frameTimeMs_; }
 
@@ -88,6 +91,7 @@ private:
     enum class Fade { None, Out, In } fade_ = Fade::In;
 
     bool quitRequested_ = false;
+    bool debugOverlay_ = false;
     bool windowedFullscreen_ = false;
     bool vsyncApplied_ = false;
     float realTime_ = 0.0f;

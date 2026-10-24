@@ -43,6 +43,7 @@ private:
     void DrawSectorChoice();
     void DrawVictory();
     void DrawTutorial();
+    void DrawDebugOverlay();
 
     RunConfig config_;
     GameView view_;
@@ -66,6 +67,7 @@ private:
     bool showTutorial_ = false;
     bool finished_ = false;
     bool victoryShown_ = false;
+    bool wasFocused_ = false;
     Vector2 lastAim_{1.0f, 0.0f};
 };
 

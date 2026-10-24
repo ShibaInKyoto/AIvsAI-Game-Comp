@@ -33,6 +33,10 @@ public:
     Vector2 ScreenToWorld(Vector2 screen) const;
     Vector2 WorldToUi(Vector2 world) const;
     Color AccentColor() const { return accent_; }
+    std::size_t ParticleCount() const { return particles_.Count(); }
+    // CPU cost of the last update/draw, for the performance overlay.
+    float UpdateMs() const { return updateMs_; }
+    float DrawMs() const { return drawMs_; }
     float Time() const { return time_; }
 
 private:
@@ -46,6 +50,8 @@ private:
     Color gridColor_{};
     Color accent_{};
     float time_ = 0.0f;
+    float updateMs_ = 0.0f;
+    float drawMs_ = 0.0f;
 };
 
 } // namespace gb

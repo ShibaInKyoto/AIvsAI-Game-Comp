@@ -20,7 +20,7 @@ constexpr Color kClearColor{3, 4, 10, 255};
 
 } // namespace
 
-App::App(LaunchOptions options) : options_(std::move(options)) {}
+App::App(LaunchOptions options) : options_(std::move(options)), debugOverlay_(options_.perfOverlay) {}
 
 App::~App() = default;
 
@@ -194,6 +194,10 @@ void App::Frame() {
         settings_.fullscreen = !settings_.fullscreen;
         ApplyDisplaySettings();
         settings_.Save();
+    }
+
+    if (IsKeyPressed(KEY_F3)) {
+        debugOverlay_ = !debugOverlay_;
     }
 
     const int width = GetRenderWidth();

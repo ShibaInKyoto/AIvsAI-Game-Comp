@@ -122,7 +122,12 @@ void GameScene::Update(float dt) {
         return;
     }
 
-    if (!autopilot_ && app_.In().Pressed(Action::Pause) && world.PlayerAlive()) {
+    // Pause on request, and automatically when the window loses focus
+    // (only on the transition, so a window that never had focus still plays).
+    const bool focused = IsWindowFocused();
+    const bool focusLost = wasFocused_ && !focused && !autopilot_;
+    wasFocused_ = focused;
+    if (!autopilot_ && (app_.In().Pressed(Action::Pause) || focusLost) && world.PlayerAlive()) {
         OpenPause();
         return;
     }
@@ -427,6 +432,9 @@ void GameScene::ConfigurePostFx(PostFxParams& params) const {
 
 void GameScene::DrawUi() {
     hud_.Draw(app_, view_);
+    if (app_.DebugOverlay()) {
+        DrawDebugOverlay();
+    }
     if (showTutorial_ && overlay_ == Overlay::None) {
         DrawTutorial();
     }
@@ -437,6 +445,27 @@ void GameScene::DrawUi() {
     case Overlay::SectorChoice: DrawSectorChoice(); break;
     case Overlay::Victory: DrawVictory(); break;
     case Overlay::None: break;
+    }
+}
+
+void GameScene::DrawDebugOverlay() {
+    const World& world = view_.GetWorld();
+    const std::array<std::string, 8> lines{{
+        TextFormat("FPS %d  (%.2f ms)", GetFPS(), static_cast<double>(GetFrameTime() * 1000.0f)),
+        TextFormat("update %.2f ms   draw %.2f ms", static_cast<double>(view_.UpdateMs()),
+                   static_cast<double>(view_.DrawMs())),
+        TextFormat("enemies %d / %d", world.ActiveEnemyCount(), static_cast<int>(world.Enemies().size())),
+        TextFormat("player bullets %d", static_cast<int>(world.Bullets().size())),
+        TextFormat("enemy bullets %d", static_cast<int>(world.EnemyBullets().size())),
+        TextFormat("pickups %d", static_cast<int>(world.Pickups().size())),
+        TextFormat("particles %d", static_cast<int>(view_.ParticleCount())),
+        TextFormat("render %dx%d", GetRenderWidth(), GetRenderHeight()),
+    }};
+    const Rectangle r{20.0f, 140.0f, 330.0f, 30.0f * static_cast<float>(lines.size()) + 20.0f};
+    DrawRectangleRec(r, Color{0, 0, 0, 170});
+    for (std::size_t i = 0; i < lines.size(); ++i) {
+        app_.Gfx().Text().Draw(FontId::BodyBold, lines[i], {r.x + 14.0f, r.y + 10.0f + 30.0f * static_cast<float>(i)},
+                               24.0f, palette::kUiGood);
     }
 }
 

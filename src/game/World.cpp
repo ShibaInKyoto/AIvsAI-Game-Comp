@@ -22,6 +22,7 @@ constexpr int kMaxBullets = 3000;
 constexpr int kMaxEnemyBullets = 2500;
 constexpr int kMaxPickups = 600;
 constexpr float kPickupCollectRadius = 16.0f;
+constexpr float kShardAutoCollectAge = 9.0f;
 constexpr float kBulletHitboxScale = 0.55f;  // forgiving: bullets must hit the ship's core
 constexpr float kBodyHitboxScale = 0.75f;
 constexpr Color kPlayerBulletColor{255, 240, 140, 255};
@@ -959,8 +960,10 @@ void World::UpdatePickups(float dt) {
         }
         const Vector2 toPlayer = p.position - pickup.position;
         const float distSq = LengthSq(toPlayer);
-        // Shards only become collectable after their initial pop-out.
-        if (p.alive && pickup.age > 0.25f && (pickup.magnetized || distSq < magnetSq)) {
+        // Shards only become collectable after their initial pop-out; old
+        // shards home in on their own so nothing is lost to clutter.
+        const bool expiring = pickup.kind == PickupKind::Xp && pickup.age > kShardAutoCollectAge;
+        if (p.alive && pickup.age > 0.25f && (pickup.magnetized || expiring || distSq < magnetSq)) {
             pickup.magnetized = true;
             const float speed = std::max(Length(pickup.velocity), 350.0f) + 2600.0f * dt;
             pickup.velocity = Normalized(toPlayer) * std::min(speed, 1800.0f);

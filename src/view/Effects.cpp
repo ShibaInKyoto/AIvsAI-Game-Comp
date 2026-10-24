@@ -96,7 +96,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
                 char buffer[16];
                 std::snprintf(buffer, sizeof(buffer), crit ? "%d!" : "%d", static_cast<int>(std::round(ev.magnitude)));
                 AddText(ev.position + Vector2{rng.Range(-10.0f, 10.0f), -14.0f}, buffer,
-                        crit ? palette::kPlayerBulletCrit : Color{230, 235, 255, 255}, crit ? 30.0f : 21.0f);
+                        crit ? palette::kPlayerBulletCrit : Color{230, 235, 255, 210}, crit ? 26.0f : 18.0f);
             }
             break;
         }
