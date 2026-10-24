@@ -165,7 +165,10 @@ void App::UpdateDynamicResolution(float frameTime) {
     frameSampleCount_ = 0;
     auto middle = frameSamples_.begin() + kFrameSamples / 2;
     std::nth_element(frameSamples_.begin(), middle, frameSamples_.end());
-    if (*middle > kSlowFrame) {
+    // A 50 Hz or 30 Hz display with V-Sync is not a slow GPU.
+    const int refresh = GetMonitorRefreshRate(GetCurrentMonitor());
+    const float vsyncFrame = settings_.vsync && refresh > 0 ? 1.15f / static_cast<float>(refresh) : 0.0f;
+    if (*middle > std::max(kSlowFrame, vsyncFrame)) {
         dynamicScale_ = std::max(kMinScale, dynamicScale_ - 0.1f);
         measureDelay_ = 1.0f; // let the new resolution settle before judging again
         TraceLog(LOG_INFO, "RENDER: median frame %.1f ms, automatic render scale now %d%%",
