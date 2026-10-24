@@ -101,6 +101,7 @@ enum class EventType : std::uint8_t {
     BossPhase,
     BossDefeated,
     SectorCleared,
+    SectorEvent,  // value = SectorEvent
     ComboMilestone,
 };
 

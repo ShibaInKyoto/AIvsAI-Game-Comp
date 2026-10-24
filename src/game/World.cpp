@@ -897,6 +897,21 @@ void World::PurgeEnemies(bool dropLoot) {
     }
 }
 
+void World::SpawnPickup(PickupKind kind, Vector2 position, int value, float speed) {
+    if (static_cast<int>(pickups_.size()) >= kMaxPickups && kind == PickupKind::Xp) {
+        // Too many shards on the floor: fold the value into an existing one.
+        pickups_[rng_.Next() % pickups_.size()].value += value;
+        return;
+    }
+    Pickup p;
+    p.kind = kind;
+    p.position = position;
+    p.velocity = rng_.UnitVector() * rng_.Range(speed * 0.4f, speed);
+    p.value = value;
+    p.life = kind == PickupKind::Xp ? 30.0f : 20.0f;
+    pickups_.push_back(p);
+}
+
 void World::DropLoot(const Enemy& e) {
     const EnemyInfo& info = GetEnemyInfo(e.kind);
     int xp = info.xp * (e.elite ? 8 : 1);
@@ -905,18 +920,7 @@ void World::DropLoot(const Enemy& e) {
     }
 
     auto spawnPickup = [&](PickupKind kind, int value, float speed) {
-        if (static_cast<int>(pickups_.size()) >= kMaxPickups && kind == PickupKind::Xp) {
-            // Too many shards on the floor: fold the value into an existing one.
-            pickups_[rng_.Next() % pickups_.size()].value += value;
-            return;
-        }
-        Pickup p;
-        p.kind = kind;
-        p.position = e.position + rng_.InCircle(e.radius * 0.5f);
-        p.velocity = rng_.UnitVector() * rng_.Range(speed * 0.4f, speed);
-        p.value = value;
-        p.life = kind == PickupKind::Xp ? 30.0f : 20.0f;
-        pickups_.push_back(p);
+        SpawnPickup(kind, e.position + rng_.InCircle(e.radius * 0.5f), value, speed);
     };
 
     // Break the experience into a handful of shards: big ones read as a jackpot.

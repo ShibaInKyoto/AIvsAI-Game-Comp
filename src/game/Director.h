@@ -49,6 +49,18 @@ struct SectorModifierInfo {
 
 const SectorModifierInfo& GetSectorModifierInfo(SectorModifier modifier);
 
+// Set-piece moments thrown into a sector's waves every ~40 seconds.
+enum class SectorEvent : std::uint8_t {
+    None,
+    Ambush,     // a ring of swarmers or drifters closes in on the player
+    Crossfire,  // a line of darts lunges across the player's position
+    DataStorm,  // a shower of free experience shards
+    Count
+};
+
+const char* SectorEventName(SectorEvent event);
+const char* SectorEventTagline(SectorEvent event);
+
 // Paces a run: spends a growing threat budget on telegraphed enemy groups,
 // throws surges and elites, then stages the sector boss.
 class Director {
@@ -66,6 +78,9 @@ public:
     float WaveTime() const { return waveTime_; }
     float WaveProgress() const;
     EntityId BossId() const { return bossId_; }
+    // The most recent sector event and how long ago it started (None outside waves).
+    SectorEvent ActiveEvent() const { return event_; }
+    float EventTime() const { return eventTime_; }
 
     // Called (via World) once the player picked a sector modifier.
     void AdvanceSector(SectorModifier modifier);
@@ -75,6 +90,7 @@ public:
     void DebugJump(int sector, bool boss);
     // Starts a sector already part-way through its waves (attract mode).
     void JumpToWaves(int sector, float waveTime);
+    void DebugTriggerEvent(World& world, SectorEvent event) { StartEvent(world, event); }
 
     float EnemyHpMultiplier() const;
     float EnemySpeedMultiplier() const;
@@ -85,7 +101,11 @@ private:
     void SetPhase(SectorPhase phase);
     void UpdateWaves(World& world, float dt);
     void SpawnGroup(World& world, EnemyKind kind, bool elite);
-    void SpawnSurge(World& world);
+    void StartEvent(World& world, SectorEvent event);
+    SectorEvent PickEvent(World& world) const;
+    void SpawnAmbush(World& world);
+    void SpawnCrossfire(World& world);
+    void SpawnDataStorm(World& world);
     void SpawnBoss(World& world);
     EnemyKind PickKind(World& world) const;
     float CurrentThreatRate() const;
@@ -97,6 +117,9 @@ private:
     float waveTime_ = 0.0f;
     float budget_ = 0.0f;
     float surgeTimer_ = 0.0f;
+    SectorEvent event_ = SectorEvent::None;
+    SectorEvent lastEvent_ = SectorEvent::None;
+    float eventTime_ = 0.0f;
     float eliteTimer_ = 0.0f;
     EntityId bossId_ = kInvalidId;
 

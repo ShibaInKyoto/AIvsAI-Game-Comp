@@ -147,6 +147,28 @@ TEST_CASE("Sector modifiers advance the run") {
     CHECK(world.GetDirector().Sector() == 2);
 }
 
+TEST_CASE("Sector events stage their set pieces") {
+    World world(RunConfig{});
+    Director& director = world.GetDirector();
+    director.JumpToWaves(1, 10.0f);
+    const auto darts = [&] {
+        return std::count_if(world.Enemies().begin(), world.Enemies().end(),
+                             [](const Enemy& e) { return e.alive && e.kind == EnemyKind::Dart; });
+    };
+    const auto before = darts();
+    director.DebugTriggerEvent(world, SectorEvent::Crossfire);
+    world.Update(1.0f / 60.0f, PlayerInput{});  // spawns are queued until the next tick
+    CHECK(darts() >= before + 9);  // 7 + 2 per sector index
+    CHECK(director.ActiveEvent() == SectorEvent::Crossfire);
+
+    const std::size_t pickups = world.Pickups().size();
+    director.DebugTriggerEvent(world, SectorEvent::DataStorm);
+    CHECK(world.Pickups().size() >= pickups + 30);
+    for (const Pickup& p : world.Pickups()) {
+        CHECK(CheckCollisionPointRec(p.position, World::kArena));
+    }
+}
+
 TEST_CASE("Spatial hash finds every nearby item") {
     SpatialHash hash;
     hash.Configure({-1000.0f, -1000.0f, 2000.0f, 2000.0f}, 64.0f);

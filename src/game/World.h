@@ -115,6 +115,8 @@ public:
                   EntityId owner = kInvalidId);
     Shockwave& AddShockwave(Vector2 position, float maxRadius, float speed, float damage, float knockback,
                             bool clearsBullets);
+    // Drops a pickup with a random outward velocity of up to `speed`.
+    void SpawnPickup(PickupKind kind, Vector2 position, int value, float speed);
     void Emit(EventType type, Vector2 position, Color color = WHITE, float magnitude = 1.0f, Vector2 direction = {},
               int value = 0, EnemyKind enemy = EnemyKind::Drifter, EntityId source = kInvalidId);
 

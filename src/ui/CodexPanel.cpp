@@ -38,7 +38,7 @@ constexpr std::array<EnemyEntry, 17> kEnemyEntries{{
     {EnemyKind::Singularity, 0,
      "Gravity well that drags your ship and your bullets toward it. Dash against the pull."},
     {EnemyKind::Weaver, 0,
-     "Serpent head trailing a chain of fragile segments. Destroy the head and the whole tail detonates."},
+     "Serpent head trailing an armoured tail that soaks up shots. Destroy the head and the tail detonates."},
     {EnemyKind::Shielder, 0,
      "Its frontal shield deflects every shot that hits the front. Circle around and strike from behind."},
     {EnemyKind::Lancer, 0, "Stops to charge, then fires a laser along its aim line. Get off the line before it fires."},

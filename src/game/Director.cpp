@@ -76,10 +76,44 @@ std::pair<int, int> GroupSize(EnemyKind kind) {
     }
 }
 
+Vector2 ClampToArena(Vector2 p, float margin) {
+    const Rectangle& a = World::kArena;
+    return {std::clamp(p.x, a.x + margin, a.x + a.width - margin),
+            std::clamp(p.y, a.y + margin, a.y + a.height - margin)};
+}
+
+bool InsideArena(Vector2 p, float margin) {
+    const Rectangle& a = World::kArena;
+    return p.x >= a.x + margin && p.x <= a.x + a.width - margin && p.y >= a.y + margin &&
+           p.y <= a.y + a.height - margin;
+}
+
 } // namespace
 
 const SectorModifierInfo& GetSectorModifierInfo(SectorModifier modifier) {
     return kModifiers[static_cast<std::size_t>(modifier)];
+}
+
+const char* SectorEventName(SectorEvent event) {
+    switch (event) {
+    case SectorEvent::Ambush: return "AMBUSH";
+    case SectorEvent::Crossfire: return "CROSSFIRE";
+    case SectorEvent::DataStorm: return "DATA STORM";
+    case SectorEvent::None:
+    case SectorEvent::Count: break;
+    }
+    return "";
+}
+
+const char* SectorEventTagline(SectorEvent event) {
+    switch (event) {
+    case SectorEvent::Ambush: return "HOSTILES CLOSING IN FROM ALL SIDES";
+    case SectorEvent::Crossfire: return "DART LINE LOCKING ON  //  MOVE SIDEWAYS";
+    case SectorEvent::DataStorm: return "FREE DATA IN THE AREA  //  GRAB IT";
+    case SectorEvent::None:
+    case SectorEvent::Count: break;
+    }
+    return "";
 }
 
 const SectorInfo& Director::Info() const {
@@ -99,6 +133,7 @@ void Director::Start(int sector) {
 void Director::SetPhase(SectorPhase phase) {
     phase_ = phase;
     phaseTime_ = 0.0f;
+    event_ = SectorEvent::None;
 }
 
 float Director::WaveProgress() const {
@@ -180,10 +215,11 @@ void Director::Update(World& world, float dt) {
 void Director::UpdateWaves(World& world, float dt) {
     budget_ += CurrentThreatRate() * world.Tuning().spawnRate * dt;
 
+    eventTime_ += dt;
     surgeTimer_ -= dt;
     if (surgeTimer_ <= 0.0f && waveTime_ < Info().duration - 12.0f) {
         surgeTimer_ = world.Random().Range(34.0f, 44.0f);
-        SpawnSurge(world);
+        StartEvent(world, PickEvent(world));
     }
 
     eliteTimer_ -= dt;
@@ -279,7 +315,33 @@ void Director::SpawnGroup(World& world, EnemyKind kind, bool elite) {
     }
 }
 
-void Director::SpawnSurge(World& world) {
+SectorEvent Director::PickEvent(World& world) const {
+    // Weights per event (index = SectorEvent - 1). Crossfire waits for sector 2;
+    // the same event never fires twice in a row.
+    std::array<float, static_cast<std::size_t>(SectorEvent::Count) - 1> weights{1.0f, sector_ >= 1 ? 1.0f : 0.0f,
+                                                                               0.6f};
+    if (lastEvent_ != SectorEvent::None) {
+        weights[static_cast<std::size_t>(lastEvent_) - 1] = 0.0f;
+    }
+    return static_cast<SectorEvent>(world.Random().WeightedIndex(weights) + 1);
+}
+
+void Director::StartEvent(World& world, SectorEvent event) {
+    event_ = event;
+    lastEvent_ = event;
+    eventTime_ = 0.0f;
+    switch (event) {
+    case SectorEvent::Ambush: SpawnAmbush(world); break;
+    case SectorEvent::Crossfire: SpawnCrossfire(world); break;
+    case SectorEvent::DataStorm: SpawnDataStorm(world); break;
+    case SectorEvent::None:
+    case SectorEvent::Count: break;
+    }
+    world.Emit(EventType::SectorEvent, world.GetPlayer().position, Info().accentColor, 1.0f, {},
+               static_cast<int>(event));
+}
+
+void Director::SpawnAmbush(World& world) {
     Rng& rng = world.Random();
     const Vector2 center = world.GetPlayer().position;
     const EnemyKind kind = sector_ >= 1 && rng.Chance(0.5f) ? EnemyKind::Swarmer : EnemyKind::Drifter;
@@ -288,12 +350,50 @@ void Director::SpawnSurge(World& world) {
     const float offset = rng.Angle();
     for (int i = 0; i < count; ++i) {
         const float angle = offset + kTau * static_cast<float>(i) / static_cast<float>(count);
-        Vector2 p = center + FromAngle(angle, radius);
-        p.x = std::clamp(p.x, World::kArena.x + 40.0f, World::kArena.x + World::kArena.width - 40.0f);
-        p.y = std::clamp(p.y, World::kArena.y + 40.0f, World::kArena.y + World::kArena.height - 40.0f);
-        world.SpawnEnemy(kind, p, 1.4f);
+        world.SpawnEnemy(kind, ClampToArena(center + FromAngle(angle, radius), 40.0f), 1.4f);
     }
     world.Emit(EventType::EnemySpawnWarning, center, Info().accentColor, 2.0f);
+}
+
+void Director::SpawnCrossfire(World& world) {
+    Rng& rng = world.Random();
+    const Vector2 player = world.GetPlayer().position;
+    constexpr float kDistance = 500.0f;
+    // Put the firing line on a side of the player that has room for it.
+    Vector2 dir = Normalized(Vector2{World::kArena.x + World::kArena.width * 0.5f,
+                                     World::kArena.y + World::kArena.height * 0.5f} -
+                             player);
+    for (int attempt = 0; attempt < 8; ++attempt) {
+        const Vector2 candidate = FromAngle(rng.Angle());
+        const Vector2 lineCenter = player + candidate * kDistance;
+        if (InsideArena(lineCenter, 120.0f)) {
+            dir = candidate;
+            break;
+        }
+    }
+    if (LengthSq(dir) < 0.5f) {
+        dir = {1.0f, 0.0f};
+    }
+    const Vector2 along = Perp(dir);
+    const int count = 7 + 2 * std::min(sector_, 4);
+    constexpr float kSpacing = 95.0f;
+    for (int i = 0; i < count; ++i) {
+        const float offset = (static_cast<float>(i) - static_cast<float>(count - 1) * 0.5f) * kSpacing;
+        // Staggered telegraphs make the line fire as a sweeping volley.
+        const float telegraph = 1.3f + 0.06f * static_cast<float>(i);
+        world.SpawnEnemy(EnemyKind::Dart, ClampToArena(player + dir * kDistance + along * offset, 40.0f), telegraph);
+    }
+    world.Emit(EventType::EnemySpawnWarning, player + dir * kDistance, Info().accentColor, 2.0f);
+}
+
+void Director::SpawnDataStorm(World& world) {
+    Rng& rng = world.Random();
+    const Vector2 player = world.GetPlayer().position;
+    const int shards = 30 + 4 * std::min(sector_, 5);
+    for (int i = 0; i < shards; ++i) {
+        const Vector2 p = ClampToArena(player + rng.InCircle(560.0f), 60.0f);
+        world.SpawnPickup(PickupKind::Xp, p, rng.Chance(0.15f) ? 5 : 1, 80.0f);
+    }
 }
 
 void Director::SpawnBoss(World& world) {

@@ -373,6 +373,15 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
         case EventType::SectorCleared:
             PlaySfx(SfxId::SectorClear, 0.9f, 1.0f, 0.0f);
             break;
+        case EventType::SectorEvent:
+            if (static_cast<SectorEvent>(ev.value) == SectorEvent::DataStorm) {
+                PlaySfx(SfxId::PickupCache, 0.7f, 1.2f, 0.0f);
+                grid_.ApplyExplosiveForce(30.0f, ev.position, 500.0f);
+                Flash(palette::kXpMedium, 0.12f);
+            } else {
+                PlaySfx(SfxId::BossWarning, 0.35f, 1.5f, 0.0f);
+            }
+            break;
         case EventType::ComboMilestone: {
             char buffer[24];
             std::snprintf(buffer, sizeof(buffer), "%d COMBO", static_cast<int>(ev.magnitude));

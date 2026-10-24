@@ -412,6 +412,32 @@ void Hud::DrawBanners(App& app, const GameView& view) const {
                       WithAlpha(WHITE, a), WithAlpha(c, a), Align::Center, 0.12f);
         break;
     }
+    case SectorPhase::Waves: {
+        // Compact set-piece banner, high enough to keep the arena centre clear.
+        const SectorEvent event = director.ActiveEvent();
+        const float et = director.EventTime();
+        if (event == SectorEvent::None || et > 2.8f) {
+            break;
+        }
+        const float by = ui.y * 0.2f;
+        // Fade out of the way when the ship is underneath (camera pinned at an edge).
+        const Vector2 ship = view.WorldToUi(world.GetPlayer().position);
+        const bool covering = std::abs(ship.x - cx) < 420.0f && std::abs(ship.y - (by + 14.0f)) < 90.0f;
+        const float a = fade(et, 0.15f, 2.0f, 0.6f) * (covering ? 0.3f : 1.0f);
+        const Color color = event == SectorEvent::DataStorm ? palette::kXpMedium
+                            : event == SectorEvent::Crossfire ? palette::kUiWarn
+                                                              : palette::kDanger;
+        const float spread = 380.0f * EaseOutCubic(Saturate(et / 0.4f));
+        neon.Begin();
+        neon.Line({cx - spread, by - 34.0f}, {cx + spread, by - 34.0f}, 2.5f, WithAlpha(color, 0.8f * a));
+        neon.Line({cx - spread, by + 62.0f}, {cx + spread, by + 62.0f}, 2.5f, WithAlpha(color, 0.8f * a));
+        neon.End();
+        text.DrawGlow(FontId::Display, SectorEventName(event), {cx, by - 22.0f}, 52.0f, WithAlpha(WHITE, a),
+                      WithAlpha(color, a), Align::Center, 0.12f);
+        text.Draw(FontId::Heading, SectorEventTagline(event), {cx, by + 36.0f}, 17.0f, WithAlpha(color, a),
+                  Align::Center, 0.2f);
+        break;
+    }
     case SectorPhase::Cleared:
     case SectorPhase::Victory: {
         const float a = Saturate(t / 0.4f);
