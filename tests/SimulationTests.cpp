@@ -139,9 +139,10 @@ TEST_CASE("Player takes damage, gets invulnerability and can die") {
     CHECK(world.GetPlayer().hp == hp - 1);
     for (int i = 0; i < hp + 2; ++i) {
         world.Update(2.0f, PlayerInput{});  // let invulnerability lapse
-        world.DamagePlayer({100.0f, 0.0f});
+        world.DamagePlayer({100.0f, 0.0f}, EnemyKind::Lancer);
     }
     CHECK_FALSE(world.PlayerAlive());
+    CHECK(world.Record().killedBy == EnemyKind::Lancer);
 }
 
 TEST_CASE("Bosses can be spawned and defeated") {
