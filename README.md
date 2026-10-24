@@ -54,7 +54,9 @@ Prompts adapt automatically to whichever device you used last.
 * **Shards → levels → upgrades.** Destroyed enemies drop data shards. Every
   level-up pauses the action and offers three upgrade cards (common → legendary).
   Elites drop *data caches* with rarer cards.
-* **Build expression.** 38 upgrades: weapon mods (split shot, ricochet, frag,
+* **Sector events.** Every forty seconds or so a sector stages a set piece: an
+  ambush ring closing in, a crossfire line of darts, or a storm of free data.
+* **Build expression.** 39 upgrades: weapon mods (split shot, ricochet, frag,
   cryo, seeker rounds...), defences (deflector shield, reactive armour,
   auto-repair), mobility, utility and seven levelled **weapon modules**: Orbit
   Blades, Wingmen drones, Arc Coil chain lightning, Swarm Missiles, Pulse Nova,
@@ -68,8 +70,10 @@ Prompts adapt automatically to whichever device you used last.
   upgrade cache, or a breather.
 * **Score attack.** Chain kills to build a combo multiplier (up to x10). Getting
   hit resets it.
-* **Challenges.** Sixteen goals (beat each guardian, flawless sectors, huge
-  combos...) pay out bonus credits.
+* **Challenges and records.** Sixteen goals (beat each guardian, flawless
+  sectors, huge combos...) pay out bonus credits. Records keep your best scores
+  and your last ten runs, and every results screen shows your final loadout and
+  what destroyed you.
 * **Codex.** Every hostile you meet and every upgrade you draft is decoded in
   the title-screen codex, with tactics, base stats and evolution recipes. Its
   *Guide* tab explains every mechanic in a page each.
