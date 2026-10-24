@@ -11,7 +11,7 @@ constexpr std::array<ShipInfo, static_cast<std::size_t>(ShipId::Count)> kShips{{
      "Reliable twin blaster and solid handling. A clean slate for any build.", {120, 230, 255, 255}, 0,
      UpgradeId::Count, 0},
     {ShipId::Lancer, "LANCER", "Piercing railgun",
-     "Slow, devastating rail shots that punch through lines of enemies. Fragile hull.", {255, 90, 220, 255}, 350,
+     "Slow, devastating rail shots that punch through lines of enemies.", {255, 90, 220, 255}, 350,
      UpgradeId::Count, 0},
     {ShipId::Bruiser, "BRUISER", "Close-range scattergun",
      "A wide shotgun blast and a thick hull. Get in close and stay there.", {255, 160, 60, 255}, 450,
@@ -41,8 +41,8 @@ PlayerStats ShipBaseStats(ShipId id) {
         s.damage = 9.0f;
         break;
     case ShipId::Lancer:
-        s.maxHp = 4;
-        s.fireRate = 3.0f;
+        s.maxHp = 5;
+        s.fireRate = 3.3f;
         s.damage = 38.0f;
         s.pierce = 3;
         s.bulletSpeed = 2600.0f;
@@ -70,7 +70,7 @@ PlayerStats ShipBaseStats(ShipId id) {
         s.maxHp = 4;
         s.moveSpeed = 480.0f;
         s.fireRate = 10.0f;
-        s.damage = 8.0f;
+        s.damage = 9.0f;
         s.dashCharges = 2;
         s.dashCooldown = 0.75f;
         break;

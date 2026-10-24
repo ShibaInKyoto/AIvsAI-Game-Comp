@@ -186,6 +186,13 @@ private:
     void UpdateEnemies(float dt);
     void UpdateEnemy(Enemy& enemy, float dt);
     void UpdateModules(float dt);
+    void UpdateOrbitBlades(float dt);
+    void UpdateDrones(float dt);
+    void UpdateArcCoil(float dt);
+    void UpdateMissiles(float dt);
+    void UpdatePulseNova(float dt);
+    void UpdateMines(float dt);
+    void UpdatePrismLance(float dt);
     void UpdateTraces(float dt);
     void ResolveEnemySeparation();
     void HandlePlayerContacts();

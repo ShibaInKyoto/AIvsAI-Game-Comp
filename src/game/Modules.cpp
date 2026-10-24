@@ -26,10 +26,18 @@ void World::UpdateModules(float dt) {
     if (!player_.alive) {
         return;
     }
+    UpdateOrbitBlades(dt);
+    UpdateDrones(dt);
+    UpdateArcCoil(dt);
+    UpdateMissiles(dt);
+    UpdatePulseNova(dt);
+    UpdateMines(dt);
+    UpdatePrismLance(dt);
+}
+
+void World::UpdateOrbitBlades(float dt) {
     const Vector2 origin = player_.position;
     const float power = ModulePower();
-
-    // --- Orbit blades ------------------------------------------------------
     if (const int level = ModuleLevel(stats_, ModuleId::OrbitBlades); level > 0) {
         const bool evolved = stats_.Evolved(ModuleId::OrbitBlades);
         orbitAngle_ += dt * (level >= 5 ? 4.4f : 3.3f);
@@ -58,8 +66,10 @@ void World::UpdateModules(float dt) {
             }
         }
     }
+}
 
-    // --- Drones ------------------------------------------------------------
+void World::UpdateDrones(float dt) {
+    const Vector2 origin = player_.position;
     if (const int level = ModuleLevel(stats_, ModuleId::Drones); level > 0 && !drones_.empty()) {
         const bool hive = stats_.Evolved(ModuleId::Drones);
         const float interval = level >= 3 ? 0.3f : 0.45f;
@@ -98,8 +108,11 @@ void World::UpdateModules(float dt) {
             }
         }
     }
+}
 
-    // --- Arc coil ----------------------------------------------------------
+void World::UpdateArcCoil(float dt) {
+    const Vector2 origin = player_.position;
+    const float power = ModulePower();
     if (const int level = ModuleLevel(stats_, ModuleId::ArcCoil); level > 0) {
         arcTimer_ -= dt;
         if (arcTimer_ <= 0.0f) {
@@ -149,8 +162,11 @@ void World::UpdateModules(float dt) {
             arcTimer_ = fired ? (storm ? 0.8f : (level >= 3 ? 1.5f : 2.0f)) : 0.3f;
         }
     }
+}
 
-    // --- Swarm missiles ----------------------------------------------------
+void World::UpdateMissiles(float dt) {
+    const Vector2 origin = player_.position;
+    const float power = ModulePower();
     if (const int level = ModuleLevel(stats_, ModuleId::Missiles); level > 0) {
         missileTimer_ -= dt;
         if (missileTimer_ <= 0.0f && NearestEnemy(origin, 900.0f) != nullptr) {
@@ -204,8 +220,11 @@ void World::UpdateModules(float dt) {
             }
         }
     }
+}
 
-    // --- Pulse nova --------------------------------------------------------
+void World::UpdatePulseNova(float dt) {
+    const Vector2 origin = player_.position;
+    const float power = ModulePower();
     if (const int level = ModuleLevel(stats_, ModuleId::PulseNova); level > 0) {
         pulseTimer_ -= dt;
         if (pulseTimer_ <= 0.0f) {
@@ -219,8 +238,11 @@ void World::UpdateModules(float dt) {
             Emit(EventType::PulseNova, origin, kPulseColor, radius);
         }
     }
+}
 
-    // --- Proximity mines ---------------------------------------------------
+void World::UpdateMines(float dt) {
+    const Vector2 origin = player_.position;
+    const float power = ModulePower();
     if (const int level = ModuleLevel(stats_, ModuleId::Mines); level > 0) {
         mineTimer_ -= dt * (Length(player_.velocity) > 80.0f ? 1.0f : 0.35f);
         if (mineTimer_ <= 0.0f && playerMines_.size() < 14) {
@@ -269,8 +291,11 @@ void World::UpdateModules(float dt) {
             }
         }
     }
+}
 
-    // --- Prism lance -------------------------------------------------------
+void World::UpdatePrismLance(float dt) {
+    const Vector2 origin = player_.position;
+    const float power = ModulePower();
     if (const int level = ModuleLevel(stats_, ModuleId::PrismLance); level > 0) {
         lanceTimer_ -= dt;
         if (lanceTimer_ <= 0.0f) {
@@ -305,5 +330,6 @@ void World::UpdateModules(float dt) {
         }
     }
 }
+
 
 } // namespace gb

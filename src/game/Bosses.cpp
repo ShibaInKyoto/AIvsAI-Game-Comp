@@ -42,6 +42,12 @@ int CurrentAttack(const Enemy& e, std::span<const int> sequence) {
     return sequence[static_cast<std::size_t>(e.state) % sequence.size()];
 }
 
+// Picks the attack sequence for a boss's current phase (0..2).
+std::span<const int> PhaseSequence(int phase, std::span<const int> phase0, std::span<const int> phase1,
+                                   std::span<const int> phase2) {
+    return phase == 0 ? phase0 : (phase == 1 ? phase1 : phase2);
+}
+
 } // namespace
 
 void World::BehaveBoss(Enemy& e, float dt) {
@@ -88,9 +94,7 @@ void World::UpdateBossWarden(Enemy& e, float dt) {
     static constexpr std::array<int, 3> kPhase0{0, 1, 2};
     static constexpr std::array<int, 4> kPhase1{0, 3, 1, 2};
     static constexpr std::array<int, 6> kPhase2{3, 4, 0, 4, 1, 2};
-    const std::span<const int> sequence = phase == 0 ? std::span<const int>(kPhase0)
-                                        : phase == 1 ? std::span<const int>(kPhase1)
-                                                     : std::span<const int>(kPhase2);
+    const std::span<const int> sequence = PhaseSequence(phase, kPhase0, kPhase1, kPhase2);
     const int attack = CurrentAttack(e, sequence);
 
     const bool charging = attack == 4 && !run.Recovering();
@@ -199,9 +203,7 @@ void World::UpdateBossHydra(Enemy& e, float dt) {
     static constexpr std::array<int, 2> kPhase0{0, 1};
     static constexpr std::array<int, 3> kPhase1{0, 2, 1};
     static constexpr std::array<int, 4> kPhase2{3, 2, 0, 1};
-    const std::span<const int> sequence = phase == 0 ? std::span<const int>(kPhase0)
-                                        : phase == 1 ? std::span<const int>(kPhase1)
-                                                     : std::span<const int>(kPhase2);
+    const std::span<const int> sequence = PhaseSequence(phase, kPhase0, kPhase1, kPhase2);
     const int attack = CurrentAttack(e, sequence);
 
     const bool rushing = attack == 2 && !run.Recovering();
@@ -304,9 +306,7 @@ void World::UpdateBossSingularity(Enemy& e, float dt) {
     static constexpr std::array<int, 2> kPhase0{0, 1};
     static constexpr std::array<int, 3> kPhase1{0, 2, 1};
     static constexpr std::array<int, 4> kPhase2{3, 0, 1, 2};
-    const std::span<const int> sequence = phase == 0 ? std::span<const int>(kPhase0)
-                                        : phase == 1 ? std::span<const int>(kPhase1)
-                                                     : std::span<const int>(kPhase2);
+    const std::span<const int> sequence = PhaseSequence(phase, kPhase0, kPhase1, kPhase2);
     const int attack = CurrentAttack(e, sequence);
 
     if (e.age < kIntroTime || run.Recovering()) {
@@ -397,9 +397,7 @@ void World::UpdateBossArchitect(Enemy& e, float dt) {
     static constexpr std::array<int, 3> kPhase0{0, 2, 3};
     static constexpr std::array<int, 4> kPhase1{0, 1, 3, 2};
     static constexpr std::array<int, 5> kPhase2{1, 0, 3, 1, 2};
-    const std::span<const int> sequence = phase == 0 ? std::span<const int>(kPhase0)
-                                        : phase == 1 ? std::span<const int>(kPhase1)
-                                                     : std::span<const int>(kPhase2);
+    const std::span<const int> sequence = PhaseSequence(phase, kPhase0, kPhase1, kPhase2);
     const int attack = CurrentAttack(e, sequence);
 
     if (attack != 3 || run.Recovering()) {
