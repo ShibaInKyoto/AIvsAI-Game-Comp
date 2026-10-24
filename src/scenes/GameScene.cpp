@@ -430,6 +430,7 @@ void GameScene::FinishRun(bool victory) {
     summary.stats = world.Record();
     summary.stats.victory = victory || world.Record().bossesKilled >= Director::kCampaignSectors;
     summary.config = config_;
+    summary.build = world.Inventory();
     summary.level = world.Level();
     summary.sectorReached = world.GetDirector().Sector() + 1;
     summary.victory = summary.stats.victory;

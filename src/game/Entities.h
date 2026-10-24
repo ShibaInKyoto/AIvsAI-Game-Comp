@@ -125,6 +125,7 @@ struct EnemyBullet {
     float acceleration = 0.0f;  // speeds up (or slows down) along velocity
     float turn = 0.0f;          // curving bullets (radians per second)
     EnemyBulletStyle style = EnemyBulletStyle::Orb;
+    EnemyKind source = EnemyKind::Count;  // who fired it (Count = unknown)
     Color color{255, 80, 60, 255};
     bool alive = true;
 };
@@ -139,6 +140,7 @@ struct Beam {
     float duration = 0.45f; // firing time remaining once warm
     float sweep = 0.0f;     // radians per second while firing
     EntityId owner = kInvalidId;
+    EnemyKind source = EnemyKind::Count;  // who fired it (Count = unknown)
     bool followOwner = true;
     bool alive = true;
     Color color{255, 60, 200, 255};

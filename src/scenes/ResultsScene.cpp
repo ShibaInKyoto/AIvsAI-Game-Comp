@@ -6,15 +6,30 @@
 #include "scenes/GameScene.h"
 #include "scenes/HangarScene.h"
 #include "scenes/TitleScene.h"
+#include "game/EnemyCatalog.h"
 #include "view/Palette.h"
+#include "view/Shapes.h"
 
 #include <algorithm>
+#include <string>
+#include <vector>
 
 namespace gb {
 
 namespace {
 
 enum ResultItem { ItemRetry, ItemHangar, ItemTitle };
+
+// Sub-parts read better under their parent's name.
+std::string KillerName(EnemyKind kind) {
+    switch (kind) {
+    case EnemyKind::SplitterMini: return "SPLITTER SHARD";
+    case EnemyKind::WeaverBody: return "WEAVER";
+    case EnemyKind::Mine: return "BOMBER MINE";
+    case EnemyKind::BossMinion: return "GUARDIAN TURRET";
+    default: return ToUpper(GetEnemyInfo(kind).name);
+    }
+}
 constexpr int kRowCount = 8;
 constexpr float kRowInterval = 0.14f;
 
@@ -111,8 +126,14 @@ void ResultsScene::DrawUi() {
     text.Draw(FontId::Heading, TextFormat("%s  //  %s  //  %s", ship.name, DifficultyName(summary_.config.difficulty), mode),
               {cx, 178.0f}, 22.0f, WithAlpha(palette::kUiDim, titleIn), Align::Center, 0.2f);
 
-    const Rectangle panel{cx - 460.0f, 230.0f, 920.0f, 560.0f};
+    // Stats on the left, the run's loadout on the right.
+    const float totalWidth = std::min(1480.0f, ui.x - 80.0f);
+    const float statsWidth = std::min(860.0f, totalWidth * 0.58f);
+    const float left = cx - totalWidth * 0.5f;
+    const Rectangle panel{left, 230.0f, statsWidth, 560.0f};
+    const Rectangle loadout{left + statsWidth + 30.0f, 230.0f, totalWidth - statsWidth - 30.0f, 560.0f};
     ui::Panel(app_, panel, accent, titleIn);
+    DrawLoadout(loadout, accent, titleIn);
     const int seconds = static_cast<int>(s.time);
     const std::array<std::pair<const char*, std::string>, kRowCount> rows{{
         {"TIME SURVIVED", TextFormat("%d:%02d", seconds / 60, seconds % 60)},
@@ -152,6 +173,96 @@ void ResultsScene::DrawUi() {
         const float pulse = 0.6f + 0.4f * std::sin(time_ * 4.0f);
         text.Draw(FontId::Heading, "YOU CAN AFFORD A NEW SHIP IN THE HANGAR", {cx, ui.y - 60.0f}, 22.0f,
                   WithAlpha(palette::kCache, pulse), Align::Center, 0.15f);
+    }
+}
+
+void ResultsScene::DrawLoadout(Rectangle panel, Color accent, float alpha) {
+    TextRenderer& text = app_.Gfx().Text();
+    NeonRenderer& neon = app_.Gfx().Neon();
+    ui::Panel(app_, panel, accent, alpha);
+
+    // Unique upgrades in the order they were first taken.
+    std::vector<UpgradeId> picks;
+    for (UpgradeId id : summary_.build.Order()) {
+        if (std::find(picks.begin(), picks.end(), id) == picks.end()) {
+            picks.push_back(id);
+        }
+    }
+    text.Draw(FontId::Heading, "LOADOUT", {panel.x + 36.0f, panel.y + 30.0f}, 24.0f, WithAlpha(WHITE, alpha),
+              Align::Left, 0.15f);
+    text.Draw(FontId::BodyBold, TextFormat("%d UPGRADES", static_cast<int>(picks.size())),
+              {panel.x + panel.width - 36.0f, panel.y + 28.0f}, 24.0f, WithAlpha(palette::kUiDim, alpha), Align::Right);
+
+    const EnemyKind killer = summary_.stats.killedBy;
+    const bool showKiller = !summary_.victory && killer != EnemyKind::Count;
+    // Shrink tiles until the whole build fits above the "destroyed by" footer.
+    const float gridTop = panel.y + 84.0f;
+    const float gridBottom = panel.y + panel.height - (showKiller ? 140.0f : 30.0f);
+    const float gridWidth = panel.width - 72.0f;
+    constexpr float kGap = 10.0f;
+    float tile = 76.0f;
+    int columns = 1;
+    for (; tile > 36.0f; tile -= 4.0f) {
+        columns = std::max(1, static_cast<int>((gridWidth + kGap) / (tile + kGap)));
+        const int rows = (static_cast<int>(picks.size()) + columns - 1) / columns;
+        if (static_cast<float>(rows) * (tile + kGap) - kGap <= gridBottom - gridTop) {
+            break;
+        }
+    }
+    auto tileRect = [&](int i) {
+        return Rectangle{panel.x + 36.0f + static_cast<float>(i % columns) * (tile + kGap),
+                         gridTop + static_cast<float>(i / columns) * (tile + kGap), tile, tile};
+    };
+    // Icons pop in one by one after the panel appears.
+    auto reveal = [&](int i) { return Saturate((time_ - 0.7f - 0.05f * static_cast<float>(i)) / 0.2f) * alpha; };
+
+    const int count = static_cast<int>(picks.size());
+    for (int i = 0; i < count; ++i) {
+        DrawRectangleRec(tileRect(i), WithAlpha(palette::kUiPanelLight, 0.9f * reveal(i)));
+    }
+    neon.Begin();
+    for (int i = 0; i < count; ++i) {
+        const float a = reveal(i);
+        if (a <= 0.0f) {
+            continue;
+        }
+        const Rectangle r = tileRect(i);
+        const UpgradeInfo& info = GetUpgradeInfo(picks[static_cast<std::size_t>(i)]);
+        const Color rarity = RarityColor(info.rarity);
+        const std::array<Vector2, 4> corners{Vector2{r.x, r.y}, Vector2{r.x + r.width, r.y},
+                                             Vector2{r.x + r.width, r.y + r.height}, Vector2{r.x, r.y + r.height}};
+        neon.Polyline(corners, true, 1.5f, WithAlpha(rarity, 0.6f * a));
+        shapes::DrawUpgradeIcon(neon, info.id, {r.x + r.width * 0.5f, r.y + r.height * 0.5f}, r.width * 0.62f,
+                                WithAlpha(LerpColor(rarity, WHITE, 0.2f), a), time_);
+    }
+    if (showKiller) {
+        const float y = panel.y + panel.height - 110.0f;
+        neon.Line({panel.x + 36.0f, y}, {panel.x + panel.width - 36.0f, y}, 1.5f,
+                  WithAlpha(palette::kUiBorder, 0.7f * alpha));
+        const EnemyInfo& info = GetEnemyInfo(killer);
+        const Vector2 icon{panel.x + 76.0f, y + 56.0f};
+        neon.Glow(icon, 50.0f, WithAlpha(info.color, 0.15f * alpha));
+        shapes::DrawEnemyPreview(neon, killer, icon, 28.0f / info.radius, time_);
+    }
+    neon.End();
+    for (int i = 0; i < count; ++i) {
+        const int stacks = summary_.build.Stacks(picks[static_cast<std::size_t>(i)]);
+        if (stacks > 1) {
+            const Rectangle r = tileRect(i);
+            text.Draw(FontId::BodyBold, TextFormat("%d", stacks), {r.x + r.width - 6.0f, r.y + r.height - 24.0f},
+                      20.0f, WithAlpha(palette::kUiText, reveal(i)), Align::Right);
+        }
+    }
+    if (count == 0) {
+        text.Draw(FontId::Body, "No upgrades taken.", {panel.x + 36.0f, gridTop}, 24.0f,
+                  WithAlpha(palette::kUiFaint, alpha));
+    }
+    if (showKiller) {
+        const float y = panel.y + panel.height - 110.0f;
+        text.Draw(FontId::Heading, "DESTROYED BY", {panel.x + 130.0f, y + 26.0f}, 16.0f,
+                  WithAlpha(palette::kUiDim, alpha), Align::Left, 0.2f);
+        text.Draw(FontId::Heading, KillerName(killer), {panel.x + 130.0f, y + 52.0f}, 28.0f,
+                  WithAlpha(GetEnemyInfo(killer).color, alpha), Align::Left, 0.08f);
     }
 }
 

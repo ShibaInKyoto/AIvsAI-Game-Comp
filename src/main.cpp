@@ -102,8 +102,16 @@ int main(int argc, char** argv) {
             summary.stats.bestCombo = 412;
             summary.stats.damageDealt = 2.4e6;
             summary.stats.hitsTaken = 6;
+            summary.stats.killedBy = gb::EnemyKind::Gunner;
             summary.level = 31;
             summary.sectorReached = 4;
+            // A representative late-run build for screenshots.
+            using U = gb::UpgradeId;
+            for (U id : {U::Overclock, U::OrbitBlades, U::OrbitBlades, U::HighVoltage, U::SplitShot, U::Drones,
+                         U::OrbitBlades, U::Thrusters, U::Drones, U::OrbitBlades, U::PiercingRounds, U::OrbitBlades,
+                         U::SawStorm, U::ArcCoil, U::Overclock, U::ArcCoil, U::HullPlating, U::Overcharge}) {
+                summary.build.Add(id);
+            }
             return std::make_unique<gb::ResultsScene>(a, summary, 512);
         }
         if (scene == "title" || scene == "records" || scene == "codex") {

@@ -59,9 +59,11 @@ void World::UpdateEnemies(float dt) {
     for (std::size_t i = 0; i < enemies_.size(); ++i) {
         Enemy& e = enemies_[i];
         if (e.alive) {
+            actingEnemy_ = e.kind;
             UpdateEnemy(e, dt);
         }
     }
+    actingEnemy_ = EnemyKind::Count;
 }
 
 void World::UpdateEnemy(Enemy& e, float dt) {
@@ -423,7 +425,7 @@ void World::BehaveMine(Enemy& e, float dt) {
     } else if (e.state == 1 && e.timer <= 0.0f) {
         const float blast = 115.0f;
         if (DistanceSq(e.position, player_.position) < blast * blast) {
-            DamagePlayer(e.position);
+            DamagePlayer(e.position, e.kind);
         }
         Emit(EventType::Explosion, e.position, kMineColor, blast);
         e.alive = false;

@@ -18,6 +18,8 @@ public:
     void DrawUi() override;
 
 private:
+    void DrawLoadout(Rectangle panel, Color accent, float alpha);
+
     RunSummary summary_;
     int creditsEarned_ = 0;
     bool newRecord_ = false;

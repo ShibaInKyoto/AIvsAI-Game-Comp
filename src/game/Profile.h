@@ -33,6 +33,7 @@ const FirmwareInfo& GetFirmwareInfo(FirmwareId id);
 struct RunSummary {
     RunStats stats;
     RunConfig config;
+    UpgradeInventory build;  // final loadout
     int level = 1;
     int sectorReached = 1;
     bool victory = false;

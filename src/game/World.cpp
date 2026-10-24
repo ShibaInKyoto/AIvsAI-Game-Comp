@@ -360,6 +360,7 @@ EnemyBullet& World::FireEnemyBullet(Vector2 position, Vector2 velocity, EnemyBul
     b.position = position;
     b.velocity = velocity * tuning_.bulletSpeed;
     b.style = style;
+    b.source = actingEnemy_;
     b.color = color;
     b.radius = radius;
     enemyBullets_.push_back(b);
@@ -376,6 +377,7 @@ Beam& World::AddBeam(Vector2 origin, float angle, float warmup, float duration, 
     b.width = width;
     b.color = color;
     b.owner = owner;
+    b.source = actingEnemy_;
     b.followOwner = owner != kInvalidId;
     beams_.push_back(b);
     Emit(EventType::LaserCharge, origin, color, warmup);
@@ -527,7 +529,7 @@ void World::SpawnPlayerBullet(Vector2 origin, float angle, float speedScale) {
     bullets_.push_back(b);
 }
 
-void World::DamagePlayer(Vector2 source) {
+void World::DamagePlayer(Vector2 source, EnemyKind cause) {
     Player& p = player_;
     if (!p.alive || p.invulnerable > 0.0f || p.Dashing()) {
         return;
@@ -573,6 +575,7 @@ void World::DamagePlayer(Vector2 source) {
     if (p.hp <= 0) {
         p.alive = false;
         p.velocity = {};
+        runStats_.killedBy = cause;
         Emit(EventType::PlayerDeath, p.position, {255, 255, 255, 255}, 1.0f);
     }
 }
@@ -597,7 +600,7 @@ void World::HandlePlayerContacts() {
             return;
         }
         if (e.contactDamage && distSq < reach * reach) {
-            DamagePlayer(e.position);
+            DamagePlayer(e.position, e.kind);
         }
     });
 }
@@ -745,7 +748,7 @@ void World::UpdateEnemyBullets(float dt) {
             const float reach = b.radius * 0.8f + p.radius * kBulletHitboxScale;
             if (DistanceSq(b.position, p.position) < reach * reach) {
                 b.alive = false;
-                DamagePlayer(b.position);
+                DamagePlayer(b.position, b.source);
             }
         }
     }
@@ -796,7 +799,7 @@ void World::UpdateBeams(float dt) {
             }();
             const float reach = beam.width * 0.45f + p.radius * kBulletHitboxScale;
             if (DistanceSq(closest, p.position) < reach * reach) {
-                DamagePlayer(closest);
+                DamagePlayer(closest, beam.source);
             }
         }
     }

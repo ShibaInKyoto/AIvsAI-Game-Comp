@@ -58,6 +58,7 @@ struct RunStats {
     std::uint32_t bossMask = 0;   // bit per EnemyKind of defeated bosses
     std::uint32_t enemiesSeen = 0;    // bit per EnemyKind encountered (codex)
     std::uint64_t upgradesTaken = 0;  // bit per UpgradeId drafted (codex)
+    EnemyKind killedBy = EnemyKind::Count;  // what dealt the final hit (Count = unknown)
     bool victory = false;
 };
 
@@ -124,7 +125,7 @@ public:
     // Returns true if the enemy died from this hit.
     bool DamageEnemy(Enemy& enemy, float amount, bool crit, Vector2 direction, float knockback = 0.0f);
     void KillEnemy(Enemy& enemy, bool dropLoot);
-    void DamagePlayer(Vector2 source);
+    void DamagePlayer(Vector2 source, EnemyKind cause = EnemyKind::Count);
     void ClearEnemyBullets(Vector2 center, float radius);
     // Removes every non-boss enemy (used before boss fights); optionally pays out loot.
     void PurgeEnemies(bool dropLoot);
@@ -281,6 +282,7 @@ private:
     int rerolls_ = 1;
 
     int combo_ = 0;
+    EnemyKind actingEnemy_ = EnemyKind::Count;  // enemy whose behaviour is running (attributes its shots)
     float comboTimer_ = 0.0f;
     float orbitAngle_ = 0.0f;
     float arcTimer_ = 0.0f;

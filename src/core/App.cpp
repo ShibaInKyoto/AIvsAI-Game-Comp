@@ -206,6 +206,7 @@ void App::Frame() {
         settings_.fullscreen = !settings_.fullscreen;
         ApplyDisplaySettings();
         settings_.Save();
+        input_.ConsumeAll();  // Alt+Enter must not also confirm a menu item
     }
 
     if (IsKeyPressed(KEY_F3)) {
