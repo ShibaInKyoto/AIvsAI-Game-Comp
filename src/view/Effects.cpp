@@ -2,6 +2,7 @@
 
 #include "audio/AudioSystem.h"
 #include "core/Settings.h"
+#include "platform/Rumble.h"
 #include "game/EnemyCatalog.h"
 #include "render/CameraRig.h"
 #include "render/Particles.h"
@@ -20,8 +21,8 @@ constexpr std::size_t kMaxTexts = 90;
 } // namespace
 
 EffectsDirector::EffectsDirector(ParticleSystem& particles, WarpGrid& grid, CameraRig& camera, AudioSystem& audio,
-                                 const Settings& settings)
-    : particles_(particles), grid_(grid), camera_(camera), audio_(audio), settings_(settings) {
+                                 Rumble& rumble, const Settings& settings)
+    : particles_(particles), grid_(grid), camera_(camera), audio_(audio), rumble_(rumble), settings_(settings) {
     texts_.reserve(kMaxTexts);
 }
 
@@ -43,6 +44,12 @@ void EffectsDirector::PlaySfx(SfxId id, float volume, float pitch, float pan) {
 }
 
 void EffectsDirector::Shake(float trauma) { camera_.AddTrauma(trauma * settings_.screenShake); }
+
+void EffectsDirector::Vibrate(float low, float high, float duration) {
+    if (!muted_) {
+        rumble_.Pulse(low, high, duration);
+    }
+}
 
 void EffectsDirector::Flash(Color color, float amount) {
     flashColor_ = color;
@@ -116,6 +123,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             } else if (big || ev.value != 0) {
                 PlaySfx(SfxId::EnemyDieBig, 0.6f, rng.Range(0.9f, 1.1f), pan);
                 Shake(0.18f);
+                Vibrate(0.35f, 0.3f, 0.12f);
             } else {
                 PlaySfx(SfxId::EnemyDie, 0.42f, rng.Range(0.85f, 1.2f), pan);
                 Shake(0.04f);
@@ -135,6 +143,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             grid_.ApplyExplosiveForce(220.0f, ev.position, 1400.0f);
             PlaySfx(SfxId::BossDeath, 1.0f, 1.0f, pan);
             Shake(1.0f);
+            Vibrate(1.0f, 0.8f, 0.9f);
             Flash(WHITE, 0.9f);
             aberration_ = std::max(aberration_, 0.02f);
             slowMo_ = 1.6f;
@@ -181,6 +190,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             grid_.ApplyExplosiveForce(70.0f, ev.position, 500.0f);
             PlaySfx(SfxId::PlayerHurt, 0.9f, 1.0f, pan);
             Shake(0.6f);
+            Vibrate(0.8f, 1.0f, 0.3f);
             Flash(palette::kDanger, 0.45f);
             aberration_ = std::max(aberration_, 0.018f);
             hitStop_ = 0.09f;
@@ -195,6 +205,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             grid_.ApplyExplosiveForce(260.0f, ev.position, 1100.0f);
             PlaySfx(SfxId::PlayerDeath, 1.0f, 1.0f, pan);
             Shake(1.0f);
+            Vibrate(1.0f, 1.0f, 0.7f);
             Flash(WHITE, 0.8f);
             aberration_ = 0.03f;
             slowMo_ = 2.0f;
@@ -205,12 +216,14 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
                              2.5f);
             grid_.ApplyDirectedForce(ev.direction * 20.0f, ev.position, 160.0f);
             PlaySfx(SfxId::Dash, 0.6f, rng.Range(0.95f, 1.1f), pan);
+            Vibrate(0.0f, 0.25f, 0.07f);
             break;
         case EventType::ShieldBlock:
             particles_.ShockRing(ev.position, 20.0f, 200.0f, 0.4f, palette::kShield);
             particles_.Burst(ev.position, 40, palette::kShield, 200.0f, 700.0f, 0.3f, 0.7f, 14.0f, 3.0f);
             PlaySfx(SfxId::ShieldBlock, 0.8f, 1.0f, pan);
             Shake(0.35f);
+            Vibrate(0.4f, 0.7f, 0.2f);
             Flash(palette::kShield, 0.25f);
             AddText(ev.position, "SHIELD BROKEN", palette::kShield, 30.0f, true);
             break;
@@ -221,6 +234,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             grid_.ApplyExplosiveForce(300.0f, ev.position, 1300.0f);
             PlaySfx(SfxId::Nova, 1.0f, 1.0f, pan);
             Shake(0.75f);
+            Vibrate(0.9f, 0.5f, 0.4f);
             Flash(Color{180, 230, 255, 255}, 0.6f);
             aberration_ = std::max(aberration_, 0.015f);
             camera_.SetZoomPunch(0.06f);

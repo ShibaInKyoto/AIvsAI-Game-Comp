@@ -35,6 +35,7 @@ bool Settings::Load() {
     damageNumbers = doc.GetBool("damage_numbers", damageNumbers);
     autoFire = doc.GetBool("auto_fire", autoFire);
     aimAssist = doc.GetBool("aim_assist", aimAssist);
+    vibration = doc.GetBool("vibration", vibration);
     Sanitize();
     return true;
 }
@@ -58,6 +59,7 @@ bool Settings::Save() const {
     doc.SetBool("damage_numbers", damageNumbers);
     doc.SetBool("auto_fire", autoFire);
     doc.SetBool("aim_assist", aimAssist);
+    doc.SetBool("vibration", vibration);
     return storage::WriteTextFileAtomic(storage::DataDirectory() / kFileName, doc.Serialize());
 }
 

@@ -14,6 +14,7 @@ class ParticleSystem;
 class WarpGrid;
 class CameraRig;
 class AudioSystem;
+class Rumble;
 struct Settings;
 
 struct FloatingText {
@@ -33,7 +34,7 @@ struct FloatingText {
 class EffectsDirector {
 public:
     EffectsDirector(ParticleSystem& particles, WarpGrid& grid, CameraRig& camera, AudioSystem& audio,
-                    const Settings& settings);
+                    Rumble& rumble, const Settings& settings);
 
     void Process(const World& world, const std::vector<GameEvent>& events);
     void Update(const World& world, float realDt);
@@ -54,11 +55,13 @@ private:
     float Pan(Vector2 position) const;
     void PlaySfx(SfxId id, float volume, float pitch, float pan);
     void Shake(float trauma);
+    void Vibrate(float low, float high, float duration);
 
     ParticleSystem& particles_;
     WarpGrid& grid_;
     CameraRig& camera_;
     AudioSystem& audio_;
+    Rumble& rumble_;
     const Settings& settings_;
 
     std::vector<FloatingText> texts_;

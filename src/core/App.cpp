@@ -103,6 +103,7 @@ void App::SetWindowIconFromAssets() {
 }
 
 void App::Shutdown() {
+    rumble_.Stop(std::max(input_.GamepadIndex(), 0));
     scene_.reset();
     pendingScene_.reset();
     if (profile_) {
@@ -224,6 +225,8 @@ void App::Frame() {
 
     input_.Update(dt);
     audio_->Update(dt);
+    rumble_.Update(GetFrameTime(), input_.GamepadIndex(),
+                   settings_.vibration && input_.LastDevice() == InputDevice::Gamepad);
     UpdateTransition(dt);
     if (scene_ && !IsWindowMinimized()) {
         scene_->Update(dt);

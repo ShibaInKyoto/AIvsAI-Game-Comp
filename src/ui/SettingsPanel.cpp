@@ -24,11 +24,12 @@ void Step(float& value, int direction, float step, float lo, float hi) {
 void SettingsPanel::Open(App& app) {
     active_ = true;
     std::vector<ui::Menu::Item> items(ItemCount);
-    const char* labels[ItemCount] = {"MASTER VOLUME", "MUSIC VOLUME", "EFFECTS VOLUME", "FULLSCREEN", "V-SYNC",
-                                     "RENDER SCALE",
-                                     "SCREEN SHAKE", "BLOOM", "CHROMATIC ABERRATION", "FILM GRAIN", "SCANLINES",
-                                     "REDUCE FLASHING", "DAMAGE NUMBERS", "AUTO-FIRE", "GAMEPAD AIM ASSIST",
-                                     "SHOW FPS", "BACK"};
+    const char* labels[ItemCount] = {"MASTER VOLUME",   "MUSIC VOLUME",      "EFFECTS VOLUME",
+                                     "FULLSCREEN",      "V-SYNC",            "RENDER SCALE",
+                                     "SCREEN SHAKE",    "BLOOM",             "CHROMATIC ABERRATION",
+                                     "FILM GRAIN",      "SCANLINES",         "REDUCE FLASHING",
+                                     "DAMAGE NUMBERS",  "AUTO-FIRE",         "GAMEPAD AIM ASSIST",
+                                     "GAMEPAD VIBRATION", "SHOW FPS",        "BACK"};
     for (int i = 0; i < ItemCount; ++i) {
         items[static_cast<std::size_t>(i)].label = labels[i];
         items[static_cast<std::size_t>(i)].adjustable = i != Back;
@@ -56,6 +57,7 @@ void SettingsPanel::Refresh(App& app) {
     menu_.SetValue(DamageNumbers, OnOff(s.damageNumbers));
     menu_.SetValue(AutoFire, OnOff(s.autoFire));
     menu_.SetValue(AimAssist, OnOff(s.aimAssist));
+    menu_.SetValue(Vibration, OnOff(s.vibration));
     menu_.SetValue(ShowFps, OnOff(s.showFps));
 }
 
@@ -100,6 +102,7 @@ void SettingsPanel::Adjust(App& app, int item, int direction) {
     case DamageNumbers: s.damageNumbers = !s.damageNumbers; break;
     case AutoFire: s.autoFire = !s.autoFire; break;
     case AimAssist: s.aimAssist = !s.aimAssist; break;
+    case Vibration: s.vibration = !s.vibration; break;
     case ShowFps: s.showFps = !s.showFps; break;
     default: return;
     }

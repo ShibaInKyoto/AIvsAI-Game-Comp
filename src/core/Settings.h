@@ -24,6 +24,7 @@ struct Settings {
     bool damageNumbers = true;
     bool autoFire = false;
     bool aimAssist = true;
+    bool vibration = true;
 
     bool Load();
     bool Save() const;

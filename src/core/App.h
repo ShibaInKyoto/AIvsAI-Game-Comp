@@ -3,6 +3,7 @@
 #include "core/Input.h"
 #include "core/Scene.h"
 #include "core/Settings.h"
+#include "platform/Rumble.h"
 #include "render/Graphics.h"
 
 #include <cstdint>
@@ -54,6 +55,7 @@ public:
     Settings& Prefs() { return settings_; }
     AudioSystem& Audio() { return *audio_; }
     Profile& Progress() { return *profile_; }
+    Rumble& Haptics() { return rumble_; }
     const LaunchOptions& Options() const { return options_; }
 
     // Applies display-related settings (fullscreen, vsync, render scale) after they change.
@@ -83,6 +85,7 @@ private:
     Graphics graphics_;
     Input input_;
     Settings settings_;
+    Rumble rumble_;
     std::unique_ptr<AudioSystem> audio_;
     std::unique_ptr<Profile> profile_;
 

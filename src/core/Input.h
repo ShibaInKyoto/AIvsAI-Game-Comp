@@ -58,6 +58,7 @@ public:
 
     InputDevice LastDevice() const { return lastDevice_; }
     bool GamepadConnected() const { return gamepad_ >= 0; }
+    int GamepadIndex() const { return gamepad_; }
 
     // Suppresses all input until every button has been released, so a press
     // that closes one screen does not leak into the next.

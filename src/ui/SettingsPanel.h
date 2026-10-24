@@ -33,6 +33,7 @@ private:
         DamageNumbers,
         AutoFire,
         AimAssist,
+        Vibration,
         ShowFps,
         Back,
         ItemCount
