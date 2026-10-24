@@ -1,8 +1,11 @@
 #include "core/App.h"
 #include "game/Profile.h"
 #include "scenes/GameScene.h"
+#include "scenes/HangarScene.h"
+#include "scenes/ResultsScene.h"
 #include "scenes/TitleScene.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -21,6 +24,8 @@ void PrintUsage() {
         "  --screenshot-at SECONDS when to take the screenshot (default 3)\n"
         "  --scene NAME            start in a specific scene (title, game)\n"
         "  --seed N                fixed run seed\n"
+        "  --sector N              (debug) start runs in sector N\n"
+        "  --boss                  (debug) start runs at the sector boss\n"
         "  --data-dir PATH         override the settings/save directory\n");
 }
 
@@ -51,6 +56,10 @@ gb::LaunchOptions ParseArgs(int argc, char** argv) {
             options.startScene = argv[++i];
         } else if (arg == "--seed" && hasValue) {
             options.seed = std::strtoull(argv[++i], nullptr, 10);
+        } else if (arg == "--sector" && hasValue) {
+            options.startSector = std::max(0, std::atoi(argv[++i]) - 1);
+        } else if (arg == "--boss") {
+            options.startAtBoss = true;
         } else if (arg == "--data-dir" && hasValue) {
             options.dataDirectory = argv[++i];
         } else if (arg == "--help" || arg == "-h") {
@@ -67,12 +76,30 @@ int main(int argc, char** argv) {
     gb::App app(ParseArgs(argc, argv));
     return app.Run([](gb::App& a) -> std::unique_ptr<gb::Scene> {
         const gb::LaunchOptions& options = a.Options();
-        // Automated runs and "--scene game" jump straight into a run.
-        if (options.autotestSeconds > 0.0f || options.startScene == "game") {
+        const std::string& scene = options.startScene;
+        // Automated runs and "--scene game|draft|pause" jump straight into a run.
+        if (options.autotestSeconds > 0.0f || scene == "game" || scene == "draft" || scene == "pause") {
             gb::RunConfig config;
             config.seed = options.seed != 0 ? options.seed : 1234u;
             config.meta = a.Progress().Bonuses();
             return std::make_unique<gb::GameScene>(a, config);
+        }
+        if (scene == "hangar" || scene == "firmware") {
+            return std::make_unique<gb::HangarScene>(a, scene == "firmware");
+        }
+        if (scene == "results") {
+            gb::RunSummary summary;
+            summary.stats.time = 754.0f;
+            summary.stats.kills = 4210;
+            summary.stats.score = 1284500;
+            summary.stats.bossesKilled = 3;
+            summary.stats.elitesKilled = 9;
+            summary.stats.bestCombo = 412;
+            summary.stats.damageDealt = 2.4e6;
+            summary.stats.hitsTaken = 6;
+            summary.level = 31;
+            summary.sectorReached = 4;
+            return std::make_unique<gb::ResultsScene>(a, summary, 512);
         }
         return std::make_unique<gb::TitleScene>(a);
     });

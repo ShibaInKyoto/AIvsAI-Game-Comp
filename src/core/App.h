@@ -30,6 +30,8 @@ struct LaunchOptions {
     std::string startScene;  // optional: jump straight to a scene ("game", "title", ...)
     std::string dataDirectory;
     std::uint64_t seed = 0;
+    int startSector = 0;     // debug: begin runs in this sector (0-based)
+    bool startAtBoss = false;  // debug: skip straight to the sector boss
 };
 
 using SceneFactory = std::function<std::unique_ptr<Scene>(App&)>;
@@ -67,6 +69,7 @@ public:
 private:
     bool Init();
     void Shutdown();
+    void SetWindowIconFromAssets();
     void Frame();
     void UpdateTransition(float dt);
     void HandleScreenshot();

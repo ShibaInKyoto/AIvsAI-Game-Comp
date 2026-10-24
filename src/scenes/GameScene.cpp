@@ -37,6 +37,37 @@ void GameScene::OnEnter() {
         HideCursor();
     }
     app_.Audio().Music().SetMood(MusicMood::Game, 0);
+
+    const LaunchOptions& options = app_.Options();
+    if (options.startSector > 0 || options.startAtBoss) {
+        World& world = view_.GetWorld();
+        world.GetDirector().DebugJump(options.startSector, options.startAtBoss);
+        // Give the debug run a build roughly matching that point of a real run.
+        const int levels = 6 + options.startSector * 7;
+        for (int i = 0; i < levels; ++i) {
+            const auto offers = world.RollOffers(3);
+            if (!offers.empty()) {
+                world.ApplyUpgrade(Bot::ChooseUpgrade(world, offers));
+            }
+        }
+    }
+
+    // Debug entry points used for UI screenshots ("--scene draft|pause").
+    const std::string& debugScene = options.startScene;
+    if (debugScene == "draft") {
+        World& world = view_.GetWorld();
+        world.ApplyUpgrade(UpgradeId::OrbitBlades);
+        world.ApplyUpgrade(UpgradeId::Overclock);
+        draft_.Open(app_, world, false);
+        overlay_ = Overlay::Draft;
+    } else if (debugScene == "pause") {
+        World& world = view_.GetWorld();
+        for (UpgradeId id : {UpgradeId::SplitShot, UpgradeId::ArcCoil, UpgradeId::ArcCoil, UpgradeId::Magnet,
+                             UpgradeId::HighVoltage, UpgradeId::Deflector}) {
+            world.ApplyUpgrade(id);
+        }
+        OpenPause();
+    }
 }
 
 Vector2 GameScene::MouseWorld() const { return view_.ScreenToWorld(app_.In().MousePosition()); }

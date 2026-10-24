@@ -316,4 +316,13 @@ void Director::AdvanceSector(SectorModifier modifier) {
 
 void Director::ContinueEndless() { Start(sector_ + 1); }
 
+void Director::DebugJump(int sector, bool boss) {
+    Start(sector);
+    if (boss) {
+        waveTime_ = Info().duration;
+        SetPhase(SectorPhase::BossWarning);
+        phaseTime_ = kBossWarningDuration - 0.1f;
+    }
+}
+
 } // namespace gb

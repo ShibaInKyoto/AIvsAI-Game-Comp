@@ -2,6 +2,7 @@
 
 #include "audio/AudioSystem.h"
 #include "core/App.h"
+#include "core/Format.h"
 #include "scenes/GameScene.h"
 #include "scenes/HangarScene.h"
 #include "scenes/TitleScene.h"
@@ -117,10 +118,10 @@ void ResultsScene::DrawUi() {
         {"TIME SURVIVED", TextFormat("%d:%02d", seconds / 60, seconds % 60)},
         {"SECTOR REACHED", std::to_string(summary_.sectorReached)},
         {"LEVEL", std::to_string(summary_.level)},
-        {"ENEMIES DESTROYED", std::to_string(s.kills)},
+        {"ENEMIES DESTROYED", FormatThousands(s.kills)},
         {"ELITES / GUARDIANS", std::to_string(s.elitesKilled) + " / " + std::to_string(s.bossesKilled)},
         {"BEST COMBO", std::to_string(s.bestCombo)},
-        {"DAMAGE DEALT", std::to_string(static_cast<long long>(s.damageDealt))},
+        {"DAMAGE DEALT", FormatThousands(static_cast<long long>(s.damageDealt))},
         {"HITS TAKEN", std::to_string(s.hitsTaken)},
     }};
     for (int i = 0; i < revealedRows_ && i < kRowCount; ++i) {
@@ -132,7 +133,7 @@ void ResultsScene::DrawUi() {
     if (revealedRows_ >= kRowCount) {
         const float y = panel.y + 400.0f;
         text.Draw(FontId::BodyBold, "SCORE", {panel.x + 60.0f, y + 14.0f}, 30.0f, palette::kUiDim);
-        text.DrawGlow(FontId::Heading, TextFormat("%lld", static_cast<long long>(displayedScore_)),
+        text.DrawGlow(FontId::Heading, FormatThousands(static_cast<long long>(displayedScore_)),
                       {panel.x + panel.width - 60.0f, y}, 56.0f, WHITE, accent, Align::Right, 0.04f);
         if (newRecord_ && displayedScore_ >= static_cast<float>(s.score)) {
             const float pulse = 0.6f + 0.4f * std::sin(time_ * 6.0f);

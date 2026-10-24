@@ -61,7 +61,7 @@ void MenuBackdrop::Draw(App& app) {
     BeginMode2D(camera);
     NeonRenderer& neon = app.Gfx().Neon();
     neon.Begin(1.6f, 0.15f);
-    grid_.Draw(neon, visible, WithAlpha(accent_, 0.08f), WithAlpha(accent_, 0.16f));
+    grid_.Draw(neon, visible, WithAlpha(accent_, 0.045f), WithAlpha(accent_, 0.09f));
     neon.End();
     neon.Begin();
     particles_.Draw(neon, visible);

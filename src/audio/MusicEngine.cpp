@@ -358,7 +358,7 @@ void MusicEngine::RenderSample(float& left, float& right) {
     padGain_ = Smooth(padGain_, mood_ == MusicMood::Silent ? 0.0f : (0.55f - 0.15f * i), rate);
     bassGain_ = Smooth(bassGain_, i > 0.12f ? 0.75f : 0.0f, rate);
     kickGain_ = Smooth(kickGain_, i > 0.28f ? 0.9f : 0.0f, rate);
-    hatGain_ = Smooth(hatGain_, i > 0.3f ? 0.35f : 0.0f, rate);
+    hatGain_ = Smooth(hatGain_, i > 0.3f ? 0.2f : 0.0f, rate);
     snareGain_ = Smooth(snareGain_, i > 0.5f ? 0.55f : 0.0f, rate);
     arpGain_ = Smooth(arpGain_, i > 0.42f ? 0.22f : 0.0f, rate);
     leadGain_ = Smooth(leadGain_, lead_on ? 0.2f : 0.0f, rate);

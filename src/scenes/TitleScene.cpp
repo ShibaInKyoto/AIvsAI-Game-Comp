@@ -3,6 +3,7 @@
 #include "audio/AudioSystem.h"
 #include "core/App.h"
 #include "core/BuildInfo.h"
+#include "core/Format.h"
 #include "game/Profile.h"
 #include "scenes/GameScene.h"
 #include "scenes/HangarScene.h"
@@ -170,12 +171,12 @@ void TitleScene::DrawRecords() {
         {"RUNS", std::to_string(p.Runs())},
         {"VICTORIES", std::to_string(p.Wins())},
         {"FURTHEST SECTOR", p.BestSector() > 0 ? std::to_string(p.BestSector()) : "-"},
-        {"ENEMIES DESTROYED", std::to_string(p.TotalKills())},
+        {"ENEMIES DESTROYED", FormatThousands(p.TotalKills())},
         {"GUARDIANS DESTROYED", std::to_string(p.BossKills())},
         {"TIME PLAYED", std::to_string(minutes / 60) + "h " + std::to_string(minutes % 60) + "m"},
-        {"BEST SCORE - RELAXED", std::to_string(p.BestScore(Difficulty::Relaxed))},
-        {"BEST SCORE - STANDARD", std::to_string(p.BestScore(Difficulty::Standard))},
-        {"BEST SCORE - OVERCLOCKED", std::to_string(p.BestScore(Difficulty::Overclocked))},
+        {"BEST SCORE - RELAXED", FormatThousands(p.BestScore(Difficulty::Relaxed))},
+        {"BEST SCORE - STANDARD", FormatThousands(p.BestScore(Difficulty::Standard))},
+        {"BEST SCORE - OVERCLOCKED", FormatThousands(p.BestScore(Difficulty::Overclocked))},
     }};
     for (std::size_t i = 0; i < rows.size(); ++i) {
         const float y = panel.y + 110.0f + static_cast<float>(i) * 48.0f;

@@ -71,6 +71,9 @@ public:
     void AdvanceSector(SectorModifier modifier);
     void ContinueEndless();
 
+    // Debug/testing: jump to a sector, optionally straight to its boss.
+    void DebugJump(int sector, bool boss);
+
     float EnemyHpMultiplier() const;
     float EnemySpeedMultiplier() const;
     float XpMultiplier() const { return xpMultiplier_; }

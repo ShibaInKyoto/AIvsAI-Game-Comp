@@ -42,6 +42,7 @@ FetchContent_MakeAvailable(raylib)
 set(GB_ASSET_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 file(GLOB_RECURSE GB_ASSET_FILES CONFIGURE_DEPENDS
     "${GB_ASSET_ROOT}/fonts/*.ttf"
+    "${GB_ASSET_ROOT}/icons/*.png"
     "${GB_ASSET_ROOT}/shaders/*.glsl")
 set(GB_ASSET_RELATIVE "")
 foreach(asset IN LISTS GB_ASSET_FILES)
@@ -133,9 +134,12 @@ if(GB_BUILD_TESTS)
 endif()
 
 # --- Tools ----------------------------------------------------------------
-option(GB_BUILD_TOOLS "Build developer tools (balance simulator)" ON)
+option(GB_BUILD_TOOLS "Build developer tools (balance simulator, audio dump)" ON)
 if(GB_BUILD_TOOLS)
     add_executable(gridbreaker_balance tools/BalanceSim.cpp)
     target_link_libraries(gridbreaker_balance PRIVATE gridbreaker_lib)
     gb_set_warnings(gridbreaker_balance)
+    add_executable(gridbreaker_audiodump tools/AudioDump.cpp)
+    target_link_libraries(gridbreaker_audiodump PRIVATE gridbreaker_lib)
+    gb_set_warnings(gridbreaker_audiodump)
 endif()

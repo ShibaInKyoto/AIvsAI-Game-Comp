@@ -51,7 +51,7 @@ jobs:
           Copy-Item build/bin/Gridbreaker.exe smoke/
           Copy-Item mesa/x64/*.dll smoke/
           $env:GALLIUM_DRIVER = "llvmpipe"
-          $p = Start-Process -FilePath smoke/Gridbreaker.exe -ArgumentList "--windowed","--size","1280x720","--no-audio","--data-dir","smoke/data","--autotest","40","--screenshot","smoke/windows.png","--screenshot-at","30" -PassThru -Wait
+          $p = Start-Process -FilePath smoke/Gridbreaker.exe -ArgumentList "--windowed","--size","1000x600","--no-audio","--data-dir","smoke/data","--autotest","40","--screenshot","smoke/windows.png","--screenshot-at","30" -PassThru -Wait
           Write-Host "Exit code: $($p.ExitCode)"
           if (-not (Test-Path smoke/windows.png)) { throw "Smoke test produced no screenshot" }
 

@@ -2,6 +2,7 @@
 
 #include "audio/AudioSystem.h"
 #include "core/BuildInfo.h"
+#include "core/EmbeddedAssets.h"
 #include "core/Storage.h"
 #include "game/Profile.h"
 
@@ -47,9 +48,17 @@ bool App::Init() {
     vsyncApplied_ = settings_.vsync;
     SetExitKey(KEY_NULL);  // Escape is a gameplay key (pause), never quit outright
     SetWindowMinSize(960, 540);
+    SetWindowIconFromAssets();
 
     const int monitor = GetCurrentMonitor();
-    if (!options_.windowed) {
+    if (options_.windowed) {
+        // Never open a window larger than the desktop it lands on.
+        const int mw = GetMonitorWidth(monitor);
+        const int mh = GetMonitorHeight(monitor);
+        if (mw > 0 && mh > 0 && (options_.width > mw || options_.height > mh)) {
+            SetWindowSize(std::min(options_.width, mw), std::min(options_.height, mh - 60));
+        }
+    } else {
         // Size the window sensibly for the monitor before going fullscreen so
         // leaving fullscreen lands on a reasonable windowed size.
         const int mw = GetMonitorWidth(monitor);
@@ -77,6 +86,19 @@ bool App::Init() {
     profile_ = std::make_unique<Profile>();
     profile_->Load();
     return true;
+}
+
+void App::SetWindowIconFromAssets() {
+    const auto png = assets::Find("icons/window.png");
+    if (png.empty()) {
+        return;
+    }
+    Image icon = LoadImageFromMemory(".png", png.data(), static_cast<int>(png.size()));
+    if (icon.data != nullptr) {
+        ImageFormat(&icon, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
+        SetWindowIcon(icon);
+        UnloadImage(icon);
+    }
 }
 
 void App::Shutdown() {

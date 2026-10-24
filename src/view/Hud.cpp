@@ -1,6 +1,7 @@
 #include "view/Hud.h"
 
 #include "core/App.h"
+#include "core/Format.h"
 #include "game/EnemyCatalog.h"
 #include "view/GameView.h"
 #include "view/Palette.h"
@@ -12,20 +13,6 @@
 namespace gb {
 
 namespace {
-
-std::string FormatScore(long long value) {
-    std::string digits = std::to_string(std::max(0LL, value));
-    std::string out;
-    const int len = static_cast<int>(digits.size());
-    for (int i = 0; i < len; ++i) {
-        out += digits[static_cast<std::size_t>(i)];
-        const int remaining = len - i - 1;
-        if (remaining > 0 && remaining % 3 == 0) {
-            out += ',';
-        }
-    }
-    return out;
-}
 
 void Hexagon(NeonRenderer& neon, Vector2 c, float r, Color color, bool filled, float width = 2.0f) {
     std::array<Vector2, 6> pts{};
@@ -149,7 +136,7 @@ void Hud::DrawScore(App& app, const GameView& view) const {
     TextRenderer& text = app.Gfx().Text();
     const Vector2 ui = app.Gfx().UiSize();
     const float right = ui.x - 48.0f;
-    text.Draw(FontId::Heading, FormatScore(static_cast<long long>(displayedScore_)), {right, 30.0f}, 40.0f,
+    text.Draw(FontId::Heading, FormatThousands(static_cast<long long>(displayedScore_)), {right, 30.0f}, 40.0f,
               palette::kUiText, Align::Right, 0.04f);
 
     const int multiplier = world.ComboMultiplier();
