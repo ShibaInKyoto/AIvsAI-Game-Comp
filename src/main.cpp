@@ -1,6 +1,7 @@
 #include "core/App.h"
 #include "game/Profile.h"
 #include "scenes/BootScene.h"
+#include "scenes/EndingScene.h"
 #include "scenes/GameScene.h"
 #include "scenes/HangarScene.h"
 #include "scenes/ResultsScene.h"
@@ -94,7 +95,7 @@ int main(int argc, char** argv) {
         if (scene == "hangar" || scene == "firmware") {
             return std::make_unique<gb::HangarScene>(a, scene == "firmware");
         }
-        if (scene == "results") {
+        if (scene == "results" || scene == "ending") {
             gb::RunSummary summary;
             summary.stats.time = 754.0f;
             summary.stats.kills = 4210;
@@ -113,6 +114,10 @@ int main(int argc, char** argv) {
                          U::OrbitBlades, U::Thrusters, U::Drones, U::OrbitBlades, U::PiercingRounds, U::OrbitBlades,
                          U::SawStorm, U::ArcCoil, U::Overclock, U::ArcCoil, U::HullPlating, U::Overcharge}) {
                 summary.build.Add(id);
+            }
+            if (scene == "ending") {
+                summary.victory = summary.stats.victory = true;
+                return std::make_unique<gb::EndingScene>(a, summary, 512);
             }
             return std::make_unique<gb::ResultsScene>(a, summary, 512);
         }

@@ -64,7 +64,8 @@ endless mode after that. Short runs (15–20 min), lots of build variety.
 ## Status (living section)
 
 Implemented:
-- Full loop: boot → title (attract demo) → hangar → run → results; pause/settings.
+- Full loop: boot → title (attract demo) → hangar → run → (victory epilogue +
+  credits) → results; pause/settings.
 - 6 ships, 39 upgrades + 7 evolutions, 14 enemies, 5 bosses, 5 sector modifiers.
 - Campaign / Endless / Boss Rush / Daily, 3 difficulties, credits + firmware + 16 challenges.
 - Codex of hostiles and upgrades, decoded as they are met or drafted.
@@ -92,7 +93,7 @@ Balance targets (tools/BalanceSim, bot skill = reaction speed):
   far better than people, so endless pacing is tuned by design, not by sim.
 
 Testing helpers:
-- `--scene title|game|bossrush|warp|draft|evolution|pause|hangar|firmware|results|records|codex`
+- `--scene title|game|bossrush|warp|ending|draft|evolution|pause|hangar|firmware|results|records|codex`
 - `--sector N --boss`, `--autotest S`, `--screenshot P --screenshot-at S`, `--perf`
 - xdotool scripts under Xvfb drive real key presses through the menus.
 

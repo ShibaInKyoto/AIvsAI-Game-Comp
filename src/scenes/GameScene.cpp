@@ -5,6 +5,7 @@
 #include "core/Format.h"
 #include "game/EnemyCatalog.h"
 #include "game/Profile.h"
+#include "scenes/EndingScene.h"
 #include "scenes/ResultsScene.h"
 #include "scenes/TitleScene.h"
 #include "view/Palette.h"
@@ -523,7 +524,11 @@ void GameScene::FinishRun(bool victory) {
     }
     const int credits = profile.RecordRun(summary);
     ShowCursor();
-    app_.ChangeScene(std::make_unique<ResultsScene>(app_, summary, credits), 0.6f);
+    if (summary.victory) {
+        app_.ChangeScene(std::make_unique<EndingScene>(app_, summary, credits), 1.2f);
+    } else {
+        app_.ChangeScene(std::make_unique<ResultsScene>(app_, summary, credits), 0.6f);
+    }
 }
 
 void GameScene::DrawWorld() {
