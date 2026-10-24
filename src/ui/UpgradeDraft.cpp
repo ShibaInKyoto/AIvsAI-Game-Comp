@@ -146,8 +146,10 @@ void UpgradeDraft::Draw(App& app, const World& world) {
     text.DrawGlow(FontId::Display, cache_ ? "DATA CACHE" : "LEVEL UP", {ui.x * 0.5f, ui.y * 0.5f - 330.0f}, 64.0f,
                   WithAlpha(WHITE, titleAlpha), WithAlpha(titleColor, titleAlpha), Align::Center, 0.12f);
     text.Draw(FontId::BodyBold,
-              cache_ ? "Rare upgrades are more likely."
-                     : TextFormat("Level %d reached. Choose an upgrade.", world.Level()),
+              cache_                        ? "Rare upgrades are more likely."
+              : world.PendingLevelUps() > 1 ? TextFormat("Level %d reached. Choose an upgrade (%d more after this).",
+                                                         world.Level(), world.PendingLevelUps() - 1)
+                                            : TextFormat("Level %d reached. Choose an upgrade.", world.Level()),
               {ui.x * 0.5f, ui.y * 0.5f - 252.0f}, 26.0f, WithAlpha(palette::kUiDim, titleAlpha), Align::Center);
 
     const int n = static_cast<int>(offers_.size());

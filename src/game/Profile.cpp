@@ -68,6 +68,7 @@ bool Profile::Load() {
     }
     dailyDate_ = static_cast<int>(doc.GetInt("daily_date", 0));
     dailyBest_ = doc.GetInt("daily_best", 0);
+    bossRushBest_ = doc.GetInt("boss_rush_best", 0);
     challenges_ = static_cast<std::uint32_t>(doc.GetInt("challenges", 0));
     seenEnemies_ = static_cast<std::uint32_t>(doc.GetInt("codex_enemies", 0));
     seenUpgrades_ = static_cast<std::uint64_t>(doc.GetInt("codex_upgrades", 0));
@@ -100,6 +101,7 @@ bool Profile::Save() const {
     doc.SetInt("last_difficulty", static_cast<int>(lastDifficulty_));
     doc.SetInt("daily_date", dailyDate_);
     doc.SetInt("daily_best", dailyBest_);
+    doc.SetInt("boss_rush_best", bossRushBest_);
     doc.SetInt("challenges", challenges_);
     doc.SetInt("codex_enemies", seenEnemies_);
     doc.SetInt("codex_upgrades", static_cast<long long>(seenUpgrades_));
@@ -191,6 +193,9 @@ int Profile::CreditsForRun(const RunSummary& run) {
     if (run.victory) {
         credits += 150.0f;
     }
+    if (run.config.mode == GameMode::BossRush) {
+        credits *= 0.5f; // five guardians in a few minutes: not a farming shortcut
+    }
     return std::max(5, static_cast<int>(credits));
 }
 
@@ -206,7 +211,8 @@ int Profile::RecordRun(const RunSummary& run) {
     bestSector_ = std::max(bestSector_, run.sectorReached);
     seenEnemies_ |= run.stats.enemiesSeen;
     seenUpgrades_ |= run.stats.upgradesTaken;
-    auto& best = bestScore_[static_cast<std::size_t>(run.config.difficulty)];
+    auto& best = run.config.mode == GameMode::BossRush ? bossRushBest_
+                                                       : bestScore_[static_cast<std::size_t>(run.config.difficulty)];
     best = std::max(best, run.stats.score);
     auto& shipBest = shipBestScore_[static_cast<std::size_t>(run.config.ship)];
     shipBest = std::max(shipBest, run.stats.score);
@@ -220,6 +226,10 @@ int Profile::RecordRun(const RunSummary& run) {
     }
     Save();
     return earned;
+}
+
+long long Profile::BestScoreFor(const RunConfig& config) const {
+    return config.mode == GameMode::BossRush ? bossRushBest_ : BestScore(config.difficulty);
 }
 
 int TodayStamp() {

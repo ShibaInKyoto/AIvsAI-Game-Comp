@@ -82,6 +82,8 @@ Prompts adapt automatically to whichever device you used last.
   in endless mode afterwards.
 * **Endless:** sectors loop forever. Each loop compounds enemy toughness and
   numbers, and *corruption* makes destroyed hostiles fire back.
+* **Boss rush:** the five guardians back to back. You start with fourteen
+  upgrades and draft eight more after every kill. Great for a quick session.
 * **Daily run:** a fixed seed and ship for everyone each day.
 * **Relaxed / Standard / Overclocked:** Relaxed adds two integrity and softens
   enemies; Overclocked is denser and faster, with bigger rewards.

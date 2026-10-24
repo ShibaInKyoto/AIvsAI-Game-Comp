@@ -58,6 +58,9 @@ public:
     static int CreditsForRun(const RunSummary& run);
 
     long long BestScore(Difficulty difficulty) const { return bestScore_[static_cast<std::size_t>(difficulty)]; }
+    long long BossRushBest() const { return bossRushBest_; }
+    // The best a finished run is measured against (boss rush keeps its own).
+    long long BestScoreFor(const RunConfig& config) const;
     long long BestScoreForShip(ShipId id) const { return shipBestScore_[static_cast<std::size_t>(id)]; }
     int BestSector() const { return bestSector_; }
     int Runs() const { return runs_; }
@@ -110,6 +113,7 @@ private:
     Difficulty lastDifficulty_ = Difficulty::Standard;
     int dailyDate_ = 0;
     long long dailyBest_ = 0;
+    long long bossRushBest_ = 0;
     std::uint32_t challenges_ = 0;
     std::uint32_t seenEnemies_ = 0;
     std::uint64_t seenUpgrades_ = 0;

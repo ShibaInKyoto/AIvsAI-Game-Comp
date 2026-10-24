@@ -201,7 +201,7 @@ void TitleScene::DrawRecords() {
         const char* label;
         std::string value;
     };
-    const std::array<Row, 9> rows{{
+    const std::array<Row, 10> rows{{
         {"RUNS", std::to_string(p.Runs())},
         {"VICTORIES", std::to_string(p.Wins())},
         {"FURTHEST SECTOR", p.BestSector() > 0 ? std::to_string(p.BestSector()) : "-"},
@@ -211,6 +211,7 @@ void TitleScene::DrawRecords() {
         {"BEST - RELAXED", FormatThousands(p.BestScore(Difficulty::Relaxed))},
         {"BEST - STANDARD", FormatThousands(p.BestScore(Difficulty::Standard))},
         {"BEST - OVERCLOCKED", FormatThousands(p.BestScore(Difficulty::Overclocked))},
+        {"BEST - BOSS RUSH", FormatThousands(p.BossRushBest())},
     }};
     const float leftWidth = width * 0.38f;
     for (std::size_t i = 0; i < rows.size(); ++i) {
@@ -221,7 +222,7 @@ void TitleScene::DrawRecords() {
     }
     if (p.DailyDate() == TodayStamp() && p.DailyBest() > 0) {
         text.Draw(FontId::BodyBold, TextFormat("TODAY'S DAILY BEST: %s", FormatThousands(p.DailyBest()).c_str()),
-                  {panel.x + 40.0f, panel.y + 570.0f}, 24.0f, palette::kUiWarn);
+                  {panel.x + 40.0f, panel.y + 620.0f}, 24.0f, palette::kUiWarn);
     }
 
     // Challenges column.

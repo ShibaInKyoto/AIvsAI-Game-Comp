@@ -82,9 +82,12 @@ int main(int argc, char** argv) {
         const std::string& scene = options.startScene;
         // Automated runs and "--scene game|draft|pause" jump straight into a run.
         if (options.autotestSeconds > 0.0f || scene == "game" || scene == "draft" || scene == "evolution" ||
-            scene == "pause" || scene == "nova") {
+            scene == "pause" || scene == "nova" || scene == "bossrush") {
             gb::RunConfig config;
             config.seed = options.seed != 0 ? options.seed : 1234u;
+            if (scene == "bossrush") {
+                config.mode = gb::GameMode::BossRush;
+            }
             config.meta = a.Progress().Bonuses();
             return std::make_unique<gb::GameScene>(a, config);
         }

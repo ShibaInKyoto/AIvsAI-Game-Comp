@@ -66,7 +66,7 @@ endless mode after that. Short runs (15–20 min), lots of build variety.
 Implemented:
 - Full loop: boot → title (attract demo) → hangar → run → results; pause/settings.
 - 6 ships, 39 upgrades + 7 evolutions, 14 enemies, 5 bosses, 5 sector modifiers.
-- Campaign / Endless / Daily, 3 difficulties, credits + firmware + 16 challenges.
+- Campaign / Endless / Boss Rush / Daily, 3 difficulties, credits + firmware + 16 challenges.
 - Codex of hostiles and upgrades, decoded as they are met or drafted.
 - Procedural SFX + adaptive music; XInput rumble on Windows.
 - Render scale (auto caps 4K), F3 perf overlay, auto-pause on focus loss.
@@ -77,6 +77,8 @@ Balance targets (tools/BalanceSim, bot skill = reaction speed):
 - Standard @ skill 0.45 ≈ 85 % wins, losses split between the Warden and
   the Architect (difficulty should rise through the run, not peak at boss 1);
   Relaxed @ 0.2 ≈ 95 %; Overclocked @ 0.6 ≈ 55 %, punishing for fragile ships.
+- Boss Rush @ Standard 0.45 ≈ 70 % (a gauntlet, slightly harder than the
+  campaign); credits are halved so it is not a farming shortcut.
 - A run's first sector event is always a Data Storm (teaches events safely).
 - Endless loops compound (enemy hp x4, spawn rate x1.4, guardian hp x3 per
   loop) and add corruption (destroyed hostiles may fire back). Overcharge
@@ -84,7 +86,7 @@ Balance targets (tools/BalanceSim, bot skill = reaction speed):
   far better than people, so endless pacing is tuned by design, not by sim.
 
 Testing helpers:
-- `--scene title|game|draft|evolution|pause|hangar|firmware|results|records|codex`
+- `--scene title|game|bossrush|draft|evolution|pause|hangar|firmware|results|records|codex`
 - `--sector N --boss`, `--autotest S`, `--screenshot P --screenshot-at S`, `--perf`
 - xdotool scripts under Xvfb drive real key presses through the menus.
 

@@ -44,7 +44,7 @@ ResultsScene::ResultsScene(App& app, const RunSummary& summary, int creditsEarne
       backdrop_(summary.victory ? palette::kUiGood : palette::kDanger) {
     const Profile& profile = app.Progress();
     // RecordRun already folded this run in, so a tie with the best means it set it.
-    newRecord_ = summary.stats.score > 0 && summary.stats.score >= profile.BestScore(summary.config.difficulty);
+    newRecord_ = summary.stats.score > 0 && summary.stats.score >= profile.BestScoreFor(summary.config);
     for (const ShipInfo& ship : AllShips()) {
         if (!profile.ShipUnlocked(ship.id) && profile.Credits() >= ship.cost) {
             unlockAvailable_ = true;
@@ -122,9 +122,7 @@ void ResultsScene::DrawUi() {
                   {cx, 70.0f - (1.0f - titleIn) * 40.0f}, 86.0f, WithAlpha(WHITE, titleIn), WithAlpha(accent, titleIn),
                   Align::Center, 0.08f);
     const ShipInfo& ship = GetShipInfo(summary_.config.ship);
-    const char* mode = summary_.config.mode == GameMode::Daily     ? "DAILY RUN"
-                       : summary_.config.mode == GameMode::Endless ? "ENDLESS"
-                                                                   : "CAMPAIGN";
+    const char* mode = GameModeName(summary_.config.mode);
     text.Draw(FontId::Heading,
               TextFormat("%s  //  %s  //  %s", ship.name, DifficultyName(summary_.config.difficulty), mode),
               {cx, 178.0f}, 22.0f, WithAlpha(palette::kUiDim, titleIn), Align::Center, 0.2f);

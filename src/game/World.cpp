@@ -26,6 +26,17 @@ const DifficultyTuning& GetDifficultyTuning(Difficulty difficulty) {
     return kDifficulty[static_cast<std::size_t>(difficulty)];
 }
 
+const char* GameModeName(GameMode mode) {
+    switch (mode) {
+    case GameMode::Campaign: return "CAMPAIGN";
+    case GameMode::Endless: return "ENDLESS";
+    case GameMode::Daily: return "DAILY RUN";
+    case GameMode::BossRush: return "BOSS RUSH";
+    case GameMode::Count: break;
+    }
+    return "";
+}
+
 const char* DifficultyName(Difficulty difficulty) {
     switch (difficulty) {
     case Difficulty::Relaxed: return "RELAXED";
@@ -64,6 +75,15 @@ World::World(const RunConfig& config)
     rerolls_ = stats_.rerolls;
     xpToNext_ = XpForLevel(1);
     director_.Start(0);
+    if (config.mode == GameMode::BossRush) {
+        GrantLevels(kBossRushStartLevels);
+    }
+}
+
+void World::GrantLevels(int levels) {
+    for (int i = 0; i < levels; ++i) {
+        GainXp(std::max(1, xpToNext_ - xp_));
+    }
 }
 
 void World::RecomputeStats() {
@@ -145,6 +165,9 @@ void World::OnSectorCleared() {
         runStats_.flawlessSectors++;
     }
     pendingCaches_++;
+    if (config_.mode == GameMode::BossRush) {
+        GrantLevels(kBossRushLevelsPerGuardian);
+    }
     // Hoover up every remaining shard so nothing is lost to the transition.
     for (Pickup& p : pickups_) {
         p.magnetized = true;

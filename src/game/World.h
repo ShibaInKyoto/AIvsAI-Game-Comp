@@ -73,6 +73,7 @@ struct DifficultyTuning {
 
 const DifficultyTuning& GetDifficultyTuning(Difficulty difficulty);
 const char* DifficultyName(Difficulty difficulty);
+const char* GameModeName(GameMode mode);
 
 // The whole gameplay simulation. Rendering-agnostic: everything visual is
 // communicated through the event queue and read-only accessors, which keeps it
@@ -175,6 +176,10 @@ public:
     void OnSectorCleared();
     // Applies the player's sector modifier choice and starts the next sector.
     void ChooseSectorModifier(SectorModifier modifier);
+    // Boss rush: free level-ups at the start and after every guardian.
+    static constexpr int kBossRushStartLevels = 14;
+    static constexpr int kBossRushLevelsPerGuardian = 8;
+    void GrantLevels(int levels);
     void ContinueEndless();
     float ModulePower() const;
 

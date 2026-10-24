@@ -169,6 +169,19 @@ TEST_CASE("Sector events stage their set pieces") {
     }
 }
 
+TEST_CASE("Boss rush starts with a head-start build and skips the waves") {
+    RunConfig config;
+    config.mode = GameMode::BossRush;
+    World world(config);
+    CHECK(world.PendingLevelUps() == World::kBossRushStartLevels);
+    for (int i = 0; i < 60 * 15 && world.GetDirector().Phase() != SectorPhase::Boss; ++i) {
+        world.Update(1.0f / 60.0f, PlayerInput{});
+    }
+    CHECK(world.GetDirector().Phase() == SectorPhase::Boss);
+    CHECK(world.Record().time < 10.0f);
+    CHECK(world.Record().kills == 0);
+}
+
 TEST_CASE("Spatial hash finds every nearby item") {
     SpatialHash hash;
     hash.Configure({-1000.0f, -1000.0f, 2000.0f, 2000.0f}, 64.0f);

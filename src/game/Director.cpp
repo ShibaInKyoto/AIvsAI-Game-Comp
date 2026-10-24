@@ -176,7 +176,8 @@ void Director::Update(World& world, float dt) {
     switch (phase_) {
     case SectorPhase::Intro:
         if (phaseTime_ >= kIntroDuration) {
-            SetPhase(SectorPhase::Waves);
+            // Boss rush skips the waves and goes straight to the guardian.
+            SetPhase(world.Config().mode == GameMode::BossRush ? SectorPhase::Purge : SectorPhase::Waves);
         }
         break;
     case SectorPhase::Waves:

@@ -1,7 +1,7 @@
 // Headless balance harness: plays many bot runs and prints survival
 // statistics per ship and difficulty. Used to tune pacing without a window.
 //
-//   gridbreaker_balance [runs] [maxSeconds] [difficulty 0-2] [bot skill 0-1] [endless]
+//   gridbreaker_balance [runs] [maxSeconds] [difficulty 0-2] [bot skill 0-1] [endless|bossrush]
 
 #include "game/Bot.h"
 #include "game/World.h"
@@ -104,6 +104,8 @@ int main(int argc, char** argv) {
     g_skill = argc > 4 ? static_cast<float>(std::atof(argv[4])) : 0.6f;
     if (argc > 5 && std::string_view(argv[5]) == "endless") {
         g_mode = GameMode::Endless;
+    } else if (argc > 5 && std::string_view(argv[5]) == "bossrush") {
+        g_mode = GameMode::BossRush;
     }
     std::printf("%-9s %8s %7s %6s %7s %10s %5s %5s %5s %6s  %s\n", "ship", "time", "sector", "level", "kills", "score",
                 "win", "peak", "hits", "ms/s", "boss fight seconds per sector");

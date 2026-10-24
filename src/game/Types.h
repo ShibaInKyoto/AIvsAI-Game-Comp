@@ -18,6 +18,7 @@ enum class GameMode : std::uint8_t {
     Campaign, // five sectors and the final boss, then optional endless
     Endless,  // sector loop with ever-rising threat
     Daily,    // fixed seed + ship derived from the date
+    BossRush, // the five guardians back to back, starting from a head-start build
     Count
 };
 

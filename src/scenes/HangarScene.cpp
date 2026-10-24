@@ -9,6 +9,7 @@
 #include "view/Shapes.h"
 
 #include <algorithm>
+#include <array>
 
 namespace gb {
 
@@ -23,14 +24,16 @@ enum HangarItem {
     ItemBack
 };
 
-const char* ModeName(GameMode mode) {
+// Modes selectable in the hangar (the daily run starts from the title).
+constexpr std::array<GameMode, 3> kHangarModes{GameMode::Campaign, GameMode::Endless, GameMode::BossRush};
+
+const char* ModeBlurb(GameMode mode) {
     switch (mode) {
-    case GameMode::Campaign: return "CAMPAIGN";
-    case GameMode::Endless: return "ENDLESS";
-    case GameMode::Daily: return "DAILY";
-    case GameMode::Count: break;
+    case GameMode::Endless: return "No finish line. Sectors loop forever with compounding threat and corruption.";
+    case GameMode::BossRush:
+        return "The five guardians back to back. Start with ten upgrades and gain seven more after every kill.";
+    default: return "Clear five sectors and destroy the Core.";
     }
-    return "";
 }
 
 const char* DifficultyBlurb(Difficulty d) {
@@ -90,7 +93,7 @@ void HangarScene::RefreshMenu() {
         items.push_back(item);
     }
     items.push_back({"DIFFICULTY", DifficultyName(difficulty_), true});
-    items.push_back({"MODE", ModeName(mode_), true});
+    items.push_back({"MODE", GameModeName(mode_), true});
     items.push_back({"LAUNCH"});
     items.push_back({"FIRMWARE UPGRADES"});
     items.push_back({"BACK"});
@@ -176,7 +179,10 @@ void HangarScene::Update(float dt) {
         app_.Audio().Play(SfxId::UiMove, 0.7f);
         RefreshMenu();
     } else if (adjust != 0 && selected == ItemMode) {
-        mode_ = mode_ == GameMode::Campaign ? GameMode::Endless : GameMode::Campaign;
+        const auto current = std::find(kHangarModes.begin(), kHangarModes.end(), mode_);
+        const int index = current == kHangarModes.end() ? 0 : static_cast<int>(current - kHangarModes.begin());
+        const int count = static_cast<int>(kHangarModes.size());
+        mode_ = kHangarModes[static_cast<std::size_t>((index + adjust + count) % count)];
         app_.Audio().Play(SfxId::UiMove, 0.7f);
         RefreshMenu();
     }
@@ -335,11 +341,7 @@ void HangarScene::DrawUi() {
     if (selected == ItemDifficulty) {
         text.DrawWrapped(FontId::Body, DifficultyBlurb(difficulty_), blurb, kMenuWidth - 40.0f, 24.0f, palette::kUiDim);
     } else if (selected == ItemMode) {
-        text.DrawWrapped(FontId::Body,
-                         mode_ == GameMode::Campaign
-                             ? "Clear five sectors and destroy the Core."
-                             : "No finish line. Sectors loop forever with compounding threat and corruption.",
-                         blurb, kMenuWidth - 40.0f, 24.0f, palette::kUiDim);
+        text.DrawWrapped(FontId::Body, ModeBlurb(mode_), blurb, kMenuWidth - 40.0f, 24.0f, palette::kUiDim);
     }
 
     DrawShipDetails({right - detailWidth, 150.0f, detailWidth, 860.0f});
