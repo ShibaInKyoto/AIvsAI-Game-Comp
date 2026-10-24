@@ -96,5 +96,6 @@ Testing helpers:
 - xdotool scripts under Xvfb drive real key presses through the menus.
 
 Remaining ideas / TODO:
-- Tag the v1.0.0 release at the end (push a `[release]` commit or a tag).
+- Releases: a commit whose message contains `[release]` (or a `v*` tag)
+  publishes `v<project version>`; re-running it replaces that release.
 - Optional: more evolutions.
