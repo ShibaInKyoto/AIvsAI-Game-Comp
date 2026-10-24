@@ -67,6 +67,8 @@ bool Profile::Load() {
     dailyDate_ = static_cast<int>(doc.GetInt("daily_date", 0));
     dailyBest_ = doc.GetInt("daily_best", 0);
     challenges_ = static_cast<std::uint32_t>(doc.GetInt("challenges", 0));
+    seenEnemies_ = static_cast<std::uint32_t>(doc.GetInt("codex_enemies", 0));
+    seenUpgrades_ = static_cast<std::uint64_t>(doc.GetInt("codex_upgrades", 0));
     return true;
 }
 
@@ -97,6 +99,8 @@ bool Profile::Save() const {
     doc.SetInt("daily_date", dailyDate_);
     doc.SetInt("daily_best", dailyBest_);
     doc.SetInt("challenges", challenges_);
+    doc.SetInt("codex_enemies", seenEnemies_);
+    doc.SetInt("codex_upgrades", static_cast<long long>(seenUpgrades_));
     return storage::WriteTextFileAtomic(storage::DataDirectory() / kFileName, doc.Serialize());
 }
 
@@ -198,6 +202,8 @@ int Profile::RecordRun(const RunSummary& run) {
     bossKills_ += run.stats.bossesKilled;
     playTime_ += run.stats.time;
     bestSector_ = std::max(bestSector_, run.sectorReached);
+    seenEnemies_ |= run.stats.enemiesSeen;
+    seenUpgrades_ |= run.stats.upgradesTaken;
     auto& best = bestScore_[static_cast<std::size_t>(run.config.difficulty)];
     best = std::max(best, run.stats.score);
     auto& shipBest = shipBestScore_[static_cast<std::size_t>(run.config.ship)];

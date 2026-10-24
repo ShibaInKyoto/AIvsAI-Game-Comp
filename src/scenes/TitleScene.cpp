@@ -15,14 +15,18 @@ namespace gb {
 
 namespace {
 
-enum TitleItem { ItemPlay, ItemDaily, ItemHangar, ItemRecords, ItemSettings, ItemQuit };
+enum TitleItem { ItemPlay, ItemDaily, ItemHangar, ItemRecords, ItemCodex, ItemSettings, ItemQuit };
 
 } // namespace
 
 TitleScene::TitleScene(App& app) : Scene(app) {
-    menu_.SetItems({{"PLAY"}, {"DAILY RUN"}, {"HANGAR"}, {"RECORDS"}, {"SETTINGS"}, {"QUIT"}});
+    menu_.SetItems({{"PLAY"}, {"DAILY RUN"}, {"HANGAR"}, {"RECORDS"}, {"CODEX"}, {"SETTINGS"}, {"QUIT"}});
     ResetDemo();
-    showRecords_ = app.Options().startScene == "records";  // debug entry point for screenshots
+    // Debug entry points for screenshots.
+    showRecords_ = app.Options().startScene == "records";
+    if (app.Options().startScene == "codex") {
+        codex_.Open(app);
+    }
 }
 
 void TitleScene::OnEnter() {
@@ -96,6 +100,10 @@ void TitleScene::Update(float dt) {
         settings_.Update(app_);
         return;
     }
+    if (codex_.Active()) {
+        codex_.Update(app_, dt);
+        return;
+    }
     if (showRecords_) {
         if (app_.In().Pressed(Action::Back) || app_.In().Pressed(Action::Confirm) || app_.In().MouseClicked()) {
             showRecords_ = false;
@@ -123,6 +131,10 @@ void TitleScene::Update(float dt) {
         app_.Audio().Play(SfxId::UiConfirm, 0.8f);
         showRecords_ = true;
         app_.In().ConsumeAll();
+        break;
+    case ItemCodex:
+        app_.Audio().Play(SfxId::UiConfirm, 0.8f);
+        codex_.Open(app_);
         break;
     case ItemSettings:
         app_.Audio().Play(SfxId::UiConfirm, 0.8f);
@@ -243,6 +255,15 @@ void TitleScene::DrawUi() {
     }
     DrawLogo({ui.x * 0.5f, 120.0f}, 1.0f);
     menu_.Draw(app_, {110.0f, 430.0f}, 460.0f, 70.0f, palette::kUiAccent);
+    // Full-screen panels replace the footer, which would only peek out from under them.
+    if (showRecords_) {
+        DrawRecords();
+        return;
+    }
+    if (codex_.Active()) {
+        codex_.Draw(app_);
+        return;
+    }
 
     TextRenderer& text = app_.Gfx().Text();
     const Profile& profile = app_.Progress();
@@ -263,9 +284,6 @@ void TitleScene::DrawUi() {
                   22.0f, palette::kUiDim);
     }
 
-    if (showRecords_) {
-        DrawRecords();
-    }
     settings_.Draw(app_);
 }
 

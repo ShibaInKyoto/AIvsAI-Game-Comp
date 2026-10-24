@@ -114,7 +114,9 @@ float World::ModulePower() const {
 }
 
 void World::ApplyUpgrade(UpgradeId id) {
+    static_assert(static_cast<int>(UpgradeId::Count) <= 64, "upgradesTaken is a 64-bit mask");
     inventory_.Add(id);
+    runStats_.upgradesTaken |= std::uint64_t{1} << static_cast<unsigned>(id);
     RecomputeStats();
     switch (id) {
     case UpgradeId::HullPlating: player_.hp = std::min(player_.hp + 1, stats_.maxHp); break;
@@ -315,7 +317,9 @@ void World::Emit(EventType type, Vector2 position, Color color, float magnitude,
 // ---------------------------------------------------------------------------
 
 Enemy& World::SpawnEnemy(EnemyKind kind, Vector2 position, float telegraph, bool elite) {
+    static_assert(static_cast<int>(EnemyKind::Count) <= 32, "enemiesSeen is a 32-bit mask");
     const EnemyInfo& info = GetEnemyInfo(kind);
+    runStats_.enemiesSeen |= 1u << static_cast<unsigned>(kind);
     Enemy e;
     e.id = nextId_++;
     e.kind = kind;

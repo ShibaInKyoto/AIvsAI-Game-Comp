@@ -55,6 +55,7 @@ public:
     Settings& Prefs() { return settings_; }
     AudioSystem& Audio() { return *audio_; }
     Profile& Progress() { return *profile_; }
+    const Profile& Progress() const { return *profile_; }
     Rumble& Haptics() { return rumble_; }
     const LaunchOptions& Options() const { return options_; }
 

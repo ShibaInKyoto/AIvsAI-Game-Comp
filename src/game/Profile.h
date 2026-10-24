@@ -71,6 +71,10 @@ public:
     int CompletedChallengeCount() const;
     bool AllShipsUnlocked() const;
 
+    // Codex discovery: enemies met and upgrades drafted in any run.
+    bool EnemyDiscovered(EnemyKind kind) const { return (seenEnemies_ >> static_cast<unsigned>(kind)) & 1u; }
+    bool UpgradeDiscovered(UpgradeId id) const { return (seenUpgrades_ >> static_cast<unsigned>(id)) & 1u; }
+
     bool TutorialSeen() const { return tutorialSeen_; }
     void SetTutorialSeen() { tutorialSeen_ = true; }
 
@@ -106,6 +110,8 @@ private:
     int dailyDate_ = 0;
     long long dailyBest_ = 0;
     std::uint32_t challenges_ = 0;
+    std::uint32_t seenEnemies_ = 0;
+    std::uint64_t seenUpgrades_ = 0;
 };
 
 // Today's date as YYYYMMDD in local time, and a seed derived from it.

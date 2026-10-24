@@ -23,7 +23,7 @@ void PrintUsage() {
         "  --autotest SECONDS      let the bot play for SECONDS of game time, then exit\n"
         "  --screenshot PATH       save a screenshot to PATH and exit\n"
         "  --screenshot-at SECONDS when to take the screenshot (default 3)\n"
-        "  --scene NAME            start in a specific scene (title, game)\n"
+        "  --scene NAME            start in a specific scene (title, game, hangar, codex, ...)\n"
         "  --seed N                fixed run seed\n"
         "  --sector N              (debug) start runs in sector N\n"
         "  --boss                  (debug) start runs at the sector boss\n"
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
             summary.sectorReached = 4;
             return std::make_unique<gb::ResultsScene>(a, summary, 512);
         }
-        if (scene == "title") {
+        if (scene == "title" || scene == "records" || scene == "codex") {
             return std::make_unique<gb::TitleScene>(a);
         }
         return std::make_unique<gb::BootScene>(a);

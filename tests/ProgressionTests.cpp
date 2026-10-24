@@ -56,6 +56,29 @@ TEST_CASE("Profile persists credits, unlocks, firmware and challenges") {
     CHECK(loaded.ShipUnlocked(ShipId::Vector));
 }
 
+TEST_CASE("Codex discoveries accumulate across runs and persist") {
+    TempDataDir dir;
+    {
+        World world(RunConfig{});
+        world.SpawnEnemy(EnemyKind::Gunner, {0.0f, 0.0f}, 0.0f);
+        world.ApplyUpgrade(UpgradeId::Overclock);
+        world.ApplyUpgrade(UpgradeId::SpectrumCannon);  // highest id: exercises the top of the 64-bit mask
+        RunSummary run;
+        run.stats = world.Record();
+        Profile profile;
+        profile.RecordRun(run);
+        CHECK(profile.EnemyDiscovered(EnemyKind::Gunner));
+        CHECK_FALSE(profile.EnemyDiscovered(EnemyKind::BossCore));
+        CHECK(profile.UpgradeDiscovered(UpgradeId::SpectrumCannon));
+    }
+    Profile loaded;
+    REQUIRE(loaded.Load());
+    CHECK(loaded.EnemyDiscovered(EnemyKind::Gunner));
+    CHECK(loaded.UpgradeDiscovered(UpgradeId::Overclock));
+    CHECK(loaded.UpgradeDiscovered(UpgradeId::SpectrumCannon));
+    CHECK_FALSE(loaded.UpgradeDiscovered(UpgradeId::HiveSwarm));
+}
+
 TEST_CASE("Firmware purchases respect cost and rank limits") {
     TempDataDir dir;
     Profile profile;

@@ -2,6 +2,7 @@
 
 #include "core/Scene.h"
 #include "game/Bot.h"
+#include "ui/CodexPanel.h"
 #include "ui/SettingsPanel.h"
 #include "ui/Widgets.h"
 #include "view/GameView.h"
@@ -31,6 +32,7 @@ private:
     Bot bot_;
     ui::Menu menu_;
     SettingsPanel settings_;
+    CodexPanel codex_;
     bool showRecords_ = false;
     float time_ = 0.0f;
     float demoDeathTimer_ = 0.0f;

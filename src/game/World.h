@@ -56,6 +56,8 @@ struct RunStats {
     int sectorsCleared = 0;
     int flawlessSectors = 0;      // sectors cleared without taking a hit
     std::uint32_t bossMask = 0;   // bit per EnemyKind of defeated bosses
+    std::uint32_t enemiesSeen = 0;    // bit per EnemyKind encountered (codex)
+    std::uint64_t upgradesTaken = 0;  // bit per UpgradeId drafted (codex)
     bool victory = false;
 };
 
