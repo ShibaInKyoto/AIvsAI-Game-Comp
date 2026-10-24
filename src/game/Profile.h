@@ -154,5 +154,7 @@ private:
 // Today's date as YYYYMMDD in local time, and a seed derived from it.
 int TodayStamp();
 std::uint64_t DailySeed(int stamp);
+// The daily ship rotates through the full roster, unlocked or not.
+ShipId DailyShip(std::uint64_t seed);
 
 } // namespace gb
