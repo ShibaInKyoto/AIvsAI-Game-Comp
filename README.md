@@ -71,7 +71,8 @@ Prompts adapt automatically to whichever device you used last.
 * **Challenges.** Sixteen goals (beat each guardian, flawless sectors, huge
   combos...) pay out bonus credits.
 * **Codex.** Every hostile you meet and every upgrade you draft is decoded in
-  the title-screen codex, with tactics, base stats and evolution recipes.
+  the title-screen codex, with tactics, base stats and evolution recipes. Its
+  *Guide* tab explains every mechanic in a page each.
 * **Meta-progression.** Runs earn credits. Spend them in the **Hangar** to unlock
   five more ships (each with its own weapon and starting kit) and permanent
   firmware upgrades.

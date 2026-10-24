@@ -11,8 +11,9 @@ namespace gb {
 
 class App;
 
-// Compendium of hostiles and upgrades. Entries decode once they have been
-// met (enemies) or drafted (upgrades) in any run; the rest stay redacted.
+// Compendium of hostiles and upgrades, plus a short how-to-play guide.
+// Hostile and upgrade entries decode once they have been met or drafted in
+// any run; the rest stay redacted.
 class CodexPanel {
 public:
     void Open(App& app);
@@ -24,8 +25,10 @@ public:
 private:
     enum class Tab {
         Hostiles,
-        Upgrades
+        Upgrades,
+        Guide
     };
+    static constexpr int kTabCount = 3;
 
     struct Layout {
         Rectangle panel;
@@ -46,6 +49,7 @@ private:
     void DrawTile(App& app, const Layout& layout, int index);
     void DrawEnemyDetail(App& app, const Layout& layout, EnemyKind kind, bool known);
     void DrawUpgradeDetail(App& app, const Layout& layout, UpgradeId id, bool known);
+    void DrawGuideDetail(App& app, const Layout& layout, int index);
 
     std::vector<EnemyKind> enemies_;
     std::vector<UpgradeId> upgrades_;

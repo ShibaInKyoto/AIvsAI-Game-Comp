@@ -54,6 +54,57 @@ constexpr std::array<EnemyEntry, 17> kEnemyEntries{{
     {EnemyKind::BossCore, 5, "Shielded by orbiting nodes until they fall. Then it unleashes everything at once."},
 }};
 
+// How-to-play topics. Icons reuse upgrade glyphs, or an enemy preview when
+// `icon` is UpgradeId::Count.
+struct GuideEntry {
+    const char* label; // tile caption
+    const char* title;
+    UpgradeId icon;
+    EnemyKind enemy;
+    const char* text;
+};
+
+constexpr UpgradeId kEnemyIcon = UpgradeId::Count;
+
+constexpr std::array<GuideEntry, 12> kGuide{{
+    {"DASH", "MOVE & DASH", UpgradeId::Thrusters, EnemyKind::Count,
+     "Move with WASD or the left stick and aim with the mouse or right stick. Dashing (Space / LT) makes you briefly "
+     "invulnerable: dash through bullets, not around them. Dash charges refill over time."},
+    {"NOVA", "NOVA", UpgradeId::PulseNova, EnemyKind::Count,
+     "Kills charge the Nova gauge in the bottom right corner. When it is full, trigger it (Q / RB) to wipe out enemy "
+     "bullets and blast everything around you. Save it for a guardian's worst attack."},
+    {"COMBO", "COMBO & SCORE", UpgradeId::Overclock, EnemyKind::Count,
+     "Kills in quick succession build your combo, and every 30 kills raise the score multiplier, up to x10. Taking a "
+     "hit resets it, so clean play scores far more than reckless play."},
+    {"SHARDS", "DATA SHARDS", UpgradeId::Magnet, EnemyKind::Count,
+     "Destroyed hostiles drop data shards. Collect them to level up. Your magnet pulls in nearby shards, and shards "
+     "left lying around for a while fly to you on their own."},
+    {"DRAFTS", "UPGRADE DRAFTS", UpgradeId::BackupDrive, EnemyKind::Count,
+     "Every level offers three upgrade cards; rarer cards are stronger. A reroll (R / Y) replaces the whole offer. You "
+     "start each run with one, and upgrades and firmware add more."},
+    {"MODULES", "WEAPON MODULES", UpgradeId::OrbitBlades, EnemyKind::Count,
+     "Modules are automatic weapons: orbit blades, drones, chain lightning, missiles, mines and more. You can run four "
+     "at once, and each one levels up to 5."},
+    {"EVOLVE", "EVOLUTIONS", UpgradeId::SawStorm, EnemyKind::Count,
+     "Raise a module to level 5 while holding its catalyst upgrade and a legendary evolution card appears in your "
+     "drafts. Module cards always name the catalyst they need."},
+    {"ELITES", "ELITES & CACHES", UpgradeId::LuckyBreak, EnemyKind::Count,
+     "Golden elites are much tougher, but each one drops a data cache: a bonus draft where rare upgrades are more "
+     "likely. Defeating a guardian grants one too."},
+    {"EVENTS", "SECTOR EVENTS", UpgradeId::ProxMines, EnemyKind::Count,
+     "About every forty seconds a sector stages a set piece: an Ambush ring closing in, a Crossfire line of darts "
+     "locking on, or a Data Storm of free shards."},
+    {"GUARDIANS", "GUARDIANS", kEnemyIcon, EnemyKind::BossWarden,
+     "Each sector ends with a guardian. Guardians change tactics at two thirds and one third of their health, and "
+     "every big attack is telegraphed: watch for the warning lines."},
+    {"PROTOCOLS", "PROTOCOLS", UpgradeId::DataMiner, EnemyKind::Count,
+     "After each guardian, choose one of two protocols for the next sector: more enemies for more data, tougher ones "
+     "for more score, an elite bounty, an extra upgrade, or repairs."},
+    {"HANGAR", "HANGAR & CHALLENGES", UpgradeId::HullPlating, EnemyKind::Count,
+     "Every run earns credits, even a short one. Spend them in the hangar on new ships and permanent firmware. "
+     "Challenges, listed under Records, pay bonus credits."},
+}};
+
 constexpr float kHeaderHeight = 110.0f;
 
 const EnemyEntry& EntryFor(EnemyKind kind) {
@@ -93,20 +144,34 @@ void CodexPanel::Open(App& app) {
         }
     }
     active_ = true;
-    tab_ = Tab::Hostiles;
+    // A fresh profile has nothing decoded yet: open on the guide instead.
+    const Profile& profile = app.Progress();
+    const bool anything =
+        std::any_of(enemies_.begin(), enemies_.end(), [&](EnemyKind kind) { return profile.EnemyDiscovered(kind); });
+    tab_ = anything ? Tab::Hostiles : Tab::Guide;
     selected_ = 0;
     selectPulse_ = 1.0f;
     app.In().ConsumeAll();
 }
 
 int CodexPanel::EntryCount() const {
-    return static_cast<int>(tab_ == Tab::Hostiles ? enemies_.size() : upgrades_.size());
+    switch (tab_) {
+    case Tab::Hostiles: return static_cast<int>(enemies_.size());
+    case Tab::Upgrades: return static_cast<int>(upgrades_.size());
+    case Tab::Guide: return static_cast<int>(kGuide.size());
+    }
+    return 0;
 }
 
 bool CodexPanel::Discovered(const App& app, int index) const {
     const Profile& profile = app.Progress();
     const auto i = static_cast<std::size_t>(index);
-    return tab_ == Tab::Hostiles ? profile.EnemyDiscovered(enemies_[i]) : profile.UpgradeDiscovered(upgrades_[i]);
+    switch (tab_) {
+    case Tab::Hostiles: return profile.EnemyDiscovered(enemies_[i]);
+    case Tab::Upgrades: return profile.UpgradeDiscovered(upgrades_[i]);
+    case Tab::Guide: return true;
+    }
+    return false;
 }
 
 CodexPanel::Layout CodexPanel::ComputeLayout(const App& app) const {
@@ -115,7 +180,7 @@ CodexPanel::Layout CodexPanel::ComputeLayout(const App& app) const {
     const float width = std::min(1640.0f, ui.x - 80.0f);
     const float height = std::min(840.0f, ui.y - 120.0f);
     l.panel = {ui.x * 0.5f - width * 0.5f, ui.y * 0.5f - height * 0.5f, width, height};
-    l.columns = tab_ == Tab::Hostiles ? 6 : 8;
+    l.columns = tab_ == Tab::Upgrades ? 8 : 6;
     l.gap = 12.0f;
     const int rows = (EntryCount() + l.columns - 1) / l.columns;
     const float gridWidth = width * 0.56f;
@@ -130,8 +195,8 @@ CodexPanel::Layout CodexPanel::ComputeLayout(const App& app) const {
 }
 
 Rectangle CodexPanel::TabRect(const Layout& layout, Tab tab) const {
-    const float x = layout.panel.x + 250.0f + (tab == Tab::Hostiles ? 0.0f : 320.0f);
-    return {x, layout.panel.y + 26.0f, 300.0f, 50.0f};
+    const float x = layout.panel.x + 250.0f + static_cast<float>(tab) * 290.0f;
+    return {x, layout.panel.y + 26.0f, 270.0f, 50.0f};
 }
 
 Rectangle CodexPanel::TileRect(const Layout& layout, int index) const {
@@ -159,8 +224,9 @@ bool CodexPanel::Update(App& app, float dt) {
     selectPulse_ = std::max(0.0f, selectPulse_ - dt * 4.0f);
     const Input& in = app.In();
 
-    if (in.Pressed(Action::TabPrev) || in.Pressed(Action::TabNext)) {
-        SwitchTab(app, tab_ == Tab::Hostiles ? Tab::Upgrades : Tab::Hostiles);
+    const int step = in.Pressed(Action::TabNext) ? 1 : (in.Pressed(Action::TabPrev) ? -1 : 0);
+    if (step != 0) {
+        SwitchTab(app, static_cast<Tab>((static_cast<int>(tab_) + step + kTabCount) % kTabCount));
     }
 
     const Layout layout = ComputeLayout(app);
@@ -192,7 +258,7 @@ bool CodexPanel::Update(App& app, float dt) {
         }
     }
     if (in.MouseClicked()) {
-        for (Tab tab : {Tab::Hostiles, Tab::Upgrades}) {
+        for (Tab tab : {Tab::Hostiles, Tab::Upgrades, Tab::Guide}) {
             if (ui::MouseOver(app, TabRect(layout, tab))) {
                 SwitchTab(app, tab);
                 return false;
@@ -238,20 +304,22 @@ void CodexPanel::Draw(App& app) {
     for (UpgradeId id : upgrades_) {
         knownUpgrades += profile.UpgradeDiscovered(id) ? 1 : 0;
     }
-    for (Tab tab : {Tab::Hostiles, Tab::Upgrades}) {
+    for (Tab tab : {Tab::Hostiles, Tab::Upgrades, Tab::Guide}) {
         const Rectangle r = TabRect(layout, tab);
         const bool current = tab == tab_;
         DrawRectangleRec(r, current ? WithAlpha(palette::kUiAccent, 0.16f) : WithAlpha(palette::kUiPanelLight, 0.6f));
         DrawRectangleRec({r.x, r.y + r.height - 3.0f, r.width, 3.0f},
                          current ? palette::kUiAccent : WithAlpha(palette::kUiBorder, 0.7f));
-        const bool hostiles = tab == Tab::Hostiles;
-        const char* label = hostiles ? "HOSTILES" : "UPGRADES";
-        const int known = hostiles ? knownEnemies : knownUpgrades;
-        const int total = static_cast<int>(hostiles ? enemies_.size() : upgrades_.size());
+        const char* label = tab == Tab::Hostiles ? "HOSTILES" : (tab == Tab::Upgrades ? "UPGRADES" : "GUIDE");
         text.Draw(FontId::Heading, label, {r.x + 18.0f, r.y + 13.0f}, 21.0f, current ? WHITE : palette::kUiDim,
                   Align::Left, 0.12f);
-        text.Draw(FontId::BodyBold, TextFormat("%d / %d", known, total), {r.x + r.width - 16.0f, r.y + 10.0f}, 26.0f,
-                  current ? palette::kUiAccent : palette::kUiFaint, Align::Right);
+        if (tab != Tab::Guide) {
+            const bool hostiles = tab == Tab::Hostiles;
+            const int known = hostiles ? knownEnemies : knownUpgrades;
+            const int total = static_cast<int>(hostiles ? enemies_.size() : upgrades_.size());
+            text.Draw(FontId::BodyBold, TextFormat("%d / %d", known, total), {r.x + r.width - 16.0f, r.y + 10.0f},
+                      26.0f, current ? palette::kUiAccent : palette::kUiFaint, Align::Right);
+        }
     }
 
     // Tile backgrounds.
@@ -269,7 +337,9 @@ void CodexPanel::Draw(App& app) {
         const bool known = Discovered(app, i);
         const bool selected = i == selected_;
         Color accent = palette::kUiBorder;
-        if (known) {
+        if (tab_ == Tab::Guide) {
+            accent = palette::kUiAccent;
+        } else if (known) {
             accent = tab_ == Tab::Hostiles ? GetEnemyInfo(enemies_[static_cast<std::size_t>(i)]).color
                                            : RarityColor(GetUpgradeInfo(upgrades_[static_cast<std::size_t>(i)]).rarity);
         }
@@ -283,7 +353,16 @@ void CodexPanel::Draw(App& app) {
         if (!known) {
             continue;
         }
-        if (tab_ == Tab::Hostiles) {
+        if (tab_ == Tab::Guide) {
+            const GuideEntry& entry = kGuide[static_cast<std::size_t>(i)];
+            const Vector2 iconCenter{c.x, c.y - r.height * 0.1f};
+            if (entry.icon == kEnemyIcon) {
+                DrawEnemyFitted(neon, entry.enemy, iconCenter, r.width * 0.24f, time_);
+            } else {
+                shapes::DrawUpgradeIcon(neon, entry.icon, iconCenter, r.width * 0.5f,
+                                        LerpColor(palette::kUiAccent, WHITE, 0.3f), time_);
+            }
+        } else if (tab_ == Tab::Hostiles) {
             const EnemyKind kind = enemies_[static_cast<std::size_t>(i)];
             DrawEnemyFitted(neon, kind, c, r.width * (IsBoss(kind) ? 0.3f : 0.24f), time_);
         } else {
@@ -292,6 +371,12 @@ void CodexPanel::Draw(App& app) {
         }
     }
     neon.End();
+    for (int i = 0; i < count && tab_ == Tab::Guide; ++i) {
+        const Rectangle r = TileRect(layout, i);
+        text.Draw(FontId::Heading, kGuide[static_cast<std::size_t>(i)].label,
+                  {r.x + r.width * 0.5f, r.y + r.height - 30.0f}, 15.0f, i == selected_ ? WHITE : palette::kUiDim,
+                  Align::Center, 0.12f);
+    }
     for (int i = 0; i < count; ++i) {
         if (!Discovered(app, i)) {
             const Rectangle r = TileRect(layout, i);
@@ -305,10 +390,10 @@ void CodexPanel::Draw(App& app) {
     DrawRectangleRec(d, WithAlpha(palette::kUiPanel, 0.7f));
     DrawRectangleRec({d.x, d.y, 2.0f, d.height}, WithAlpha(palette::kUiBorder, 0.6f));
     const bool known = Discovered(app, selected_);
-    if (tab_ == Tab::Hostiles) {
-        DrawEnemyDetail(app, layout, enemies_[static_cast<std::size_t>(selected_)], known);
-    } else {
-        DrawUpgradeDetail(app, layout, upgrades_[static_cast<std::size_t>(selected_)], known);
+    switch (tab_) {
+    case Tab::Hostiles: DrawEnemyDetail(app, layout, enemies_[static_cast<std::size_t>(selected_)], known); break;
+    case Tab::Upgrades: DrawUpgradeDetail(app, layout, upgrades_[static_cast<std::size_t>(selected_)], known); break;
+    case Tab::Guide: DrawGuideDetail(app, layout, selected_); break;
     }
 
     const float promptY = layout.panel.y + layout.panel.height - 46.0f;
@@ -437,6 +522,31 @@ void CodexPanel::DrawUpgradeDetail(App& app, const Layout& layout, UpgradeId id,
         footer = "UNIQUE";
     }
     text.Draw(FontId::BodyBold, footer, {center.x, d.y + d.height - 60.0f}, 24.0f, footerColor, Align::Center, 0.06f);
+}
+
+void CodexPanel::DrawGuideDetail(App& app, const Layout& layout, int index) {
+    TextRenderer& text = app.Gfx().Text();
+    NeonRenderer& neon = app.Gfx().Neon();
+    const Rectangle d = layout.detail;
+    const GuideEntry& entry = kGuide[static_cast<std::size_t>(index)];
+    const Vector2 center{d.x + d.width * 0.5f, d.y + 150.0f};
+    const Color color = palette::kUiAccent;
+
+    neon.Begin();
+    neon.RegularPolygon(center, 6, 120.0f, kPi / 6.0f, 2.0f, WithAlpha(color, 0.5f));
+    neon.Glow(center, 150.0f, WithAlpha(color, 0.12f));
+    if (entry.icon == kEnemyIcon) {
+        DrawEnemyFitted(neon, entry.enemy, center, 80.0f, time_);
+    } else {
+        shapes::DrawUpgradeIcon(neon, entry.icon, center, 150.0f, LerpColor(color, WHITE, 0.3f), time_);
+    }
+    neon.End();
+
+    float y = d.y + 300.0f;
+    text.DrawGlow(FontId::Heading, entry.title, {center.x, y}, 34.0f, WHITE, color, Align::Center, 0.08f);
+    y += 70.0f;
+    text.DrawWrapped(FontId::Body, entry.text, {d.x + 40.0f, y}, d.width - 80.0f, 28.0f, palette::kUiText, 1.15f,
+                     Align::Center);
 }
 
 } // namespace gb
