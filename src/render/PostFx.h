@@ -21,6 +21,16 @@ struct PostFxParams {
     Color flashColor = WHITE;
     float flashAmount = 0.0f;
     bool bloomEnabled = true;
+
+    // Screen-space shockwave distortions (uv centre, uv radius, strength).
+    static constexpr int kMaxRipples = 4;
+    struct Ripple {
+        Vector2 center;
+        float radius;
+        float strength;
+    };
+    std::array<Ripple, kMaxRipples> ripples{};
+    int rippleCount = 0;
 };
 
 // HDR scene target plus a physically-inspired bloom chain and a final
@@ -71,7 +81,7 @@ private:
     } upLocs_{};
     struct CompositeLocs {
         int bloom, resolution, time, bloomStrength, exposure, vignette, aberration, grain, scanlines, saturation,
-            flash;
+            flash, ripples, rippleCount;
     } compLocs_{};
 };
 

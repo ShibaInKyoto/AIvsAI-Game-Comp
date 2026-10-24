@@ -45,6 +45,13 @@ void EffectsDirector::PlaySfx(SfxId id, float volume, float pitch, float pan) {
 
 void EffectsDirector::Shake(float trauma) { camera_.AddTrauma(trauma * settings_.screenShake); }
 
+void EffectsDirector::Ripple(Vector2 position, float maxRadius, float speed, float strength) {
+    if (distortions_.size() >= 8) {
+        distortions_.erase(distortions_.begin());
+    }
+    distortions_.push_back({position, 0.0f, maxRadius, speed, strength});
+}
+
 void EffectsDirector::Vibrate(float low, float high, float duration) {
     if (!muted_) {
         rumble_.Pulse(low, high, duration);
@@ -150,6 +157,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             particles_.Debris(ev.position, 30, ev.color, 900.0f, 40.0f);
             grid_.ApplyExplosiveForce(220.0f, ev.position, 1400.0f);
             PlaySfx(SfxId::BossDeath, 1.0f, 1.0f, pan);
+            Ripple(ev.position, 1500.0f, 1300.0f, 0.03f);
             Shake(1.0f);
             Vibrate(1.0f, 0.8f, 0.9f);
             Flash(WHITE, 0.9f);
@@ -189,6 +197,9 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             particles_.GlowPuff(ev.position, r * 1.2f, 0.25f, ev.color);
             grid_.ApplyExplosiveForce(r * 0.2f, ev.position, r * 1.5f);
             PlaySfx(SfxId::Explosion, std::min(0.75f, 0.3f + r / 400.0f), rng.Range(0.9f, 1.15f), pan);
+            if (r >= 120.0f) {
+                Ripple(ev.position, r * 1.8f, 900.0f, 0.008f);
+            }
             Shake(std::min(0.3f, r / 700.0f));
             break;
         }
@@ -197,6 +208,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             particles_.ShockRing(ev.position, 20.0f, 260.0f, 0.35f, palette::kDanger);
             grid_.ApplyExplosiveForce(70.0f, ev.position, 500.0f);
             PlaySfx(SfxId::PlayerHurt, 0.9f, 1.0f, pan);
+            Ripple(ev.position, 420.0f, 1100.0f, 0.018f);
             Shake(0.6f);
             Vibrate(0.8f, 1.0f, 0.3f);
             Flash(palette::kDanger, 0.45f);
@@ -212,6 +224,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             particles_.Debris(ev.position, 14, WHITE, 600.0f, 26.0f);
             grid_.ApplyExplosiveForce(260.0f, ev.position, 1100.0f);
             PlaySfx(SfxId::PlayerDeath, 1.0f, 1.0f, pan);
+            Ripple(ev.position, 1000.0f, 1000.0f, 0.035f);
             Shake(1.0f);
             Vibrate(1.0f, 1.0f, 0.7f);
             Flash(WHITE, 0.8f);
@@ -241,6 +254,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             particles_.Burst(ev.position, 160, Color{180, 230, 255, 255}, 400.0f, 1800.0f, 0.4f, 1.0f, 26.0f, 3.5f);
             grid_.ApplyExplosiveForce(300.0f, ev.position, 1300.0f);
             PlaySfx(SfxId::Nova, 1.0f, 1.0f, pan);
+            Ripple(ev.position, 1100.0f * ev.magnitude, 1800.0f, 0.022f);
             Shake(0.75f);
             Vibrate(0.9f, 0.5f, 0.4f);
             Flash(Color{180, 230, 255, 255}, 0.6f);
@@ -314,6 +328,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
                 particles_.ShockRing(ev.position, 30.0f, 600.0f, 0.6f, ev.color);
                 grid_.ApplyExplosiveForce(120.0f, ev.position, 800.0f);
                 PlaySfx(SfxId::BossRoar, 0.9f, 1.0f - 0.08f * ev.magnitude, pan);
+                Ripple(ev.position, 800.0f, 1200.0f, 0.02f);
                 Shake(0.5f);
                 Flash(ev.color, 0.3f);
             } else if (ev.value == -2) {
@@ -356,6 +371,13 @@ void EffectsDirector::Update(const World& world, float realDt) {
     const float dt = realDt * TimeScale();
     const Player& p = world.GetPlayer();
     Rng& rng = particles_.Random();
+
+    for (Distortion& d : distortions_) {
+        d.radius += d.speed * realDt;
+    }
+    distortions_.erase(std::remove_if(distortions_.begin(), distortions_.end(),
+                                      [](const Distortion& d) { return d.radius >= d.maxRadius; }),
+                       distortions_.end());
 
     // Scheduled cosmetic bursts run on real time so slow motion doesn't stall them.
     for (ScheduledBurst& burst : scheduled_) {

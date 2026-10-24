@@ -46,6 +46,16 @@ public:
     float FlashAmount() const { return flashAmount_; }
     const std::vector<FloatingText>& Texts() const { return texts_; }
 
+    // Expanding screen-space refraction rings (rendered by the post pass).
+    struct Distortion {
+        Vector2 position;
+        float radius;
+        float maxRadius;
+        float speed;
+        float strength;
+    };
+    const std::vector<Distortion>& Distortions() const { return distortions_; }
+
     void AddText(Vector2 position, const char* text, Color color, float size, bool big = false);
     // Muted directors still render everything but stay silent (attract mode).
     void SetMuted(bool muted) { muted_ = muted; }
@@ -56,6 +66,7 @@ private:
     void PlaySfx(SfxId id, float volume, float pitch, float pan);
     void Shake(float trauma);
     void Vibrate(float low, float high, float duration);
+    void Ripple(Vector2 position, float maxRadius, float speed, float strength);
 
     ParticleSystem& particles_;
     WarpGrid& grid_;
@@ -72,6 +83,7 @@ private:
         float size;
     };
     std::vector<ScheduledBurst> scheduled_;
+    std::vector<Distortion> distortions_;
     std::vector<FloatingText> texts_;
     float hitStop_ = 0.0f;
     float slowMo_ = 0.0f;

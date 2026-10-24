@@ -70,6 +70,9 @@ void GameScene::ApplyDebugLaunchOptions() {
         world.ApplyUpgrade(UpgradeId::Drones);
         draft_.Open(app_, world, false);
         overlay_ = Overlay::Draft;
+    } else if (debugScene == "nova") {
+        view_.GetWorld().GetPlayer().novaCharge = 1.0f;
+        debugNovaPending_ = true;
     } else if (debugScene == "pause") {
         World& world = view_.GetWorld();
         for (UpgradeId id : {UpgradeId::SplitShot, UpgradeId::ArcCoil, UpgradeId::ArcCoil, UpgradeId::Magnet,
@@ -95,6 +98,10 @@ PlayerInput GameScene::ReadPlayerInput() {
     input.move = in.Move();
     input.dash = in.Pressed(Action::Dash);
     input.nova = in.Pressed(Action::Special);
+    if (debugNovaPending_ && view_.Time() > 1.0f) {
+        input.nova = true;
+        debugNovaPending_ = false;
+    }
 
     if (in.LastDevice() == InputDevice::Gamepad) {
         if (in.AimStickActive()) {
@@ -429,6 +436,17 @@ void GameScene::DrawWorld() {
 void GameScene::ConfigurePostFx(PostFxParams& params) const {
     const EffectsDirector& fx = view_.Effects();
     params.aberration = fx.Aberration();
+    // Newest shockwaves first; positions go world -> scene pixels -> uv.
+    const Camera2D camera = view_.CurrentCamera();
+    const Vector2 scene = app_.Gfx().SceneSize();
+    const auto& distortions = fx.Distortions();
+    for (auto it = distortions.rbegin(); it != distortions.rend() && params.rippleCount < PostFxParams::kMaxRipples;
+         ++it) {
+        const Vector2 screen = GetWorldToScreen2D(it->position, camera);
+        const float fade = 1.0f - it->radius / it->maxRadius;
+        params.ripples[static_cast<std::size_t>(params.rippleCount++)] = {
+            {screen.x / scene.x, 1.0f - screen.y / scene.y}, it->radius * camera.zoom / scene.y, it->strength * fade};
+    }
     params.flashColor = fx.FlashColor();
     params.flashAmount = fx.FlashAmount();
     if (!view_.GetWorld().PlayerAlive()) {

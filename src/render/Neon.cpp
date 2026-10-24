@@ -249,7 +249,16 @@ void NeonRenderer::Streak(Vector2 center, Vector2 direction, float length, float
 }
 
 void NeonRenderer::Ring(Vector2 center, float radius, Color color) {
-    SpriteQuad(center, {radius, 0.0f}, {0.0f, radius}, ringRegion_, color);
+    constexpr float kSpriteLimit = 110.0f;
+    if (radius <= kSpriteLimit) {
+        SpriteQuad(center, {radius, 0.0f}, {0.0f, radius}, ringRegion_, color);
+        return;
+    }
+    // Matches the sprite's look: a crisp core line plus a soft, wide halo.
+    const int segments = std::clamp(static_cast<int>(radius / 9.0f), 32, 160);
+    Circle(center, radius * 0.86f, std::max(2.5f, radius * 0.02f), color, segments);
+    Circle(center, radius * 0.86f, std::max(8.0f, radius * 0.07f), WithAlpha(color, static_cast<float>(color.a) / 255.0f * 0.3f),
+           segments);
 }
 
 void NeonRenderer::FillTriangle(Vector2 a, Vector2 b, Vector2 c, Color color) {

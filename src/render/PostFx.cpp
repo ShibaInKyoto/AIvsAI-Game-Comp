@@ -32,7 +32,9 @@ bool PostFx::Init(int width, int height) {
                  GetShaderLocation(compositeShader_, "uGrain"),
                  GetShaderLocation(compositeShader_, "uScanlines"),
                  GetShaderLocation(compositeShader_, "uSaturation"),
-                 GetShaderLocation(compositeShader_, "uFlash")};
+                 GetShaderLocation(compositeShader_, "uFlash"),
+                 GetShaderLocation(compositeShader_, "uRipples"),
+                 GetShaderLocation(compositeShader_, "uRippleCount")};
 
     CreateTargets();
     // (IsRenderTextureValid would demand a depth buffer, which these targets do not need.)
@@ -206,6 +208,17 @@ void PostFx::Composite(const PostFxParams& params) {
     SetShaderValue(compositeShader_, compLocs_.scanlines, &params.scanlines, SHADER_UNIFORM_FLOAT);
     SetShaderValue(compositeShader_, compLocs_.saturation, &params.saturation, SHADER_UNIFORM_FLOAT);
     SetShaderValue(compositeShader_, compLocs_.flash, flash, SHADER_UNIFORM_VEC4);
+    std::array<float, PostFxParams::kMaxRipples * 4> ripples{};
+    const int rippleCount = std::clamp(params.rippleCount, 0, PostFxParams::kMaxRipples);
+    for (int i = 0; i < rippleCount; ++i) {
+        const PostFxParams::Ripple& r = params.ripples[static_cast<std::size_t>(i)];
+        ripples[static_cast<std::size_t>(i) * 4 + 0] = r.center.x;
+        ripples[static_cast<std::size_t>(i) * 4 + 1] = r.center.y;
+        ripples[static_cast<std::size_t>(i) * 4 + 2] = r.radius;
+        ripples[static_cast<std::size_t>(i) * 4 + 3] = r.strength;
+    }
+    SetShaderValueV(compositeShader_, compLocs_.ripples, ripples.data(), SHADER_UNIFORM_VEC4, PostFxParams::kMaxRipples);
+    SetShaderValue(compositeShader_, compLocs_.rippleCount, &rippleCount, SHADER_UNIFORM_INT);
     // When bloom is disabled the (cleared) mip is still bound; its strength is 0.
     SetShaderValueTexture(compositeShader_, compLocs_.bloom, mips_[0].texture);
 

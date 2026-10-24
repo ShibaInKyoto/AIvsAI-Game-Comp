@@ -39,7 +39,8 @@ public:
     void Glow(Vector2 center, float radius, Color color);
     // Velocity-stretched glow, used for sparks and bullets.
     void Streak(Vector2 center, Vector2 direction, float length, float width, Color color);
-    // Thin bright ring sprite (shockwaves).
+    // Bright ring (shockwaves). Small rings use the atlas sprite; large ones
+    // switch to line geometry so the profile never shows magnified texels.
     void Ring(Vector2 center, float radius, Color color);
     // Flat additive fill.
     void FillTriangle(Vector2 a, Vector2 b, Vector2 c, Color color);

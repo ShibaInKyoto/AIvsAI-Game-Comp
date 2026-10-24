@@ -243,6 +243,7 @@ void App::Frame() {
     }
     if (!settings_.chromaticAberration) {
         post.aberration = 0.0f;
+        post.rippleCount = 0;
     }
     if (settings_.reduceFlashing) {
         post.flashAmount *= 0.25f;

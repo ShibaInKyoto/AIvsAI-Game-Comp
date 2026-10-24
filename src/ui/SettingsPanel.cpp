@@ -26,7 +26,7 @@ void SettingsPanel::Open(App& app) {
     std::vector<ui::Menu::Item> items(ItemCount);
     const char* labels[ItemCount] = {"MASTER VOLUME",   "MUSIC VOLUME",      "EFFECTS VOLUME",
                                      "FULLSCREEN",      "V-SYNC",            "RENDER SCALE",
-                                     "SCREEN SHAKE",    "BLOOM",             "CHROMATIC ABERRATION",
+                                     "SCREEN SHAKE",    "BLOOM",             "SCREEN DISTORTION",
                                      "FILM GRAIN",      "SCANLINES",         "REDUCE FLASHING",
                                      "DAMAGE NUMBERS",  "AUTO-FIRE",         "GAMEPAD AIM ASSIST",
                                      "GAMEPAD VIBRATION", "SHOW FPS",        "BACK"};
