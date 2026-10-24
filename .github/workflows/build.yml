@@ -1,0 +1,136 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Windows (MSVC, x64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -A x64 -DGB_BUILD_TESTS=ON -DGB_WARNINGS_AS_ERRORS=ON
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Unit tests
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $dist = "dist/Gridbreaker"
+          New-Item -ItemType Directory -Force $dist | Out-Null
+          Copy-Item build/bin/Gridbreaker.exe $dist/
+          Copy-Item README.md $dist/README.md
+          Copy-Item LICENSE $dist/LICENSE.txt
+          New-Item -ItemType Directory -Force $dist/licenses | Out-Null
+          Copy-Item assets/fonts/OFL-*.txt $dist/licenses/
+          Compress-Archive -Path $dist -DestinationPath dist/Gridbreaker-windows-x64.zip -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Gridbreaker-windows-x64
+          path: dist/Gridbreaker-windows-x64.zip
+          if-no-files-found: error
+
+  linux:
+    name: Linux (GCC) + tests + smoke test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libx11-dev libxrandr-dev \
+            libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libasound2-dev xvfb mesa-utils
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DGB_WARNINGS_AS_ERRORS=ON
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Unit tests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Smoke test (bot plays under a virtual display)
+        run: |
+          mkdir -p smoke
+          LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s "-screen 0 1280x720x24" \
+            ./build/bin/Gridbreaker --windowed --size 1280x720 --no-audio --data-dir smoke/data \
+            --autotest 90 --screenshot smoke/autotest.png --screenshot-at 60
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test
+          path: smoke/
+          if-no-files-found: ignore
+
+  release:
+    name: Publish release
+    needs: [windows, linux]
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || contains(github.event.head_commit.message, '[release]'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: Gridbreaker-windows-x64
+          path: dist
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            # The project version lives on the "VERSION x.y.z" line of project().
+            TAG="v$(sed -n 's/^ *VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt | head -n1)"
+          fi
+          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "$TAG" dist/Gridbreaker-windows-x64.zip \
+            --target "$GITHUB_SHA" \
+            --title "Gridbreaker $TAG" \
+            --notes-file docs/RELEASE_NOTES.md
+
+  nightly:
+    name: Update rolling nightly build
+    needs: [windows, linux]
+    if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Gridbreaker-windows-x64
+          path: dist
+
+      - name: Replace nightly pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release delete nightly --yes --cleanup-tag 2>/dev/null || true
+          gh release create nightly dist/Gridbreaker-windows-x64.zip \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Gridbreaker (latest development build)" \
+            --notes "Automatically built from ${GITHUB_REF_NAME} @ ${GITHUB_SHA::7}. Download the zip, extract it and run Gridbreaker.exe."

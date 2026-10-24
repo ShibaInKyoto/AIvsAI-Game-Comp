@@ -1,0 +1,9 @@
+#pragma once
+
+namespace gb::build {
+
+inline constexpr const char* kGameName = "GRIDBREAKER";
+inline constexpr const char* kVersion = "@PROJECT_VERSION@";
+inline constexpr const char* kGitHash = "@GB_GIT_HASH@";
+
+} // namespace gb::build
