@@ -89,6 +89,9 @@ void GameScene::ApplyDebugLaunchOptions() {
                              UpgradeId::HighVoltage, UpgradeId::Deflector}) {
             world.ApplyUpgrade(id);
         }
+        // Two sectors in, with a protocol picked after each guardian.
+        world.ChooseSectorModifier(SectorModifier::Swarm);
+        world.ChooseSectorModifier(SectorModifier::Bounty);
         OpenPause();
     }
 }
