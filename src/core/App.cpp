@@ -144,7 +144,33 @@ float App::EffectiveRenderScale() const {
     // Automatic: cap the scene buffer around 1440p-class pixel counts so 4K
     // screens on integrated GPUs stay smooth; UI is always native resolution.
     const float width = static_cast<float>(std::max(GetRenderWidth(), 1));
-    return std::min(1.0f, 2560.0f / width);
+    return std::min(1.0f, 2560.0f / width) * dynamicScale_;
+}
+
+void App::UpdateDynamicResolution(float frameTime) {
+    constexpr float kSlowFrame = 1.0f / 50.0f;
+    constexpr float kMinScale = 0.5f;
+    measureDelay_ = std::max(0.0f, measureDelay_ - frameTime);
+    // Only automatic scaling adapts, and only from steady, focused frames:
+    // loading hitches and alt-tab stalls say nothing about the GPU.
+    if (settings_.renderScale != 0 || measureDelay_ > 0.0f || !IsWindowFocused() || frameTime > 0.1f ||
+        dynamicScale_ <= kMinScale) {
+        frameSampleCount_ = 0;
+        return;
+    }
+    frameSamples_[static_cast<std::size_t>(frameSampleCount_++)] = frameTime;
+    if (frameSampleCount_ < kFrameSamples) {
+        return;
+    }
+    frameSampleCount_ = 0;
+    auto middle = frameSamples_.begin() + kFrameSamples / 2;
+    std::nth_element(frameSamples_.begin(), middle, frameSamples_.end());
+    if (*middle > kSlowFrame) {
+        dynamicScale_ = std::max(kMinScale, dynamicScale_ - 0.1f);
+        measureDelay_ = 1.0f; // let the new resolution settle before judging again
+        TraceLog(LOG_INFO, "RENDER: median frame %.1f ms, automatic render scale now %d%%",
+                 static_cast<double>(*middle * 1000.0f), static_cast<int>(EffectiveRenderScale() * 100.0f + 0.5f));
+    }
 }
 
 void App::ChangeScene(std::unique_ptr<Scene> next, float fadeSeconds) {
@@ -161,6 +187,7 @@ void App::UpdateTransition(float dt) {
             fadeAlpha_ = 1.0f;
             scene_ = std::move(pendingScene_);
             input_.ConsumeAll();
+            measureDelay_ = 3.0f;
             if (scene_) {
                 scene_->OnEnter();
             }
@@ -200,6 +227,9 @@ void App::Frame() {
     const float dt = automated ? 1.0f / 60.0f : std::min(GetFrameTime(), kMaxFrameTime);
     realTime_ += dt;
     frameTimeMs_ = GetFrameTime() * 1000.0f;
+    if (!automated) {
+        UpdateDynamicResolution(GetFrameTime());
+    }
 
     if (IsKeyPressed(KEY_F11) || ((IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)) && IsKeyPressed(KEY_ENTER))) {
         settings_.fullscreen = !settings_.fullscreen;

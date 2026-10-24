@@ -46,7 +46,6 @@ private:
     bool Discovered(const App& app, int index) const;
     void SwitchTab(App& app, Tab tab);
 
-    void DrawTile(App& app, const Layout& layout, int index);
     void DrawEnemyDetail(App& app, const Layout& layout, EnemyKind kind, bool known);
     void DrawUpgradeDetail(App& app, const Layout& layout, UpgradeId id, bool known);
     void DrawGuideDetail(App& app, const Layout& layout, int index);

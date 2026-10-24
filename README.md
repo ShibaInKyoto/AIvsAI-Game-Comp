@@ -115,6 +115,9 @@ Prompts adapt automatically to whichever device you used last.
 * Attract-mode title screen: an AI pilot plays the game live behind the menu.
 * Full keyboard, mouse and gamepad support, including gamepad aim assist.
 * Borderless fullscreen by default, V-Sync, resolution-independent UI.
+* Automatic render scale: the scene buffer is capped on very high resolutions
+  and steps down further if a weak GPU cannot hold ~50 fps (the UI always stays
+  at native resolution). A fixed scale can be chosen in Settings.
 
 ## Building from source
 

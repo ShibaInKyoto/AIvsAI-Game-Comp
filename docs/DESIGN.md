@@ -72,7 +72,8 @@ Implemented:
 - Results show the run's loadout and what destroyed the ship; Records keep
   the last ten runs.
 - Procedural SFX + adaptive music; XInput rumble on Windows.
-- Render scale (auto caps 4K), F3 perf overlay, auto-pause on focus loss.
+- Render scale (auto caps 4K and steps down on slow GPUs), F3 perf overlay,
+  auto-pause on focus loss or gamepad disconnect.
 - CI: MSVC + GCC with -Werror, clang-format check, unit/sim tests, ASan +
   UBSan job, smoke tests (Linux Xvfb, Windows Mesa llvmpipe), dependency
   check, rolling nightly release.

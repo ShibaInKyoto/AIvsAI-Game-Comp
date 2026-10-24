@@ -6,6 +6,7 @@
 #include "platform/Rumble.h"
 #include "render/Graphics.h"
 
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -80,6 +81,7 @@ private:
     void SetWindowIconFromAssets();
     void Frame();
     void UpdateTransition(float dt);
+    void UpdateDynamicResolution(float frameTime);
     void HandleScreenshot();
 
     LaunchOptions options_;
@@ -107,6 +109,14 @@ private:
     float realTime_ = 0.0f;
     float frameTimeMs_ = 0.0f;
     float appliedRenderScale_ = 1.0f;
+
+    // Automatic render scale also steps down (never back up) when the GPU
+    // cannot hold ~50 fps, judged by the median of a two-second window.
+    static constexpr int kFrameSamples = 120;
+    std::array<float, kFrameSamples> frameSamples_{};
+    int frameSampleCount_ = 0;
+    float dynamicScale_ = 1.0f;
+    float measureDelay_ = 3.0f; // settle time after start-up and scene changes
     int lastWidth_ = 0;
     int lastHeight_ = 0;
 };

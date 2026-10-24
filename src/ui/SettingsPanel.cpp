@@ -45,7 +45,8 @@ void SettingsPanel::Refresh(App& app) {
     menu_.SetValue(SfxVolume, Percent(s.sfxVolume));
     menu_.SetValue(Fullscreen, OnOff(s.fullscreen));
     menu_.SetValue(VSync, OnOff(s.vsync));
-    menu_.SetValue(RenderScale, s.renderScale == 0 ? "AUTO" : Percent(static_cast<float>(s.renderScale) / 100.0f));
+    menu_.SetValue(RenderScale, s.renderScale == 0 ? "AUTO  " + Percent(app.EffectiveRenderScale())
+                                                   : Percent(static_cast<float>(s.renderScale) / 100.0f));
     menu_.SetValue(ScreenShake, Percent(s.screenShake));
     menu_.SetValue(Bloom, s.bloom ? Percent(s.bloomIntensity) : "OFF");
     menu_.SetValue(Aberration, OnOff(s.chromaticAberration));
