@@ -127,22 +127,22 @@ void ResultsScene::DrawUi() {
     for (int i = 0; i < revealedRows_ && i < kRowCount; ++i) {
         const float y = panel.y + 36.0f + static_cast<float>(i) * 44.0f;
         text.Draw(FontId::BodyBold, rows[static_cast<std::size_t>(i)].first, {panel.x + 60.0f, y}, 28.0f, palette::kUiDim);
-        text.Draw(FontId::Heading, rows[static_cast<std::size_t>(i)].second, {panel.x + panel.width - 60.0f, y + 2.0f},
-                  26.0f, palette::kUiText, Align::Right);
+        text.Draw(FontId::BodyBold, rows[static_cast<std::size_t>(i)].second, {panel.x + panel.width - 60.0f, y - 3.0f},
+                  32.0f, palette::kUiText, Align::Right);
     }
     if (revealedRows_ >= kRowCount) {
         const float y = panel.y + 400.0f;
         text.Draw(FontId::BodyBold, "SCORE", {panel.x + 60.0f, y + 14.0f}, 30.0f, palette::kUiDim);
-        text.DrawGlow(FontId::Heading, FormatThousands(static_cast<long long>(displayedScore_)),
-                      {panel.x + panel.width - 60.0f, y}, 56.0f, WHITE, accent, Align::Right, 0.04f);
+        text.DrawGlow(FontId::BodyBold, FormatThousands(static_cast<long long>(displayedScore_)),
+                      {panel.x + panel.width - 60.0f, y - 8.0f}, 70.0f, WHITE, accent, Align::Right, 0.02f);
         if (newRecord_ && displayedScore_ >= static_cast<float>(s.score)) {
             const float pulse = 0.6f + 0.4f * std::sin(time_ * 6.0f);
             text.Draw(FontId::Heading, "NEW RECORD", {panel.x + panel.width * 0.5f, y + 20.0f}, 26.0f,
                       WithAlpha(palette::kUiWarn, pulse), Align::Center, 0.2f);
         }
         text.Draw(FontId::BodyBold, "CREDITS EARNED", {panel.x + 60.0f, y + 96.0f}, 28.0f, palette::kUiDim);
-        text.Draw(FontId::Heading, TextFormat("+%d", static_cast<int>(displayedCredits_)),
-                  {panel.x + panel.width - 60.0f, y + 94.0f}, 34.0f, palette::kCache, Align::Right);
+        text.Draw(FontId::BodyBold, TextFormat("+%d", static_cast<int>(displayedCredits_)),
+                  {panel.x + panel.width - 60.0f, y + 88.0f}, 42.0f, palette::kCache, Align::Right);
     }
 
     if (time_ >= 1.0f) {

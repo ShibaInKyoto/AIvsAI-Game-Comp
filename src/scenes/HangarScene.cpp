@@ -275,7 +275,7 @@ void HangarScene::DrawFirmware() {
     text.Draw(FontId::Heading, "FIRMWARE UPGRADES", {panel.x + 40.0f, panel.y + 30.0f}, 36.0f, WHITE, Align::Left, 0.12f);
     text.Draw(FontId::BodyBold, "Permanent upgrades that apply to every run.", {panel.x + 40.0f, panel.y + 80.0f}, 24.0f,
               palette::kUiDim);
-    text.Draw(FontId::Heading, TextFormat("%d CR", profile.Credits()), {panel.x + panel.width - 40.0f, panel.y + 34.0f},
+    text.Draw(FontId::BodyBold, TextFormat("%d CR", profile.Credits()), {panel.x + panel.width - 40.0f, panel.y + 28.0f},
               34.0f, LerpColor(palette::kCache, WHITE, purchaseFlash_), Align::Right);
 
     const float listX = panel.x + 30.0f;
@@ -308,7 +308,7 @@ void HangarScene::DrawUi() {
     const Vector2 ui = app_.Gfx().UiSize();
     TextRenderer& text = app_.Gfx().Text();
     text.DrawGlow(FontId::Display, "HANGAR", {90.0f, 60.0f}, 64.0f, WHITE, palette::kUiAccent, Align::Left, 0.1f);
-    text.Draw(FontId::Heading, TextFormat("CREDITS  %d", app_.Progress().Credits()), {ui.x - 90.0f, 78.0f}, 30.0f,
+    text.Draw(FontId::BodyBold, TextFormat("CREDITS  %d", app_.Progress().Credits()), {ui.x - 90.0f, 70.0f}, 38.0f,
               LerpColor(palette::kCache, WHITE, purchaseFlash_), Align::Right, 0.05f);
 
     menu_.Draw(app_, {90.0f, 190.0f}, 560.0f, 62.0f, palette::kUiAccent);

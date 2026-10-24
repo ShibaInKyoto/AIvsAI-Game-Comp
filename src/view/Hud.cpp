@@ -179,14 +179,15 @@ void Hud::DrawScore(App& app, const GameView& view) const {
     TextRenderer& text = app.Gfx().Text();
     const Vector2 ui = app.Gfx().UiSize();
     const float right = ui.x - 48.0f;
-    text.Draw(FontId::Heading, FormatThousands(static_cast<long long>(displayedScore_)), {right, 30.0f}, 40.0f,
-              palette::kUiText, Align::Right, 0.04f);
+    // Numbers use Rajdhani: Orbitron's slashed zero reads like an icon at a glance.
+    text.Draw(FontId::BodyBold, FormatThousands(static_cast<long long>(displayedScore_)), {right, 22.0f}, 52.0f,
+              palette::kUiText, Align::Right, 0.02f);
 
     const int multiplier = world.ComboMultiplier();
     const int combo = world.Combo();
     if (combo > 0) {
         const Color c = multiplier >= 5 ? palette::kUiWarn : palette::kUiAccent;
-        text.Draw(FontId::Heading, TextFormat("x%d", multiplier), {right, 78.0f}, 30.0f, c, Align::Right);
+        text.Draw(FontId::BodyBold, TextFormat("x%d", multiplier), {right, 72.0f}, 38.0f, c, Align::Right);
         text.Draw(FontId::BodyBold, TextFormat("%d COMBO", combo), {right - 60.0f, 82.0f}, 22.0f, palette::kUiDim,
                   Align::Right);
         const float t = Saturate(world.ComboTimer() / 3.0f);
@@ -260,7 +261,7 @@ void Hud::DrawExperience(App& app, const GameView& view) const {
     neon.Begin();
     neon.Line({0.0f, y - 6.0f}, {ui.x * xpFill_, y - 6.0f}, 2.0f, WithAlpha(c, 0.8f));
     neon.End();
-    app.Gfx().Text().Draw(FontId::Heading, TextFormat("LV %d", world.Level()), {24.0f, y - 42.0f}, 28.0f,
+    app.Gfx().Text().Draw(FontId::BodyBold, TextFormat("LV %d", world.Level()), {24.0f, y - 48.0f}, 36.0f,
                           LerpColor(palette::kXpSmall, WHITE, 0.3f + 0.7f * levelFlash_));
 }
 
