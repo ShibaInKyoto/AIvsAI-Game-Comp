@@ -11,6 +11,7 @@ take down five guardian bosses on a living, warping grid.
 |---|---|
 | ![Event Horizon boss](docs/screenshots/event-horizon.jpg) | ![The Core boss](docs/screenshots/the-core.jpg) |
 | ![Level-up draft](docs/screenshots/level-up.jpg) | ![Hangar](docs/screenshots/hangar.jpg) |
+| ![Codex](docs/screenshots/codex.jpg) | ![Run results](docs/screenshots/results.jpg) |
 
 ---
 

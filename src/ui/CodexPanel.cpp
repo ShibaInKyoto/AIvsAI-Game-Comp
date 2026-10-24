@@ -65,10 +65,20 @@ const EnemyEntry& EntryFor(EnemyKind kind) {
     return kEnemyEntries.front();
 }
 
-// Enemy previews are sized by their collision radius; scale them so they
-// fill a given radius regardless of their in-game size.
+// How far a body's outline reaches beyond its collision radius (gravity
+// wells draw orbiting rings).
+float VisualExtent(EnemyKind kind) {
+    switch (kind) {
+    case EnemyKind::Singularity: return 1.6f;
+    case EnemyKind::BossSingularity: return 2.3f;
+    default: return 1.0f;
+    }
+}
+
+// Enemy previews are sized by their collision radius; scale them so their
+// outline fills a given radius regardless of their in-game size.
 void DrawEnemyFitted(NeonRenderer& neon, EnemyKind kind, Vector2 center, float radius, float time) {
-    shapes::DrawEnemyPreview(neon, kind, center, radius / GetEnemyInfo(kind).radius, time);
+    shapes::DrawEnemyPreview(neon, kind, center, radius / (GetEnemyInfo(kind).radius * VisualExtent(kind)), time);
 }
 
 } // namespace
