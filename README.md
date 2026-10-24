@@ -141,7 +141,8 @@ cmake --build build
 
 ```sh
 ctest --test-dir build --output-on-failure      # unit + simulation tests
-./build/gridbreaker_balance 4 1500 1 0.6         # bot balance runs: runs, seconds, difficulty, skill
+./build/gridbreaker_balance 4 1500 1 0.6         # bot balance runs: runs, seconds, difficulty 0-2, skill 0-1
+./build/gridbreaker_balance 2 900 1 0.45 bossrush # ...optionally in endless or bossrush mode
 ./build/gridbreaker_audiodump out/ 20            # render music and SFX to WAV files
 ```
 
@@ -155,7 +156,9 @@ ctest --test-dir build --output-on-failure      # unit + simulation tests
 | `--screenshot PATH --screenshot-at SECONDS` | Capture a screenshot and exit |
 | `--seed N` | Fixed run seed |
 | `--data-dir PATH` | Override the save/settings directory |
-| `--sector N`, `--boss`, `--scene NAME` | Debug entry points |
+| `--sector N`, `--boss` | Start runs at a later sector, or straight at its guardian |
+| `--scene NAME` | Jump to `title`, `game`, `bossrush`, `hangar`, `codex`, `records`, `results`, `draft`, `pause`... |
+| `--perf` | Show the performance overlay (toggle in game with `F3`) |
 
 ## Continuous integration
 
