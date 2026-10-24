@@ -31,7 +31,8 @@ const char* ModeBlurb(GameMode mode) {
     switch (mode) {
     case GameMode::Endless: return "No finish line. Sectors loop forever with compounding threat and corruption.";
     case GameMode::BossRush:
-        return "The five guardians back to back. Start with ten upgrades and gain seven more after every kill.";
+        return TextFormat("The five guardians back to back. Start with %d upgrades and draft %d more after every kill.",
+                          World::kBossRushStartLevels, World::kBossRushLevelsPerGuardian);
     default: return "Clear five sectors and destroy the Core.";
     }
 }
