@@ -167,7 +167,7 @@ void Director::Update(World& world, float dt) {
     }
     case SectorPhase::Cleared:
         if (phaseTime_ >= kClearedDelay && sector_ + 1 >= kCampaignSectors &&
-            world.Config().mode == GameMode::Campaign && Loop() == 0) {
+            world.Config().mode != GameMode::Endless && Loop() == 0) {
             SetPhase(SectorPhase::Victory);
         }
         break;

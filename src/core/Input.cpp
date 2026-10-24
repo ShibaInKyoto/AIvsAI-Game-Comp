@@ -10,6 +10,7 @@ constexpr float kStickDeadzone = 0.22f;
 constexpr float kTriggerThreshold = 0.35f;
 constexpr float kRepeatDelay = 0.38f;
 constexpr float kRepeatInterval = 0.085f;
+constexpr float kDeviceSwitchStick = 0.5f;
 
 bool AnyKeyDown(std::initializer_list<int> keys) {
     for (int key : keys) {
@@ -111,13 +112,16 @@ void Input::Update(float dt) {
     if (AnyKeyDown({KEY_S, KEY_DOWN})) keys.y += 1.0f;
     keys = LengthSq(keys) > 0.0f ? Normalized(keys) : keys;
 
-    const bool padActive = LengthSq(leftStick_) > 0.0f || LengthSq(aimStick_) > 0.0f ||
+    // Only deliberate input switches devices, so a drifting stick on an idle
+    // controller cannot steal control from the mouse.
+    const bool padActive = LengthSq(leftStick_) > kDeviceSwitchStick * kDeviceSwitchStick ||
+                           LengthSq(aimStick_) > kDeviceSwitchStick * kDeviceSwitchStick ||
                            (gamepad_ >= 0 && GetGamepadButtonPressed() != GAMEPAD_BUTTON_UNKNOWN);
-    const bool kbmActive = LengthSq(keys) > 0.0f || MouseMoved() || GetKeyPressed() != 0 ||
+    const bool kbmActive = LengthSq(keys) > 0.0f || LengthSq(mouseDelta_) > 4.0f || GetKeyPressed() != 0 ||
                            IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT);
-    if (padActive) {
+    if (padActive && !kbmActive) {
         lastDevice_ = InputDevice::Gamepad;
-    } else if (kbmActive) {
+    } else if (kbmActive && !padActive) {
         lastDevice_ = InputDevice::KeyboardMouse;
     }
 

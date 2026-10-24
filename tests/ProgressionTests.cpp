@@ -177,3 +177,34 @@ TEST_CASE("Challenges evaluate against run state") {
     CHECK(ChallengeMet(ChallengeId::WardenDown, world));
     CHECK_FALSE(ChallengeMet(ChallengeId::FleetCommander, world));  // profile-based
 }
+
+TEST_CASE("Final guardian ends campaign and daily runs, but not endless") {
+    for (GameMode mode : {GameMode::Campaign, GameMode::Daily, GameMode::Endless}) {
+        RunConfig config;
+        config.mode = mode;
+        World world(config);
+        Director& director = world.GetDirector();
+        director.DebugJump(Director::kCampaignSectors - 1, true);
+        world.Update(0.5f, PlayerInput{});
+        REQUIRE(director.Phase() == SectorPhase::Boss);
+        world.Update(2.5f, PlayerInput{});  // let the Core materialise and deploy its nodes
+        // Shield nodes protect the Core; remove them, then the Core itself.
+        for (Enemy& e : world.Enemies()) {
+            if (e.alive && e.kind == EnemyKind::BossMinion) {
+                world.KillEnemy(e, false);
+            }
+        }
+        world.Update(0.1f, PlayerInput{});
+        Enemy* core = world.FindEnemy(director.BossId());
+        REQUIRE(core != nullptr);
+        world.DamageEnemy(*core, 1e9f, false, {0.0f, 1.0f});
+        world.Update(0.1f, PlayerInput{});
+        CHECK(director.Phase() == SectorPhase::Cleared);
+        world.Update(3.0f, PlayerInput{});
+        if (mode == GameMode::Endless) {
+            CHECK(director.Phase() == SectorPhase::Cleared);
+        } else {
+            CHECK(director.Phase() == SectorPhase::Victory);
+        }
+    }
+}

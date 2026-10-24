@@ -29,6 +29,7 @@ void SettingsPanel::Open(App& app) {
                                      "SHOW FPS", "BACK"};
     for (int i = 0; i < ItemCount; ++i) {
         items[static_cast<std::size_t>(i)].label = labels[i];
+        items[static_cast<std::size_t>(i)].adjustable = i != Back;
     }
     menu_.SetItems(std::move(items));
     menu_.SetSelected(0);

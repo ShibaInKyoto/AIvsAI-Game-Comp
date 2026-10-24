@@ -83,8 +83,8 @@ void HangarScene::RefreshMenu() {
         }
         items.push_back(item);
     }
-    items.push_back({"DIFFICULTY", DifficultyName(difficulty_)});
-    items.push_back({"MODE", ModeName(mode_)});
+    items.push_back({"DIFFICULTY", DifficultyName(difficulty_), true});
+    items.push_back({"MODE", ModeName(mode_), true});
     items.push_back({"LAUNCH"});
     items.push_back({"FIRMWARE UPGRADES"});
     items.push_back({"BACK"});

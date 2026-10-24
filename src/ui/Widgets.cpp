@@ -87,11 +87,13 @@ int Menu::Update(App& app) {
     if (in.Repeated(Action::Down)) {
         move(1);
     }
-    if (in.Repeated(Action::Left)) {
-        adjustment_ = -1;
-    }
-    if (in.Repeated(Action::Right)) {
-        adjustment_ = 1;
+    if (items_[static_cast<std::size_t>(selected_)].adjustable) {
+        if (in.Repeated(Action::Left)) {
+            adjustment_ = -1;
+        }
+        if (in.Repeated(Action::Right)) {
+            adjustment_ = 1;
+        }
     }
 
     // Mouse hover selects; clicking activates.
@@ -107,7 +109,7 @@ int Menu::Update(App& app) {
     }
     if (hovered >= 0 && in.MouseClicked()) {
         selected_ = hovered;
-        if (!items_[static_cast<std::size_t>(selected_)].value.empty()) {
+        if (items_[static_cast<std::size_t>(selected_)].adjustable) {
             adjustment_ = 1;  // clicking a value item cycles it
             return -1;
         }
@@ -154,7 +156,7 @@ void Menu::Draw(App& app, Vector2 position, float width, float itemHeight, Color
         Color c = item.enabled ? LerpColor(palette::kUiDim, WHITE, h) : palette::kUiFaint;
         text.Draw(FontId::Heading, item.label, {r.x + 22.0f + 10.0f * h, y}, textSize, c, Align::Left, 0.08f);
         if (!item.value.empty()) {
-            const std::string value = h > 0.5f ? "<  " + item.value + "  >" : item.value;
+            const std::string value = h > 0.5f && item.adjustable ? "<  " + item.value + "  >" : item.value;
             text.Draw(FontId::BodyBold, value, {r.x + r.width - 16.0f, y - 2.0f}, textSize * 1.1f,
                       h > 0.5f ? accent : palette::kUiDim, Align::Right);
         }
