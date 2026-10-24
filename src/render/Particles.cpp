@@ -137,7 +137,7 @@ void ParticleSystem::Draw(NeonRenderer& neon, Rectangle visible) const {
                 continue;
             }
         }
-        const float t = p.life / p.maxLife;  // 1 -> 0 over lifetime
+        const float t = p.life / p.maxLife; // 1 -> 0 over lifetime
         switch (p.kind) {
         case ParticleKind::Spark: {
             const float speed = Length(p.velocity);

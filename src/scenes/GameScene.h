@@ -28,7 +28,14 @@ public:
     void ConfigurePostFx(PostFxParams& params) const override;
 
 private:
-    enum class Overlay { None, Draft, Pause, Settings, SectorChoice, Victory };
+    enum class Overlay {
+        None,
+        Draft,
+        Pause,
+        Settings,
+        SectorChoice,
+        Victory
+    };
 
     void ApplyDebugLaunchOptions();
     PlayerInput ReadPlayerInput();
@@ -66,7 +73,7 @@ private:
     float musicIntensity_ = 0.3f;
     float tutorialTime_ = 0.0f;
     float challengeTimer_ = 0.0f;
-    std::uint32_t announcedEnemies_ = 0;  // EnemyKind bits already toasted this run
+    std::uint32_t announcedEnemies_ = 0; // EnemyKind bits already toasted this run
     bool showTutorial_ = false;
     bool finished_ = false;
     bool victoryShown_ = false;

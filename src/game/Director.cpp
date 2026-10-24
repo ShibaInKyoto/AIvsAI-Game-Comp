@@ -23,6 +23,7 @@ Weights MakeWeights(std::initializer_list<std::pair<EnemyKind, float>> entries) 
 
 const std::array<SectorInfo, Director::kCampaignSectors>& Sectors() {
     using K = EnemyKind;
+    // clang-format off
     static const std::array<SectorInfo, Director::kCampaignSectors> sectors{{
         {"SECTOR 01", "PERIMETER", {40, 90, 220, 255}, {80, 220, 255, 255}, 110.0f, 2.5f, K::BossWarden,
          MakeWeights({{K::Drifter, 10.0f}, {K::Pinwheel, 5.0f}, {K::Dart, 3.0f}, {K::Swarmer, 2.0f}})},
@@ -42,9 +43,11 @@ const std::array<SectorInfo, Director::kCampaignSectors>& Sectors() {
                       {K::Splitter, 2.5f}, {K::Gunner, 3.0f}, {K::Shielder, 2.5f}, {K::Lancer, 2.5f},
                       {K::Weaver, 1.5f}, {K::Bomber, 1.5f}, {K::Singularity, 0.8f}, {K::Hive, 1.0f}})},
     }};
+    // clang-format on
     return sectors;
 }
 
+// clang-format off
 constexpr std::array<SectorModifierInfo, static_cast<std::size_t>(SectorModifier::Count)> kModifiers{{
     {"SWARM PROTOCOL", "+30% enemies. +30% experience.", {255, 90, 200, 255}},
     {"HARDENED TARGETS", "+25% enemy integrity. +40% score.", {255, 160, 60, 255}},
@@ -52,6 +55,7 @@ constexpr std::array<SectorModifierInfo, static_cast<std::size_t>(SectorModifier
     {"ARMORY", "Gain an upgrade cache now. Enemies move 10% faster.", {120, 220, 255, 255}},
     {"RESPITE", "Repair 2 integrity. No strings attached.", {110, 255, 150, 255}},
 }};
+// clang-format on
 
 constexpr float kIntroDuration = 3.0f;
 constexpr float kPurgeDuration = 1.2f;
@@ -116,9 +120,7 @@ const char* SectorEventTagline(SectorEvent event) {
     return "";
 }
 
-const SectorInfo& Director::Info() const {
-    return Sectors()[static_cast<std::size_t>(sector_ % kCampaignSectors)];
-}
+const SectorInfo& Director::Info() const { return Sectors()[static_cast<std::size_t>(sector_ % kCampaignSectors)]; }
 
 void Director::Start(int sector) {
     sector_ = sector;
@@ -151,9 +153,7 @@ float Director::EnemyHpMultiplier() const {
     return sectorScale * loopScale * rampWithinSector * hpMultiplier_;
 }
 
-float Director::EnemySpeedMultiplier() const {
-    return (1.0f + 0.05f * static_cast<float>(sector_)) * speedMultiplier_;
-}
+float Director::EnemySpeedMultiplier() const { return (1.0f + 0.05f * static_cast<float>(sector_)) * speedMultiplier_; }
 
 float Director::CurrentThreatRate() const {
     const float loopScale = 1.0f + 0.5f * static_cast<float>(Loop());
@@ -207,8 +207,7 @@ void Director::Update(World& world, float dt) {
             SetPhase(SectorPhase::Victory);
         }
         break;
-    case SectorPhase::Victory:
-        break;
+    case SectorPhase::Victory: break;
     }
 }
 
@@ -318,8 +317,7 @@ void Director::SpawnGroup(World& world, EnemyKind kind, bool elite) {
 SectorEvent Director::PickEvent(World& world) const {
     // Weights per event (index = SectorEvent - 1). Crossfire waits for sector 2;
     // the same event never fires twice in a row.
-    std::array<float, static_cast<std::size_t>(SectorEvent::Count) - 1> weights{1.0f, sector_ >= 1 ? 1.0f : 0.0f,
-                                                                               0.6f};
+    std::array<float, static_cast<std::size_t>(SectorEvent::Count) - 1> weights{1.0f, sector_ >= 1 ? 1.0f : 0.0f, 0.6f};
     if (lastEvent_ != SectorEvent::None) {
         weights[static_cast<std::size_t>(lastEvent_) - 1] = 0.0f;
     }
@@ -360,9 +358,8 @@ void Director::SpawnCrossfire(World& world) {
     const Vector2 player = world.GetPlayer().position;
     constexpr float kDistance = 500.0f;
     // Put the firing line on a side of the player that has room for it.
-    Vector2 dir = Normalized(Vector2{World::kArena.x + World::kArena.width * 0.5f,
-                                     World::kArena.y + World::kArena.height * 0.5f} -
-                             player);
+    Vector2 dir = Normalized(
+        Vector2{World::kArena.x + World::kArena.width * 0.5f, World::kArena.y + World::kArena.height * 0.5f} - player);
     for (int attempt = 0; attempt < 8; ++attempt) {
         const Vector2 candidate = FromAngle(rng.Angle());
         const Vector2 lineCenter = player + candidate * kDistance;

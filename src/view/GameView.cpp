@@ -17,8 +17,7 @@ Color DampColor(Color current, Color target, float dt) {
 } // namespace
 
 GameView::GameView(App& app, const RunConfig& config)
-    : app_(app),
-      world_(std::make_unique<World>(config)),
+    : app_(app), world_(std::make_unique<World>(config)),
       effects_(particles_, grid_, camera_, app.Audio(), app.Haptics(), app.Prefs()) {
     grid_.Build(World::kArena, kGridSpacing);
     camera_.SetViewHeight(kViewHeight);

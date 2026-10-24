@@ -8,7 +8,10 @@
 
 namespace gb {
 
-enum class InputDevice { KeyboardMouse, Gamepad };
+enum class InputDevice {
+    KeyboardMouse,
+    Gamepad
+};
 
 // Logical actions, decoupled from physical bindings.
 enum class Action {
@@ -26,7 +29,7 @@ enum class Action {
     Right,
     TabPrev,
     TabNext,
-    Alt,  // secondary menu action (e.g. reroll)
+    Alt, // secondary menu action (e.g. reroll)
     Count
 };
 

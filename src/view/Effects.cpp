@@ -2,8 +2,8 @@
 
 #include "audio/AudioSystem.h"
 #include "core/Settings.h"
-#include "platform/Rumble.h"
 #include "game/EnemyCatalog.h"
+#include "platform/Rumble.h"
 #include "render/CameraRig.h"
 #include "render/Particles.h"
 #include "render/WarpGrid.h"
@@ -176,8 +176,8 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             for (int i = 0; i < 9; ++i) {
                 const float delay = 0.12f + 0.11f * static_cast<float>(i);
                 const Vector2 offset = rng.InCircle(ev.magnitude * 1.6f);
-                scheduled_.push_back({delay, ev.position + offset, i % 2 == 0 ? ev.color : WHITE,
-                                      rng.Range(40.0f, 90.0f)});
+                scheduled_.push_back(
+                    {delay, ev.position + offset, i % 2 == 0 ? ev.color : WHITE, rng.Range(40.0f, 90.0f)});
             }
             scheduled_.push_back({1.25f, ev.position, ev.color, 260.0f});
             particles_.Burst(ev.position, 220, ev.color, 300.0f, 1600.0f, 0.6f, 2.0f, 30.0f, 4.0f);
@@ -332,28 +332,20 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             PlaySfx(SfxId::LaserFire, 0.6f, rng.Range(0.95f, 1.05f), pan);
             Shake(0.12f);
             break;
-        case EventType::ArcZap:
-            PlaySfx(SfxId::Zap, 0.45f, rng.Range(0.9f, 1.2f), pan);
-            break;
+        case EventType::ArcZap: PlaySfx(SfxId::Zap, 0.45f, rng.Range(0.9f, 1.2f), pan); break;
         case EventType::PlayerLance:
             PlaySfx(SfxId::Lance, 0.55f, 1.0f, pan);
             grid_.ApplyDirectedForce(ev.direction * 25.0f, ev.position + ev.direction * 300.0f, 400.0f);
             Shake(0.1f);
             break;
-        case EventType::MissileLaunch:
-            PlaySfx(SfxId::Missile, 0.4f, rng.Range(0.9f, 1.1f), pan);
-            break;
+        case EventType::MissileLaunch: PlaySfx(SfxId::Missile, 0.4f, rng.Range(0.9f, 1.1f), pan); break;
         case EventType::PulseNova:
             particles_.ShockRing(ev.position, 10.0f, ev.magnitude, 0.3f, ev.color);
             grid_.ApplyExplosiveForce(ev.magnitude * 0.3f, ev.position, ev.magnitude * 1.5f);
             PlaySfx(SfxId::Pulse, 0.6f, 1.0f, pan);
             break;
-        case EventType::MineArmed:
-            PlaySfx(SfxId::MineArm, 0.5f, 1.0f, pan);
-            break;
-        case EventType::BossSpawn:
-            PlaySfx(SfxId::BossWarning, 0.8f, 1.0f, 0.0f);
-            break;
+        case EventType::MineArmed: PlaySfx(SfxId::MineArm, 0.5f, 1.0f, pan); break;
+        case EventType::BossSpawn: PlaySfx(SfxId::BossWarning, 0.8f, 1.0f, 0.0f); break;
         case EventType::BossPhase:
             if (ev.value >= 1) {
                 particles_.ShockRing(ev.position, 30.0f, 600.0f, 0.6f, ev.color);
@@ -370,9 +362,7 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
                 PlaySfx(SfxId::BossRoar, 0.6f, 1.3f, pan);
             }
             break;
-        case EventType::SectorCleared:
-            PlaySfx(SfxId::SectorClear, 0.9f, 1.0f, 0.0f);
-            break;
+        case EventType::SectorCleared: PlaySfx(SfxId::SectorClear, 0.9f, 1.0f, 0.0f); break;
         case EventType::SectorEvent:
             if (static_cast<SectorEvent>(ev.value) == SectorEvent::DataStorm) {
                 PlaySfx(SfxId::PickupCache, 0.7f, 1.2f, 0.0f);
@@ -434,9 +424,9 @@ void EffectsDirector::Update(const World& world, float realDt) {
             Shake(burst.size > 200.0f ? 0.7f : 0.2f);
         }
     }
-    scheduled_.erase(std::remove_if(scheduled_.begin(), scheduled_.end(),
-                                    [](const ScheduledBurst& b) { return b.delay <= 0.0f; }),
-                     scheduled_.end());
+    scheduled_.erase(
+        std::remove_if(scheduled_.begin(), scheduled_.end(), [](const ScheduledBurst& b) { return b.delay <= 0.0f; }),
+        scheduled_.end());
 
     // Engine exhaust.
     exhaustTimer_ -= dt;

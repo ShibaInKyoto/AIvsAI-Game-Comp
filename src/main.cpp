@@ -15,20 +15,19 @@
 namespace {
 
 void PrintUsage() {
-    std::printf(
-        "Gridbreaker options:\n"
-        "  --windowed              start in a window instead of borderless fullscreen\n"
-        "  --size WxH              window size (default 1600x900)\n"
-        "  --no-audio              disable the audio device\n"
-        "  --autotest SECONDS      let the bot play for SECONDS of game time, then exit\n"
-        "  --screenshot PATH       save a screenshot to PATH and exit\n"
-        "  --screenshot-at SECONDS when to take the screenshot (default 3)\n"
-        "  --scene NAME            start in a specific scene (title, game, hangar, codex, ...)\n"
-        "  --seed N                fixed run seed\n"
-        "  --sector N              (debug) start runs in sector N\n"
-        "  --boss                  (debug) start runs at the sector boss\n"
-        "  --perf                  show the performance overlay (toggle with F3)\n"
-        "  --data-dir PATH         override the settings/save directory\n");
+    std::printf("Gridbreaker options:\n"
+                "  --windowed              start in a window instead of borderless fullscreen\n"
+                "  --size WxH              window size (default 1600x900)\n"
+                "  --no-audio              disable the audio device\n"
+                "  --autotest SECONDS      let the bot play for SECONDS of game time, then exit\n"
+                "  --screenshot PATH       save a screenshot to PATH and exit\n"
+                "  --screenshot-at SECONDS when to take the screenshot (default 3)\n"
+                "  --scene NAME            start in a specific scene (title, game, hangar, codex, ...)\n"
+                "  --seed N                fixed run seed\n"
+                "  --sector N              (debug) start runs in sector N\n"
+                "  --boss                  (debug) start runs at the sector boss\n"
+                "  --perf                  show the performance overlay (toggle with F3)\n"
+                "  --data-dir PATH         override the settings/save directory\n");
 }
 
 gb::LaunchOptions ParseArgs(int argc, char** argv) {

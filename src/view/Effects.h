@@ -25,9 +25,9 @@ struct FloatingText {
     float life = 1.0f;
     float maxLife = 1.0f;
     float size = 22.0f;
-    float pop = 0.0f;           // brief scale bump when a merged number grows
-    float total = 0.0f;         // accumulated damage for merged numbers
-    EntityId owner = kInvalidId;  // enemy whose hits merge into this number
+    float pop = 0.0f;            // brief scale bump when a merged number grows
+    float total = 0.0f;          // accumulated damage for merged numbers
+    EntityId owner = kInvalidId; // enemy whose hits merge into this number
     bool big = false;
 };
 
@@ -36,8 +36,8 @@ struct FloatingText {
 // floating combat text.
 class EffectsDirector {
 public:
-    EffectsDirector(ParticleSystem& particles, WarpGrid& grid, CameraRig& camera, AudioSystem& audio,
-                    Rumble& rumble, const Settings& settings);
+    EffectsDirector(ParticleSystem& particles, WarpGrid& grid, CameraRig& camera, AudioSystem& audio, Rumble& rumble,
+                    const Settings& settings);
 
     void Process(const World& world, const std::vector<GameEvent>& events);
     void Update(const World& world, float realDt);

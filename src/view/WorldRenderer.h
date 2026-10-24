@@ -47,7 +47,7 @@ private:
 
     struct Star {
         Vector2 position;
-        float depth;  // 0 = infinitely far (moves with camera), 1 = world-locked
+        float depth; // 0 = infinitely far (moves with camera), 1 = world-locked
         float size;
         float phase;
     };

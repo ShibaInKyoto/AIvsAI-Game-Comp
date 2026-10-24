@@ -33,8 +33,8 @@ void Dim(App& app, float alpha) {
     DrawRectangleRec({0.0f, 0.0f, ui.x, ui.y}, WithAlpha(Color{2, 4, 12, 255}, alpha));
 }
 
-void Prompt(App& app, Vector2 position, const char* keyboardKey, const char* padButton, const char* label,
-            Align align, float size) {
+void Prompt(App& app, Vector2 position, const char* keyboardKey, const char* padButton, const char* label, Align align,
+            float size) {
     const bool pad = app.In().LastDevice() == InputDevice::Gamepad;
     const char* key = pad ? padButton : keyboardKey;
     TextRenderer& text = app.Gfx().Text();
@@ -110,7 +110,7 @@ int Menu::Update(App& app) {
     if (hovered >= 0 && in.MouseClicked()) {
         selected_ = hovered;
         if (items_[static_cast<std::size_t>(selected_)].adjustable) {
-            adjustment_ = 1;  // clicking a value item cycles it
+            adjustment_ = 1; // clicking a value item cycles it
             return -1;
         }
         return selected_;

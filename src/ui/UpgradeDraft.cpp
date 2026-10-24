@@ -16,7 +16,7 @@ namespace {
 constexpr float kCardWidth = 360.0f;
 constexpr float kCardHeight = 480.0f;
 constexpr float kCardGap = 44.0f;
-constexpr float kInputDelay = 0.4f;   // ignore input briefly so held buttons don't auto-pick
+constexpr float kInputDelay = 0.4f; // ignore input briefly so held buttons don't auto-pick
 constexpr float kPickDuration = 0.32f;
 constexpr float kCacheLuck = 2.5f;
 
@@ -146,7 +146,8 @@ void UpgradeDraft::Draw(App& app, const World& world) {
     text.DrawGlow(FontId::Display, cache_ ? "DATA CACHE" : "LEVEL UP", {ui.x * 0.5f, ui.y * 0.5f - 330.0f}, 64.0f,
                   WithAlpha(WHITE, titleAlpha), WithAlpha(titleColor, titleAlpha), Align::Center, 0.12f);
     text.Draw(FontId::BodyBold,
-              cache_ ? "Rare upgrades are more likely." : TextFormat("Level %d reached. Choose an upgrade.", world.Level()),
+              cache_ ? "Rare upgrades are more likely."
+                     : TextFormat("Level %d reached. Choose an upgrade.", world.Level()),
               {ui.x * 0.5f, ui.y * 0.5f - 252.0f}, 26.0f, WithAlpha(palette::kUiDim, titleAlpha), Align::Center);
 
     const int n = static_cast<int>(offers_.size());
@@ -226,8 +227,8 @@ void UpgradeDraft::Draw(App& app, const World& world) {
         }
         text.Draw(FontId::BodyBold, level, {r.x + r.width * 0.5f, r.y + 278.0f}, 22.0f,
                   WithAlpha(owned == 0 ? palette::kUiGood : palette::kUiDim, alpha), Align::Center, 0.1f);
-        text.DrawWrapped(FontId::Body, UpgradeLevelText(id, owned), {r.x + 26.0f, r.y + 336.0f}, r.width - 52.0f,
-                         27.0f, WithAlpha(palette::kUiText, alpha), 1.12f, Align::Center);
+        text.DrawWrapped(FontId::Body, UpgradeLevelText(id, owned), {r.x + 26.0f, r.y + 336.0f}, r.width - 52.0f, 27.0f,
+                         WithAlpha(palette::kUiText, alpha), 1.12f, Align::Center);
         if (const EvolutionRecipe* recipe = EvolutionForModule(id); recipe != nullptr) {
             // Teach the synergy: which catalyst evolves this module at level 5.
             const bool hasCatalyst = world.Inventory().Stacks(recipe->catalyst) > 0;

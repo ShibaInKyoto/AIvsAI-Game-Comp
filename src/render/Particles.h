@@ -12,10 +12,10 @@ namespace gb {
 class NeonRenderer;
 
 enum class ParticleKind : unsigned char {
-    Spark,  // velocity-aligned streak
-    Glow,   // soft round blob
-    Ring,   // expanding shockwave ring
-    Shard,  // spinning line fragment (debris)
+    Spark, // velocity-aligned streak
+    Glow,  // soft round blob
+    Ring,  // expanding shockwave ring
+    Shard, // spinning line fragment (debris)
 };
 
 struct Particle {
@@ -24,10 +24,10 @@ struct Particle {
     Color color = WHITE;
     float life = 0.0f;
     float maxLife = 1.0f;
-    float size = 8.0f;       // length for sparks/shards, radius for glows/rings
+    float size = 8.0f; // length for sparks/shards, radius for glows/rings
     float width = 3.0f;
-    float drag = 3.0f;       // exponential velocity decay per second
-    float growth = 0.0f;     // size change per second (rings expand)
+    float drag = 3.0f;   // exponential velocity decay per second
+    float growth = 0.0f; // size change per second (rings expand)
     float rotation = 0.0f;
     float spin = 0.0f;
     ParticleKind kind = ParticleKind::Spark;

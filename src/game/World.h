@@ -18,21 +18,21 @@ namespace gb {
 // Device-independent intent for one simulation step (from a human or the bot).
 struct PlayerInput {
     Vector2 move{};
-    Vector2 aim{1.0f, 0.0f};  // unit direction
+    Vector2 aim{1.0f, 0.0f}; // unit direction
     bool fire = false;
-    bool dash = false;  // edge-triggered
-    bool nova = false;  // edge-triggered
+    bool dash = false; // edge-triggered
+    bool nova = false; // edge-triggered
 };
 
 // Permanent bonuses bought with credits between runs.
 struct MetaBonuses {
     int bonusHp = 0;
-    float damage = 0.0f;      // fraction, e.g. 0.1 = +10%
+    float damage = 0.0f; // fraction, e.g. 0.1 = +10%
     float xp = 0.0f;
     float magnet = 0.0f;
     int rerolls = 0;
     float dashCooldown = 0.0f;
-    float novaCharge = 0.0f;  // starting nova charge (0..1)
+    float novaCharge = 0.0f; // starting nova charge (0..1)
 };
 
 struct RunConfig {
@@ -54,11 +54,11 @@ struct RunStats {
     int shardsCollected = 0;
     double damageDealt = 0.0;
     int sectorsCleared = 0;
-    int flawlessSectors = 0;      // sectors cleared without taking a hit
-    std::uint32_t bossMask = 0;   // bit per EnemyKind of defeated bosses
-    std::uint32_t enemiesSeen = 0;    // bit per EnemyKind encountered (codex)
-    std::uint64_t upgradesTaken = 0;  // bit per UpgradeId drafted (codex)
-    EnemyKind killedBy = EnemyKind::Count;  // what dealt the final hit (Count = unknown)
+    int flawlessSectors = 0;               // sectors cleared without taking a hit
+    std::uint32_t bossMask = 0;            // bit per EnemyKind of defeated bosses
+    std::uint32_t enemiesSeen = 0;         // bit per EnemyKind encountered (codex)
+    std::uint64_t upgradesTaken = 0;       // bit per UpgradeId drafted (codex)
+    EnemyKind killedBy = EnemyKind::Count; // what dealt the final hit (Count = unknown)
     bool victory = false;
 };
 
@@ -237,8 +237,8 @@ private:
     void UpdateBossCore(Enemy& e, float dt);
     void FireRing(Vector2 center, int count, float speed, float offset, EnemyBulletStyle style, Color color,
                   float radius = 9.0f);
-    void FireFan(Vector2 center, float angle, int count, float spread, float speed, EnemyBulletStyle style,
-                 Color color, float radius = 9.0f);
+    void FireFan(Vector2 center, float angle, int count, float spread, float speed, EnemyBulletStyle style, Color color,
+                 float radius = 9.0f);
 
     // Helpers shared by behaviours.
     Vector2 ToPlayer(const Enemy& e) const { return player_.position - e.position; }
@@ -282,7 +282,7 @@ private:
     int rerolls_ = 1;
 
     int combo_ = 0;
-    EnemyKind actingEnemy_ = EnemyKind::Count;  // enemy whose behaviour is running (attributes its shots)
+    EnemyKind actingEnemy_ = EnemyKind::Count; // enemy whose behaviour is running (attributes its shots)
     float comboTimer_ = 0.0f;
     float orbitAngle_ = 0.0f;
     float arcTimer_ = 0.0f;

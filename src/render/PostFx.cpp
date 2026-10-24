@@ -22,19 +22,14 @@ bool PostFx::Init(int width, int height) {
     downLocs_ = {GetShaderLocation(downShader_, "uTexel"), GetShaderLocation(downShader_, "uPrefilter"),
                  GetShaderLocation(downShader_, "uThreshold"), GetShaderLocation(downShader_, "uKnee")};
     upLocs_ = {GetShaderLocation(upShader_, "uTexel"), GetShaderLocation(upShader_, "uRadius")};
-    compLocs_ = {GetShaderLocation(compositeShader_, "uBloom"),
-                 GetShaderLocation(compositeShader_, "uResolution"),
-                 GetShaderLocation(compositeShader_, "uTime"),
-                 GetShaderLocation(compositeShader_, "uBloomStrength"),
-                 GetShaderLocation(compositeShader_, "uExposure"),
-                 GetShaderLocation(compositeShader_, "uVignette"),
-                 GetShaderLocation(compositeShader_, "uAberration"),
-                 GetShaderLocation(compositeShader_, "uGrain"),
-                 GetShaderLocation(compositeShader_, "uScanlines"),
-                 GetShaderLocation(compositeShader_, "uSaturation"),
-                 GetShaderLocation(compositeShader_, "uFlash"),
-                 GetShaderLocation(compositeShader_, "uRipples"),
-                 GetShaderLocation(compositeShader_, "uRippleCount")};
+    compLocs_ = {
+        GetShaderLocation(compositeShader_, "uBloom"),      GetShaderLocation(compositeShader_, "uResolution"),
+        GetShaderLocation(compositeShader_, "uTime"),       GetShaderLocation(compositeShader_, "uBloomStrength"),
+        GetShaderLocation(compositeShader_, "uExposure"),   GetShaderLocation(compositeShader_, "uVignette"),
+        GetShaderLocation(compositeShader_, "uAberration"), GetShaderLocation(compositeShader_, "uGrain"),
+        GetShaderLocation(compositeShader_, "uScanlines"),  GetShaderLocation(compositeShader_, "uSaturation"),
+        GetShaderLocation(compositeShader_, "uFlash"),      GetShaderLocation(compositeShader_, "uRipples"),
+        GetShaderLocation(compositeShader_, "uRippleCount")};
 
     CreateTargets();
     // (IsRenderTextureValid would demand a depth buffer, which these targets do not need.)
@@ -169,7 +164,8 @@ void PostFx::Composite(const PostFxParams& params) {
         SetShaderValue(downShader_, downLocs_.knee, &knee, SHADER_UNIFORM_FLOAT);
         const Texture2D* source = &scene_.texture;
         for (int i = 0; i < mipCount_; ++i) {
-            const float texel[2] = {1.0f / static_cast<float>(source->width), 1.0f / static_cast<float>(source->height)};
+            const float texel[2] = {1.0f / static_cast<float>(source->width),
+                                    1.0f / static_cast<float>(source->height)};
             const float prefilter = i == 0 ? 1.0f : 0.0f;
             SetShaderValue(downShader_, downLocs_.texel, texel, SHADER_UNIFORM_VEC2);
             SetShaderValue(downShader_, downLocs_.prefilter, &prefilter, SHADER_UNIFORM_FLOAT);
@@ -217,7 +213,8 @@ void PostFx::Composite(const PostFxParams& params) {
         ripples[static_cast<std::size_t>(i) * 4 + 2] = r.radius;
         ripples[static_cast<std::size_t>(i) * 4 + 3] = r.strength;
     }
-    SetShaderValueV(compositeShader_, compLocs_.ripples, ripples.data(), SHADER_UNIFORM_VEC4, PostFxParams::kMaxRipples);
+    SetShaderValueV(compositeShader_, compLocs_.ripples, ripples.data(), SHADER_UNIFORM_VEC4,
+                    PostFxParams::kMaxRipples);
     SetShaderValue(compositeShader_, compLocs_.rippleCount, &rippleCount, SHADER_UNIFORM_INT);
     // When bloom is disabled the (cleared) mip is still bound; its strength is 0.
     SetShaderValueTexture(compositeShader_, compLocs_.bloom, mips_[0].texture);

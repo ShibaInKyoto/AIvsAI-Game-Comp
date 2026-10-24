@@ -133,7 +133,7 @@ Vector2 Bot::Steer(World& world, bool& emergency) {
         const Vector2 v = Normalized(b.velocity);
         const float along = Dot(d, v);
         if (along < -20.0f) {
-            continue;  // moving away
+            continue; // moving away
         }
         const Vector2 closest = b.position + v * along;
         const Vector2 off = p.position - closest;

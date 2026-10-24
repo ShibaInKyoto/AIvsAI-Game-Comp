@@ -15,7 +15,7 @@ namespace gb {
 
 namespace {
 
-constexpr float kMaxFrameTime = 1.0f / 20.0f;  // clamp hitches so physics never explodes
+constexpr float kMaxFrameTime = 1.0f / 20.0f; // clamp hitches so physics never explodes
 constexpr Color kClearColor{3, 4, 10, 255};
 
 } // namespace
@@ -46,7 +46,7 @@ bool App::Init() {
         return false;
     }
     vsyncApplied_ = settings_.vsync;
-    SetExitKey(KEY_NULL);  // Escape is a gameplay key (pause), never quit outright
+    SetExitKey(KEY_NULL); // Escape is a gameplay key (pause), never quit outright
     SetWindowMinSize(960, 540);
     SetWindowIconFromAssets();
 
@@ -174,8 +174,7 @@ void App::UpdateTransition(float dt) {
             fade_ = Fade::None;
         }
         break;
-    case Fade::None:
-        break;
+    case Fade::None: break;
     }
 }
 
@@ -206,7 +205,7 @@ void App::Frame() {
         settings_.fullscreen = !settings_.fullscreen;
         ApplyDisplaySettings();
         settings_.Save();
-        input_.ConsumeAll();  // Alt+Enter must not also confirm a menu item
+        input_.ConsumeAll(); // Alt+Enter must not also confirm a menu item
     }
 
     if (IsKeyPressed(KEY_F3)) {

@@ -6,6 +6,7 @@ namespace gb {
 
 namespace {
 
+// clang-format off
 constexpr std::array<EnemyInfo, static_cast<std::size_t>(EnemyKind::Count)> kEnemies{{
     //  name             hp     speed  radius  color                    xp   score  threat mass
     {"Drifter",          20.0f, 150.0f, 18.0f, {70, 225, 255, 255},     1,   50,    1.0f,  1.0f},
@@ -31,6 +32,7 @@ constexpr std::array<EnemyInfo, static_cast<std::size_t>(EnemyKind::Count)> kEne
     {"THE CORE",      36000.0f,  60.0f, 80.0f, {255, 255, 255, 255},  300, 50000,   0.0f, 999.0f},
     {"Turret",          160.0f,   0.0f, 22.0f, {255, 120, 120, 255},    3,  150,    0.0f, 999.0f},
 }};
+// clang-format on
 
 } // namespace
 

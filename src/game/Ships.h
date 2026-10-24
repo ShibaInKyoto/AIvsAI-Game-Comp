@@ -9,15 +9,23 @@
 
 namespace gb {
 
-enum class ShipId : std::uint8_t { Vector, Lancer, Bruiser, Warden, Specter, Hivemind, Count };
+enum class ShipId : std::uint8_t {
+    Vector,
+    Lancer,
+    Bruiser,
+    Warden,
+    Specter,
+    Hivemind,
+    Count
+};
 
 struct ShipInfo {
     ShipId id;
     const char* name;
-    const char* role;         // one-line summary
-    const char* description;  // hangar blurb
+    const char* role;        // one-line summary
+    const char* description; // hangar blurb
     Color color;
-    int cost;                 // credits to unlock (0 = available from the start)
+    int cost; // credits to unlock (0 = available from the start)
     UpgradeId startingUpgrade;
     int startingUpgradeLevel; // 0 = none
 };

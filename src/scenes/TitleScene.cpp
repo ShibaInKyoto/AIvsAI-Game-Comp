@@ -15,7 +15,15 @@ namespace gb {
 
 namespace {
 
-enum TitleItem { ItemPlay, ItemDaily, ItemHangar, ItemRecords, ItemCodex, ItemSettings, ItemQuit };
+enum TitleItem {
+    ItemPlay,
+    ItemDaily,
+    ItemHangar,
+    ItemRecords,
+    ItemCodex,
+    ItemSettings,
+    ItemQuit
+};
 
 } // namespace
 
@@ -39,7 +47,7 @@ void TitleScene::ResetDemo() {
     config.difficulty = Difficulty::Relaxed;
     config.ship = static_cast<ShipId>(demoCounter_ % static_cast<int>(ShipId::Count));
     config.seed = 0xC0FFEEu + static_cast<std::uint64_t>(demoCounter_) * 977u;
-    config.meta.bonusHp = 6;  // the demo should survive long enough to look good
+    config.meta.bonusHp = 6; // the demo should survive long enough to look good
     ++demoCounter_;
     demo_ = std::make_unique<GameView>(app_, config);
     demo_->Effects().SetMuted(true);
@@ -160,10 +168,10 @@ void TitleScene::DrawLogo(Vector2 center, float scale) {
     const float glitch = std::fmod(time_, 4.3f) < 0.12f ? 1.0f : 0.0f;
     if (glitch > 0.0f) {
         const float offset = 10.0f * scale;
-        text.Draw(FontId::Display, "GRIDBREAKER", {center.x - offset, center.y}, size, WithAlpha({255, 40, 120, 255}, 0.7f),
-                  Align::Center, 0.06f);
-        text.Draw(FontId::Display, "GRIDBREAKER", {center.x + offset, center.y}, size, WithAlpha({40, 220, 255, 255}, 0.7f),
-                  Align::Center, 0.06f);
+        text.Draw(FontId::Display, "GRIDBREAKER", {center.x - offset, center.y}, size,
+                  WithAlpha({255, 40, 120, 255}, 0.7f), Align::Center, 0.06f);
+        text.Draw(FontId::Display, "GRIDBREAKER", {center.x + offset, center.y}, size,
+                  WithAlpha({40, 220, 255, 255}, 0.7f), Align::Center, 0.06f);
     }
     text.DrawGlow(FontId::Display, "GRIDBREAKER", center, size, WHITE, palette::kUiAccent, Align::Center, 0.06f);
     const float lineY = center.y + size * 1.02f;
@@ -208,7 +216,8 @@ void TitleScene::DrawRecords() {
     for (std::size_t i = 0; i < rows.size(); ++i) {
         const float y = panel.y + 100.0f + static_cast<float>(i) * 50.0f;
         text.Draw(FontId::BodyBold, rows[i].label, {panel.x + 40.0f, y}, 26.0f, palette::kUiDim);
-        text.Draw(FontId::BodyBold, rows[i].value, {panel.x + leftWidth, y - 2.0f}, 30.0f, palette::kUiText, Align::Right);
+        text.Draw(FontId::BodyBold, rows[i].value, {panel.x + leftWidth, y - 2.0f}, 30.0f, palette::kUiText,
+                  Align::Right);
     }
     if (p.DailyDate() == TodayStamp() && p.DailyBest() > 0) {
         text.Draw(FontId::BodyBold, TextFormat("TODAY'S DAILY BEST: %s", FormatThousands(p.DailyBest()).c_str()),
@@ -218,8 +227,8 @@ void TitleScene::DrawRecords() {
     // Challenges column.
     const float cx = panel.x + leftWidth + 70.0f;
     const float columnWidth = panel.x + width - 40.0f - cx;
-    text.Draw(FontId::Heading, TextFormat("CHALLENGES  %d / %d", p.CompletedChallengeCount(),
-                                          static_cast<int>(AllChallenges().size())),
+    text.Draw(FontId::Heading,
+              TextFormat("CHALLENGES  %d / %d", p.CompletedChallengeCount(), static_cast<int>(AllChallenges().size())),
               {cx, panel.y + 34.0f}, 26.0f, palette::kCache, Align::Left, 0.1f);
     const auto challenges = AllChallenges();
     const float rowHeight = 41.0f;
@@ -237,7 +246,8 @@ void TitleScene::DrawRecords() {
         const ChallengeInfo& info = challenges[i];
         const bool done = p.ChallengeCompleted(info.id);
         const float y = panel.y + 100.0f + static_cast<float>(i) * rowHeight;
-        text.Draw(FontId::Heading, info.name, {cx + 36.0f, y}, 19.0f, done ? WHITE : palette::kUiDim, Align::Left, 0.08f);
+        text.Draw(FontId::Heading, info.name, {cx + 36.0f, y}, 19.0f, done ? WHITE : palette::kUiDim, Align::Left,
+                  0.08f);
         text.Draw(FontId::Body, info.description, {cx + 300.0f, y - 2.0f}, 23.0f,
                   done ? palette::kUiText : palette::kUiFaint);
         text.Draw(FontId::BodyBold, TextFormat("%d CR", info.reward), {cx + columnWidth, y - 2.0f}, 22.0f,
@@ -271,17 +281,17 @@ void TitleScene::DrawUi() {
               palette::kCache, Align::Right, 0.05f);
     if (profile.Runs() > 0) {
         text.Draw(FontId::BodyBold,
-                  TextFormat("BEST  %lld", std::max({profile.BestScore(Difficulty::Relaxed),
-                                                     profile.BestScore(Difficulty::Standard),
-                                                     profile.BestScore(Difficulty::Overclocked)})),
+                  TextFormat("BEST  %lld",
+                             std::max({profile.BestScore(Difficulty::Relaxed), profile.BestScore(Difficulty::Standard),
+                                       profile.BestScore(Difficulty::Overclocked)})),
                   {ui.x - 60.0f, ui.y - 76.0f}, 24.0f, palette::kUiDim, Align::Right, 0.05f);
     }
     text.Draw(FontId::Body, TextFormat("v%s  (%s)", build::kVersion, build::kGitHash), {24.0f, ui.y - 40.0f}, 20.0f,
               palette::kUiFaint);
     ui::Prompt(app_, {ui.x * 0.5f, ui.y - 52.0f}, "ENTER", "A", "SELECT", Align::Center, 22.0f);
     if (menu_.Selected() == ItemDaily) {
-        text.Draw(FontId::Body, "Same seed and ship for everyone today. One shot at glory.", {600.0f, 430.0f + 70.0f + 18.0f},
-                  22.0f, palette::kUiDim);
+        text.Draw(FontId::Body, "Same seed and ship for everyone today. One shot at glory.",
+                  {600.0f, 430.0f + 70.0f + 18.0f}, 22.0f, palette::kUiDim);
     }
 
     settings_.Draw(app_);

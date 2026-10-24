@@ -23,8 +23,8 @@ struct Result {
     bool victory = false;
     int peakEnemies = 0;
     int hits = 0;
-    std::array<float, 6> sectorEnd{};  // time each sector's boss died
-    std::array<float, 6> bossTime{};   // seconds spent fighting each boss
+    std::array<float, 6> sectorEnd{}; // time each sector's boss died
+    std::array<float, 6> bossTime{};  // seconds spent fighting each boss
 };
 
 float g_skill = 0.6f;
@@ -65,7 +65,8 @@ Result Play(ShipId ship, Difficulty difficulty, std::uint64_t seed, float maxSec
         if (world.GetDirector().Phase() == SectorPhase::Boss) {
             result.bossTime[static_cast<std::size_t>(sector)] += dt;
         }
-        if (world.GetDirector().Phase() == SectorPhase::Cleared && result.sectorEnd[static_cast<std::size_t>(sector)] == 0.0f) {
+        if (world.GetDirector().Phase() == SectorPhase::Cleared &&
+            result.sectorEnd[static_cast<std::size_t>(sector)] == 0.0f) {
             result.sectorEnd[static_cast<std::size_t>(sector)] = world.Record().time;
         }
     }
@@ -94,8 +95,8 @@ int main(int argc, char** argv) {
             const Result r = Play(ship.id, difficulty, 1000u + static_cast<std::uint64_t>(i) * 7919u, maxSeconds);
             totalTime += r.time;
             wins += r.victory ? 1 : 0;
-            std::printf("%-9s %7.1fs %7d %6d %7d %10lld %5s %5d %5d  ", ship.name, static_cast<double>(r.time), r.sector,
-                        r.level, r.kills, r.score, r.victory ? "yes" : "no", r.peakEnemies, r.hits);
+            std::printf("%-9s %7.1fs %7d %6d %7d %10lld %5s %5d %5d  ", ship.name, static_cast<double>(r.time),
+                        r.sector, r.level, r.kills, r.score, r.victory ? "yes" : "no", r.peakEnemies, r.hits);
             for (float b : r.bossTime) {
                 std::printf("%5.0f", static_cast<double>(b));
             }

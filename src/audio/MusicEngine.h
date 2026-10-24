@@ -8,7 +8,14 @@
 
 namespace gb {
 
-enum class MusicMood : std::uint8_t { Silent, Menu, Game, Boss, Victory, GameOver };
+enum class MusicMood : std::uint8_t {
+    Silent,
+    Menu,
+    Game,
+    Boss,
+    Victory,
+    GameOver
+};
 
 // Real-time procedural synthwave. A step sequencer drives bass, pads, arps,
 // lead and drums; layers fade in and out with gameplay intensity, and the
@@ -38,8 +45,14 @@ private:
         float release = 0.1f;
         bool gate = false;
         bool attacking = false;
-        void Trigger() { gate = true; attacking = true; }
-        void Release() { gate = false; attacking = false; }
+        void Trigger() {
+            gate = true;
+            attacking = true;
+        }
+        void Release() {
+            gate = false;
+            attacking = false;
+        }
         float Next();
     };
 
@@ -60,9 +73,9 @@ private:
     };
 
     struct NoteEvent {
-        int step;        // 16th within the 2-bar motif
-        int length;      // in 16ths
-        int chordTone;   // index into the current chord (0..5)
+        int step;      // 16th within the 2-bar motif
+        int length;    // in 16ths
+        int chordTone; // index into the current chord (0..5)
     };
 
     void ApplyPendingMood();
@@ -84,17 +97,17 @@ private:
     float bpm_ = 110.0f;
     double samplesPerStep_ = 0.0;
     double stepAccumulator_ = 0.0;
-    int step_ = 0;   // 16th notes since the section began
+    int step_ = 0; // 16th notes since the section began
     int bar_ = 0;
     int section_ = 0;
     float intensity_ = 0.0f;
-    float moodGain_ = 0.0f;  // fades during mood changes
+    float moodGain_ = 0.0f; // fades during mood changes
     bool switching_ = false;
     Rng rng_{0xB16B00B5u};
 
     std::array<int, 4> progression_{};
     std::array<int, 16> arpPattern_{};
-    std::array<int, 16> bassPattern_{};  // semitone offsets, -1 = rest
+    std::array<int, 16> bassPattern_{}; // semitone offsets, -1 = rest
     std::array<NoteEvent, 12> motif_{};
     int motifLength_ = 0;
     bool majorMode_ = false;
@@ -127,7 +140,7 @@ private:
     Rng noise_{0x1234567u};
 
     // Stereo ping-pong delay for arp and lead.
-    static constexpr int kDelaySize = kSampleRate;  // up to 1 second
+    static constexpr int kDelaySize = kSampleRate; // up to 1 second
     std::array<float, kDelaySize> delayLeft_{};
     std::array<float, kDelaySize> delayRight_{};
     int delayIndex_ = 0;

@@ -1,0 +1,27 @@
+# Project code style, enforced in CI (clang-format 18). Hand-aligned data tables
+# are fenced with "// clang-format off/on".
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 120
+AccessModifierOffset: -4
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLambdasOnASingleLine: All
+AllowShortBlocksOnASingleLine: Never
+PointerAlignment: Left
+NamespaceIndentation: None
+FixNamespaceComments: true
+SpacesBeforeTrailingComments: 1
+IncludeBlocks: Preserve
+SortIncludes: CaseSensitive
+AlignTrailingComments: true
+AlignAfterOpenBracket: Align
+AlignOperands: Align
+BreakBeforeTernaryOperators: true
+Cpp11BracedListStyle: true
+AlwaysBreakTemplateDeclarations: Yes
+BreakConstructorInitializers: BeforeColon
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+AllowShortEnumsOnASingleLine: false

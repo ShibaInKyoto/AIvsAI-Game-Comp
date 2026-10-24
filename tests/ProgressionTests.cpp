@@ -44,7 +44,7 @@ TEST_CASE("Profile persists credits, unlocks, firmware and challenges") {
         CHECK(profile.BestScore(Difficulty::Standard) == 300000);
         CHECK(profile.TryUnlockShip(ShipId::Lancer) == (earned >= GetShipInfo(ShipId::Lancer).cost));
         CHECK(profile.CompleteChallenge(ChallengeId::WardenDown));
-        CHECK_FALSE(profile.CompleteChallenge(ChallengeId::WardenDown));  // only once
+        CHECK_FALSE(profile.CompleteChallenge(ChallengeId::WardenDown)); // only once
         CHECK(profile.Save());
     }
     Profile loaded;
@@ -62,7 +62,7 @@ TEST_CASE("Codex discoveries accumulate across runs and persist") {
         World world(RunConfig{});
         world.SpawnEnemy(EnemyKind::Gunner, {0.0f, 0.0f}, 0.0f);
         world.ApplyUpgrade(UpgradeId::Overclock);
-        world.ApplyUpgrade(UpgradeId::SpectrumCannon);  // highest id: exercises the top of the 64-bit mask
+        world.ApplyUpgrade(UpgradeId::SpectrumCannon); // highest id: exercises the top of the 64-bit mask
         RunSummary run;
         run.stats = world.Record();
         Profile profile;
@@ -82,8 +82,8 @@ TEST_CASE("Codex discoveries accumulate across runs and persist") {
 TEST_CASE("Firmware purchases respect cost and rank limits") {
     TempDataDir dir;
     Profile profile;
-    CHECK_FALSE(profile.TryBuyFirmware(FirmwareId::WeaponCalibration));  // no credits yet
-    profile.CompleteChallenge(ChallengeId::CoreDown);                      // +250 credits
+    CHECK_FALSE(profile.TryBuyFirmware(FirmwareId::WeaponCalibration)); // no credits yet
+    profile.CompleteChallenge(ChallengeId::CoreDown);                   // +250 credits
     const int before = profile.Credits();
     const int cost = profile.FirmwareNextCost(FirmwareId::WeaponCalibration);
     REQUIRE(cost > 0);
@@ -157,8 +157,8 @@ TEST_CASE("Sector events stage their set pieces") {
     };
     const auto before = darts();
     director.DebugTriggerEvent(world, SectorEvent::Crossfire);
-    world.Update(1.0f / 60.0f, PlayerInput{});  // spawns are queued until the next tick
-    CHECK(darts() >= before + 9);  // 7 + 2 per sector index
+    world.Update(1.0f / 60.0f, PlayerInput{}); // spawns are queued until the next tick
+    CHECK(darts() >= before + 9);              // 7 + 2 per sector index
     CHECK(director.ActiveEvent() == SectorEvent::Crossfire);
 
     const std::size_t pickups = world.Pickups().size();
@@ -220,7 +220,7 @@ TEST_CASE("Challenges evaluate against run state") {
     REQUIRE(e != nullptr);
     world.DamageEnemy(*e, 1e9f, false, {0.0f, 1.0f});
     CHECK(ChallengeMet(ChallengeId::WardenDown, world));
-    CHECK_FALSE(ChallengeMet(ChallengeId::FleetCommander, world));  // profile-based
+    CHECK_FALSE(ChallengeMet(ChallengeId::FleetCommander, world)); // profile-based
 }
 
 TEST_CASE("Final guardian ends campaign and daily runs, but not endless") {
@@ -232,7 +232,7 @@ TEST_CASE("Final guardian ends campaign and daily runs, but not endless") {
         director.DebugJump(Director::kCampaignSectors - 1, true);
         world.Update(0.5f, PlayerInput{});
         REQUIRE(director.Phase() == SectorPhase::Boss);
-        world.Update(2.5f, PlayerInput{});  // let the Core materialise and deploy its nodes
+        world.Update(2.5f, PlayerInput{}); // let the Core materialise and deploy its nodes
         // Shield nodes protect the Core; remove them, then the Core itself.
         for (Enemy& e : world.Enemies()) {
             if (e.alive && e.kind == EnemyKind::BossMinion) {

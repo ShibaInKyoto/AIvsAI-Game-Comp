@@ -14,7 +14,7 @@ namespace {
 
 struct LogLine {
     std::string_view label;
-    std::string_view status;  // shown in an aligned column once the label is typed
+    std::string_view status; // shown in an aligned column once the label is typed
 };
 
 constexpr std::array<LogLine, 5> kLog{{

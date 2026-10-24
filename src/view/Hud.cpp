@@ -407,7 +407,8 @@ void Hud::DrawBanners(App& app, const GameView& view) const {
         const Color c = GetEnemyInfo(boss->kind).color;
         const float a = fade(t, 0.25f, 2.6f, 0.7f);
         const float slide = (1.0f - EaseOutCubic(Saturate(t / 0.6f))) * 80.0f;
-        text.Draw(FontId::Heading, BossTitle(boss->kind), {cx, cy - 70.0f}, 26.0f, WithAlpha(c, a), Align::Center, 0.35f);
+        text.Draw(FontId::Heading, BossTitle(boss->kind), {cx, cy - 70.0f}, 26.0f, WithAlpha(c, a), Align::Center,
+                  0.35f);
         text.DrawGlow(FontId::Display, GetEnemyInfo(boss->kind).name, {cx - slide, cy - 34.0f}, 96.0f,
                       WithAlpha(WHITE, a), WithAlpha(c, a), Align::Center, 0.12f);
         break;
@@ -424,7 +425,7 @@ void Hud::DrawBanners(App& app, const GameView& view) const {
         const Vector2 ship = view.WorldToUi(world.GetPlayer().position);
         const bool covering = std::abs(ship.x - cx) < 420.0f && std::abs(ship.y - (by + 14.0f)) < 90.0f;
         const float a = fade(et, 0.15f, 2.0f, 0.6f) * (covering ? 0.3f : 1.0f);
-        const Color color = event == SectorEvent::DataStorm ? palette::kXpMedium
+        const Color color = event == SectorEvent::DataStorm   ? palette::kXpMedium
                             : event == SectorEvent::Crossfire ? palette::kUiWarn
                                                               : palette::kDanger;
         const float spread = 380.0f * EaseOutCubic(Saturate(et / 0.4f));
@@ -490,8 +491,8 @@ void Hud::DrawFloatingText(App& app, const GameView& view) const {
         const Vector2 p = view.WorldToUi(t.position);
         const float life = t.life / t.maxLife;
         const float alpha = Saturate(life * 3.0f);
-        const float pop = t.big ? 1.0f + 0.4f * EaseOutCubic(Saturate((1.0f - life) * 6.0f)) - 0.4f
-                                : 1.0f + 0.35f * t.pop;
+        const float pop =
+            t.big ? 1.0f + 0.4f * EaseOutCubic(Saturate((1.0f - life) * 6.0f)) - 0.4f : 1.0f + 0.35f * t.pop;
         const float size = t.size * pop;
         if (t.big) {
             text.DrawGlow(FontId::Heading, t.text.data(), p, size, WithAlpha(WHITE, alpha), WithAlpha(t.color, alpha),

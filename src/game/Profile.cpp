@@ -12,6 +12,7 @@ namespace {
 constexpr const char* kFileName = "profile.sav";
 constexpr int kFormatVersion = 1;
 
+// clang-format off
 constexpr std::array<FirmwareInfo, static_cast<std::size_t>(FirmwareId::Count)> kFirmware{{
     {"HULL REINFORCEMENT", "+1 max integrity", 2, {180, 450, 0, 0, 0}},
     {"WEAPON CALIBRATION", "+6% damage", 5, {80, 160, 260, 380, 520}},
@@ -21,6 +22,7 @@ constexpr std::array<FirmwareInfo, static_cast<std::size_t>(FirmwareId::Count)> 
     {"CAPACITOR CHARGE", "Start with +25% nova charge", 3, {90, 200, 330, 0, 0}},
     {"THRUSTER TUNING", "-6% dash cooldown", 3, {70, 150, 260, 0, 0}},
 }};
+// clang-format on
 
 } // namespace
 
@@ -57,10 +59,10 @@ bool Profile::Load() {
     bossKills_ = static_cast<int>(doc.GetInt("boss_kills", 0));
     playTime_ = doc.GetFloat("play_time", 0.0f);
     tutorialSeen_ = doc.GetBool("tutorial_seen", false);
-    lastShip_ = static_cast<ShipId>(std::clamp(static_cast<int>(doc.GetInt("last_ship", 0)), 0,
-                                               static_cast<int>(ShipId::Count) - 1));
-    lastDifficulty_ = static_cast<Difficulty>(std::clamp(static_cast<int>(doc.GetInt("last_difficulty", 1)), 0,
-                                                         static_cast<int>(Difficulty::Count) - 1));
+    lastShip_ = static_cast<ShipId>(
+        std::clamp(static_cast<int>(doc.GetInt("last_ship", 0)), 0, static_cast<int>(ShipId::Count) - 1));
+    lastDifficulty_ = static_cast<Difficulty>(
+        std::clamp(static_cast<int>(doc.GetInt("last_difficulty", 1)), 0, static_cast<int>(Difficulty::Count) - 1));
     if (!ShipUnlocked(lastShip_)) {
         lastShip_ = ShipId::Vector;
     }

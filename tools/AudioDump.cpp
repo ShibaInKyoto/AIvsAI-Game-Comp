@@ -61,12 +61,9 @@ int main(int argc, char** argv) {
         MusicMood mood;
         float intensity;
         const char* name;
-    } moods[] = {{MusicMood::Menu, 0.5f, "menu"},
-                 {MusicMood::Game, 0.45f, "game_low"},
-                 {MusicMood::Game, 0.9f, "game_high"},
-                 {MusicMood::Boss, 1.0f, "boss"},
-                 {MusicMood::Victory, 0.75f, "victory"},
-                 {MusicMood::GameOver, 0.15f, "gameover"}};
+    } moods[] = {{MusicMood::Menu, 0.5f, "menu"},        {MusicMood::Game, 0.45f, "game_low"},
+                 {MusicMood::Game, 0.9f, "game_high"},   {MusicMood::Boss, 1.0f, "boss"},
+                 {MusicMood::Victory, 0.75f, "victory"}, {MusicMood::GameOver, 0.15f, "gameover"}};
     for (const auto& m : moods) {
         auto music = std::make_unique<MusicEngine>();
         music->SetVolume(0.8f);

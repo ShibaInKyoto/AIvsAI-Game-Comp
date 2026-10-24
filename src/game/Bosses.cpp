@@ -110,7 +110,7 @@ void World::UpdateBossWarden(Enemy& e, float dt) {
     }
 
     switch (attack) {
-    case 0:  // rings
+    case 0: // rings
         if (run.ShotReady(dt)) {
             e.timer2 = 0.5f;
             FireRing(e.position, 16 + 4 * phase, 220.0f + 30.0f * static_cast<float>(phase), e.param,
@@ -122,7 +122,7 @@ void World::UpdateBossWarden(Enemy& e, float dt) {
             }
         }
         break;
-    case 1:  // aimed volleys
+    case 1: // aimed volleys
         if (run.ShotReady(dt)) {
             e.timer2 = 0.32f;
             FireFan(e.position, AngleOf(toPlayer), 5, 0.16f, 360.0f, EnemyBulletStyle::Needle, color);
@@ -132,7 +132,7 @@ void World::UpdateBossWarden(Enemy& e, float dt) {
             }
         }
         break;
-    case 2: {  // summon
+    case 2: { // summon
         const int count = 4 + 2 * phase;
         for (int i = 0; i < count; ++i) {
             const Vector2 offset = FromAngle(e.angle + kTau * static_cast<float>(i) / count, e.radius + 70.0f);
@@ -141,7 +141,7 @@ void World::UpdateBossWarden(Enemy& e, float dt) {
         run.Finish(1.6f);
         break;
     }
-    case 3:  // spiral
+    case 3: // spiral
         if (run.ShotReady(dt)) {
             e.timer2 = 0.085f;
             const int arms = phase >= 2 ? 3 : 2;
@@ -155,7 +155,7 @@ void World::UpdateBossWarden(Enemy& e, float dt) {
             run.Finish(0.8f);
         }
         break;
-    case 4:  // telegraphed ram
+    case 4: // telegraphed ram
         if (e.counter == 0) {
             e.counter = 1;
             e.target = player_.position;
@@ -237,7 +237,7 @@ void World::UpdateBossHydra(Enemy& e, float dt) {
     };
 
     switch (attack) {
-    case 0:  // broadside: every segment fires sideways
+    case 0: // broadside: every segment fires sideways
         if (run.ShotReady(dt)) {
             e.timer2 = 0.75f;
             forEachSegment([&](Enemy& body) {
@@ -253,7 +253,7 @@ void World::UpdateBossHydra(Enemy& e, float dt) {
             }
         }
         break;
-    case 1:  // head fans
+    case 1: // head fans
         if (run.ShotReady(dt)) {
             e.timer2 = 0.45f;
             FireFan(e.position, AngleOf(ToPlayer(e)), 7, 0.13f, 380.0f, EnemyBulletStyle::Needle, color);
@@ -263,7 +263,7 @@ void World::UpdateBossHydra(Enemy& e, float dt) {
             }
         }
         break;
-    case 2:  // rush
+    case 2: // rush
         if (e.counter == 0) {
             e.counter = 1;
             Emit(EventType::BossPhase, e.position, color, 0.0f, {}, -1, e.kind);
@@ -272,7 +272,7 @@ void World::UpdateBossHydra(Enemy& e, float dt) {
             run.Finish(0.8f);
         }
         break;
-    case 3:  // tail spray: segments aim at the player one after another
+    case 3: // tail spray: segments aim at the player one after another
         if (run.ShotReady(dt)) {
             e.timer2 = 0.06f;
             int index = 0;
@@ -317,7 +317,7 @@ void World::UpdateBossSingularity(Enemy& e, float dt) {
     }
 
     switch (attack) {
-    case 0:  // spiral arms
+    case 0: // spiral arms
         if (run.ShotReady(dt)) {
             e.timer2 = 0.11f;
             const int arms = 4 + phase;
@@ -336,7 +336,7 @@ void World::UpdateBossSingularity(Enemy& e, float dt) {
             run.Finish(1.0f);
         }
         break;
-    case 1:  // collapse rings that accelerate outward
+    case 1: // collapse rings that accelerate outward
         if (run.ShotReady(dt)) {
             e.timer2 = 0.7f;
             for (int i = 0; i < 30; ++i) {
@@ -352,7 +352,7 @@ void World::UpdateBossSingularity(Enemy& e, float dt) {
             }
         }
         break;
-    case 2: {  // spawn lesser wells
+    case 2: { // spawn lesser wells
         int wells = 0;
         for (const Enemy& other : enemies_) {
             if (other.alive && other.kind == EnemyKind::Singularity) {
@@ -370,12 +370,12 @@ void World::UpdateBossSingularity(Enemy& e, float dt) {
         run.Finish(1.2f);
         break;
     }
-    case 3:  // rotating lances
+    case 3: // rotating lances
         if (e.counter == 0) {
             e.counter = 1;
             for (int i = 0; i < 5; ++i) {
-                Beam& beam = AddBeam(e.position, e.param + kTau * static_cast<float>(i) / 5.0f, 1.3f, 2.6f, 26.0f,
-                                     color, e.id);
+                Beam& beam =
+                    AddBeam(e.position, e.param + kTau * static_cast<float>(i) / 5.0f, 1.3f, 2.6f, 26.0f, color, e.id);
                 beam.sweep = 0.45f;
             }
         }
@@ -421,7 +421,7 @@ void World::UpdateBossArchitect(Enemy& e, float dt) {
     }
 
     switch (attack) {
-    case 0:  // laser fan
+    case 0: // laser fan
         if (e.counter == 0) {
             e.counter = 1;
             const int beams = 3 + 2 * phase;
@@ -437,7 +437,7 @@ void World::UpdateBossArchitect(Enemy& e, float dt) {
             run.Finish(0.6f);
         }
         break;
-    case 1:  // twin sweeping beams
+    case 1: // twin sweeping beams
         if (e.counter == 0) {
             e.counter = 1;
             const float base = AngleOf(toPlayer) - 1.1f;
@@ -451,7 +451,7 @@ void World::UpdateBossArchitect(Enemy& e, float dt) {
             run.Finish(0.6f);
         }
         break;
-    case 2: {  // build turrets
+    case 2: { // build turrets
         int turrets = 0;
         for (const Enemy& other : enemies_) {
             if (other.alive && other.kind == EnemyKind::BossMinion) {
@@ -469,7 +469,7 @@ void World::UpdateBossArchitect(Enemy& e, float dt) {
         run.Finish(0.8f);
         break;
     }
-    case 3:  // teleport
+    case 3: // teleport
         if (e.counter == 0) {
             e.counter = 1;
             e.invulnerable = true;
@@ -551,8 +551,8 @@ void World::UpdateBossCore(Enemy& e, float dt) {
     static constexpr std::array<int, 4> kPhase1{2, 1, 0, 3};
     static constexpr std::array<int, 4> kPhase2{4, 2, 4, 3};
     const std::span<const int> sequence = shielded     ? std::span<const int>(kShielded)
-                                        : phase == 0   ? std::span<const int>(kPhase0)
-                                        : phase == 1   ? std::span<const int>(kPhase1)
+                                          : phase == 0 ? std::span<const int>(kPhase0)
+                                          : phase == 1 ? std::span<const int>(kPhase1)
                                                        : std::span<const int>(kPhase2);
     const int attack = CurrentAttack(e, sequence);
 
@@ -561,7 +561,7 @@ void World::UpdateBossCore(Enemy& e, float dt) {
     }
 
     switch (attack) {
-    case 0:  // alternating rings
+    case 0: // alternating rings
         if (run.ShotReady(dt)) {
             e.timer2 = 0.42f;
             FireRing(e.position, 22 + 4 * phase, 230.0f, e.param, EnemyBulletStyle::Orb,
@@ -573,7 +573,7 @@ void World::UpdateBossCore(Enemy& e, float dt) {
             }
         }
         break;
-    case 1:  // double spiral
+    case 1: // double spiral
         if (run.ShotReady(dt)) {
             e.timer2 = 0.09f;
             FireRing(e.position, 3, 250.0f, e.param, EnemyBulletStyle::Orb, bullet);
@@ -587,7 +587,7 @@ void World::UpdateBossCore(Enemy& e, float dt) {
             run.Finish(1.0f);
         }
         break;
-    case 2:  // rotating laser cross
+    case 2: // rotating laser cross
         if (e.counter == 0) {
             e.counter = 1;
             const int beams = phase >= 2 ? 6 : 4;
@@ -601,7 +601,7 @@ void World::UpdateBossCore(Enemy& e, float dt) {
             run.Finish(0.6f);
         }
         break;
-    case 3: {  // summon a mixed squad
+    case 3: { // summon a mixed squad
         const int count = 3 + phase;
         for (int i = 0; i < count; ++i) {
             const Vector2 p = e.position + FromAngle(kTau * static_cast<float>(i) / count + e.param, 220.0f);
@@ -613,7 +613,7 @@ void World::UpdateBossCore(Enemy& e, float dt) {
         run.Finish(1.4f);
         break;
     }
-    case 4:  // desperation: spiral and rings together
+    case 4: // desperation: spiral and rings together
         if (run.ShotReady(dt)) {
             e.timer2 = 0.1f;
             FireRing(e.position, 3, 260.0f, e.param, EnemyBulletStyle::Orb, bullet);

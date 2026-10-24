@@ -42,7 +42,8 @@ Vector2 Graphics::ScreenToScene(Vector2 screen) const {
 
 Vector2 Graphics::SceneToScreen(Vector2 scene) const {
     const float sx = static_cast<float>(std::max(GetRenderWidth(), 1)) / static_cast<float>(std::max(post_.Width(), 1));
-    const float sy = static_cast<float>(std::max(GetRenderHeight(), 1)) / static_cast<float>(std::max(post_.Height(), 1));
+    const float sy =
+        static_cast<float>(std::max(GetRenderHeight(), 1)) / static_cast<float>(std::max(post_.Height(), 1));
     return {scene.x * sx, scene.y * sy};
 }
 

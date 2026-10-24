@@ -11,6 +11,7 @@ using R = Rarity;
 using C = UpgradeCategory;
 constexpr ModuleId kNoModule = ModuleId::Count;
 
+// clang-format off
 constexpr std::array<UpgradeInfo, static_cast<std::size_t>(UpgradeId::Count)> kUpgrades{{
     {U::Overclock, "OVERCLOCK", "+15% fire rate.", R::Common, C::Weapon, 6, kNoModule},
     {U::HighVoltage, "HIGH VOLTAGE", "+20% damage.", R::Common, C::Weapon, 6, kNoModule},
@@ -79,7 +80,9 @@ constexpr std::array<UpgradeInfo, static_cast<std::size_t>(UpgradeId::Count)> kU
     {U::SpectrumCannon, "SPECTRUM CANNON", "A five-beam prism that fires twice as often.", R::Legendary,
      C::Evolution, 1, ModuleId::PrismLance},
 }};
+// clang-format on
 
+// clang-format off
 constexpr std::array<EvolutionRecipe, 7> kEvolutions{{
     {U::SawStorm, U::OrbitBlades, U::Thrusters},
     {U::HiveSwarm, U::Drones, U::SplitShot},
@@ -89,6 +92,7 @@ constexpr std::array<EvolutionRecipe, 7> kEvolutions{{
     {U::GravityMines, U::ProxMines, U::Magnet},
     {U::SpectrumCannon, U::PrismLance, U::Velocity},
 }};
+// clang-format on
 
 constexpr std::array<float, static_cast<std::size_t>(Rarity::Count)> kRarityWeights{60.0f, 28.0f, 10.0f, 2.5f};
 
@@ -204,20 +208,15 @@ const char* UpgradeLevelText(UpgradeId id, int ownedStacks) {
         }
     case U::Deflector:
         return ownedStacks == 0 ? "A shield absorbs one hit, recharging every 14s." : "Shield recharges 3s faster.";
-    case U::AutoRepair:
-        return ownedStacks == 0 ? "Regenerate 1 integrity every 50s." : "Regenerate faster.";
+    case U::AutoRepair: return ownedStacks == 0 ? "Regenerate 1 integrity every 50s." : "Regenerate faster.";
     case U::ReactiveArmor:
         return ownedStacks == 0 ? "Taking damage unleashes a damaging shockwave." : "+60% shockwave damage and size.";
-    case U::PhaseBlade:
-        return ownedStacks == 0 ? "Dashing through enemies deals heavy damage." : "+60% dash damage.";
+    case U::PhaseBlade: return ownedStacks == 0 ? "Dashing through enemies deals heavy damage." : "+60% dash damage.";
     case U::SeekerRounds:
         return ownedStacks == 0 ? "Shots curve toward nearby enemies." : "Shots turn harder toward enemies.";
-    case U::FragRounds:
-        return ownedStacks == 0 ? "Shots explode on impact for 40% damage." : "+35% explosion radius.";
-    case U::CryoRounds:
-        return ownedStacks == 0 ? "15% chance per hit to slow enemies." : "+10% slow chance.";
-    default:
-        return GetUpgradeInfo(id).description;
+    case U::FragRounds: return ownedStacks == 0 ? "Shots explode on impact for 40% damage." : "+35% explosion radius.";
+    case U::CryoRounds: return ownedStacks == 0 ? "15% chance per hit to slow enemies." : "+10% slow chance.";
+    default: return GetUpgradeInfo(id).description;
     }
 }
 
@@ -248,7 +247,7 @@ void ApplyUpgradeStack(UpgradeId id, int stack, PlayerStats& s) {
     case U::SideCannons: s.sideGuns += 1; break;
 
     case U::HullPlating: s.maxHp += 1; break;
-    case U::NanoRepair: break;  // instant effect handled by the world
+    case U::NanoRepair: break; // instant effect handled by the world
     case U::Deflector:
         s.shieldCharges = 1;
         s.shieldRecharge = stack == 1 ? 14.0f : s.shieldRecharge - 3.0f;

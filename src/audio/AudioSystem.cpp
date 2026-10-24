@@ -35,7 +35,7 @@ Sound MakeSound(const std::vector<float>& samples) {
     wave.sampleSize = 16;
     wave.channels = 1;
     wave.data = pcm.data();
-    return LoadSoundFromWave(wave);  // copies the samples
+    return LoadSoundFromWave(wave); // copies the samples
 }
 
 } // namespace

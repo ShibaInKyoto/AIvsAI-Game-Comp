@@ -15,7 +15,13 @@ namespace gb {
 namespace {
 
 constexpr int kShipCount = static_cast<int>(ShipId::Count);
-enum HangarItem { ItemDifficulty = kShipCount, ItemMode, ItemLaunch, ItemFirmware, ItemBack };
+enum HangarItem {
+    ItemDifficulty = kShipCount,
+    ItemMode,
+    ItemLaunch,
+    ItemFirmware,
+    ItemBack
+};
 
 const char* ModeName(GameMode mode) {
     switch (mode) {
@@ -108,8 +114,8 @@ void HangarScene::Launch() {
     config.difficulty = difficulty_;
     config.mode = mode_;
     config.seed = app_.Options().seed != 0 ? app_.Options().seed
-                                            : static_cast<std::uint64_t>(GetRandomValue(1, 0x7fffffff)) ^
-                                                  (static_cast<std::uint64_t>(GetTime() * 1000.0) << 20);
+                                           : static_cast<std::uint64_t>(GetRandomValue(1, 0x7fffffff)) ^
+                                                 (static_cast<std::uint64_t>(GetTime() * 1000.0) << 20);
     config.meta = profile.Bonuses();
     app_.Audio().Play(SfxId::UiConfirm, 1.0f);
     app_.ChangeScene(std::make_unique<GameScene>(app_, config), 0.5f);
@@ -272,11 +278,13 @@ void HangarScene::DrawFirmware() {
     ui::Dim(app_, 0.6f);
     const Rectangle panel{ui.x * 0.5f - 560.0f, ui.y * 0.5f - 380.0f, 1120.0f, 760.0f};
     ui::Panel(app_, panel, palette::kCache);
-    text.Draw(FontId::Heading, "FIRMWARE UPGRADES", {panel.x + 40.0f, panel.y + 30.0f}, 36.0f, WHITE, Align::Left, 0.12f);
-    text.Draw(FontId::BodyBold, "Permanent upgrades that apply to every run.", {panel.x + 40.0f, panel.y + 80.0f}, 24.0f,
-              palette::kUiDim);
-    text.Draw(FontId::BodyBold, TextFormat("%d CR", profile.Credits()), {panel.x + panel.width - 40.0f, panel.y + 28.0f},
-              34.0f, LerpColor(palette::kCache, WHITE, purchaseFlash_), Align::Right);
+    text.Draw(FontId::Heading, "FIRMWARE UPGRADES", {panel.x + 40.0f, panel.y + 30.0f}, 36.0f, WHITE, Align::Left,
+              0.12f);
+    text.Draw(FontId::BodyBold, "Permanent upgrades that apply to every run.", {panel.x + 40.0f, panel.y + 80.0f},
+              24.0f, palette::kUiDim);
+    text.Draw(FontId::BodyBold, TextFormat("%d CR", profile.Credits()),
+              {panel.x + panel.width - 40.0f, panel.y + 28.0f}, 34.0f,
+              LerpColor(palette::kCache, WHITE, purchaseFlash_), Align::Right);
 
     const float listX = panel.x + 30.0f;
     const float listY = panel.y + 140.0f;
@@ -290,8 +298,10 @@ void HangarScene::DrawFirmware() {
         const FirmwareInfo& info = GetFirmwareInfo(id);
         const int rank = profile.FirmwareRank(id);
         for (int r = 0; r < info.maxRank; ++r) {
-            const Vector2 a{listX + 690.0f + static_cast<float>(r) * 34.0f, listY + static_cast<float>(i) * itemHeight + 30.0f};
-            neon.Line(a, a + Vector2{24.0f, 0.0f}, 5.0f, r < rank ? palette::kCache : WithAlpha(palette::kUiFaint, 0.7f));
+            const Vector2 a{listX + 690.0f + static_cast<float>(r) * 34.0f,
+                            listY + static_cast<float>(i) * itemHeight + 30.0f};
+            neon.Line(a, a + Vector2{24.0f, 0.0f}, 5.0f,
+                      r < rank ? palette::kCache : WithAlpha(palette::kUiFaint, 0.7f));
         }
     }
     neon.End();

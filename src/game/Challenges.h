@@ -31,7 +31,7 @@ struct ChallengeInfo {
     ChallengeId id;
     const char* name;
     const char* description;
-    int reward;  // credits
+    int reward; // credits
 };
 
 const ChallengeInfo& GetChallengeInfo(ChallengeId id);

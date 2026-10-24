@@ -3,10 +3,10 @@
 #include "audio/AudioSystem.h"
 #include "core/App.h"
 #include "core/Format.h"
+#include "game/EnemyCatalog.h"
 #include "scenes/GameScene.h"
 #include "scenes/HangarScene.h"
 #include "scenes/TitleScene.h"
-#include "game/EnemyCatalog.h"
 #include "view/Palette.h"
 #include "view/Shapes.h"
 
@@ -18,7 +18,11 @@ namespace gb {
 
 namespace {
 
-enum ResultItem { ItemRetry, ItemHangar, ItemTitle };
+enum ResultItem {
+    ItemRetry,
+    ItemHangar,
+    ItemTitle
+};
 
 // Sub-parts read better under their parent's name.
 std::string KillerName(EnemyKind kind) {
@@ -36,9 +40,7 @@ constexpr float kRowInterval = 0.14f;
 } // namespace
 
 ResultsScene::ResultsScene(App& app, const RunSummary& summary, int creditsEarned)
-    : Scene(app),
-      summary_(summary),
-      creditsEarned_(creditsEarned),
+    : Scene(app), summary_(summary), creditsEarned_(creditsEarned),
       backdrop_(summary.victory ? palette::kUiGood : palette::kDanger) {
     const Profile& profile = app.Progress();
     // RecordRun already folded this run in, so a tie with the best means it set it.
@@ -123,7 +125,8 @@ void ResultsScene::DrawUi() {
     const char* mode = summary_.config.mode == GameMode::Daily     ? "DAILY RUN"
                        : summary_.config.mode == GameMode::Endless ? "ENDLESS"
                                                                    : "CAMPAIGN";
-    text.Draw(FontId::Heading, TextFormat("%s  //  %s  //  %s", ship.name, DifficultyName(summary_.config.difficulty), mode),
+    text.Draw(FontId::Heading,
+              TextFormat("%s  //  %s  //  %s", ship.name, DifficultyName(summary_.config.difficulty), mode),
               {cx, 178.0f}, 22.0f, WithAlpha(palette::kUiDim, titleIn), Align::Center, 0.2f);
 
     // Stats on the left, the run's loadout on the right.
@@ -147,7 +150,8 @@ void ResultsScene::DrawUi() {
     }};
     for (int i = 0; i < revealedRows_ && i < kRowCount; ++i) {
         const float y = panel.y + 36.0f + static_cast<float>(i) * 44.0f;
-        text.Draw(FontId::BodyBold, rows[static_cast<std::size_t>(i)].first, {panel.x + 60.0f, y}, 28.0f, palette::kUiDim);
+        text.Draw(FontId::BodyBold, rows[static_cast<std::size_t>(i)].first, {panel.x + 60.0f, y}, 28.0f,
+                  palette::kUiDim);
         text.Draw(FontId::BodyBold, rows[static_cast<std::size_t>(i)].second, {panel.x + panel.width - 60.0f, y - 3.0f},
                   32.0f, palette::kUiText, Align::Right);
     }
@@ -249,8 +253,8 @@ void ResultsScene::DrawLoadout(Rectangle panel, Color accent, float alpha) {
         const int stacks = summary_.build.Stacks(picks[static_cast<std::size_t>(i)]);
         if (stacks > 1) {
             const Rectangle r = tileRect(i);
-            text.Draw(FontId::BodyBold, TextFormat("%d", stacks), {r.x + r.width - 6.0f, r.y + r.height - 24.0f},
-                      20.0f, WithAlpha(palette::kUiText, reveal(i)), Align::Right);
+            text.Draw(FontId::BodyBold, TextFormat("%d", stacks), {r.x + r.width - 6.0f, r.y + r.height - 24.0f}, 20.0f,
+                      WithAlpha(palette::kUiText, reveal(i)), Align::Right);
         }
     }
     if (count == 0) {

@@ -32,8 +32,8 @@ TEST_CASE("Music engine renders bounded audio in every mood") {
     auto music = std::make_unique<MusicEngine>();
     music->SetVolume(1.0f);
     std::vector<float> buffer(2048 * 2);
-    for (MusicMood mood : {MusicMood::Menu, MusicMood::Game, MusicMood::Boss, MusicMood::Victory,
-                           MusicMood::GameOver}) {
+    for (MusicMood mood :
+         {MusicMood::Menu, MusicMood::Game, MusicMood::Boss, MusicMood::Victory, MusicMood::GameOver}) {
         music->SetMood(mood, 3);
         music->SetIntensity(0.9f);
         double energy = 0.0;

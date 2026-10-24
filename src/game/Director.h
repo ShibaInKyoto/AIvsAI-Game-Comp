@@ -11,13 +11,13 @@ namespace gb {
 class World;
 
 enum class SectorPhase : std::uint8_t {
-    Intro,        // title card, no spawns yet
-    Waves,        // timed spawning
-    Purge,        // remaining enemies dissolve
-    BossWarning,  // siren before the boss arrives
-    Boss,         // boss fight in progress
-    Cleared,      // boss down; waiting for the sector modifier choice
-    Victory,      // campaign complete
+    Intro,       // title card, no spawns yet
+    Waves,       // timed spawning
+    Purge,       // remaining enemies dissolve
+    BossWarning, // siren before the boss arrives
+    Boss,        // boss fight in progress
+    Cleared,     // boss down; waiting for the sector modifier choice
+    Victory,     // campaign complete
 };
 
 struct SectorInfo {
@@ -26,18 +26,18 @@ struct SectorInfo {
     Color gridColor;
     Color accentColor;
     float duration;
-    float threatRate;  // director budget per second at the start of the sector
+    float threatRate; // director budget per second at the start of the sector
     EnemyKind boss;
     // Spawn weights per enemy kind (zero = never spawns in this sector).
     std::array<float, static_cast<std::size_t>(EnemyKind::Count)> weights;
 };
 
 enum class SectorModifier : std::uint8_t {
-    Swarm,     // +30% enemies, +30% xp
-    Hardened,  // +25% enemy hp, +40% score
-    Bounty,    // elites twice as often, +1 cache
-    Armory,    // immediate extra upgrade, enemies faster
-    Respite,   // repair 2 integrity
+    Swarm,    // +30% enemies, +30% xp
+    Hardened, // +25% enemy hp, +40% score
+    Bounty,   // elites twice as often, +1 cache
+    Armory,   // immediate extra upgrade, enemies faster
+    Respite,  // repair 2 integrity
     Count
 };
 
@@ -52,9 +52,9 @@ const SectorModifierInfo& GetSectorModifierInfo(SectorModifier modifier);
 // Set-piece moments thrown into a sector's waves every ~40 seconds.
 enum class SectorEvent : std::uint8_t {
     None,
-    Ambush,     // a ring of swarmers or drifters closes in on the player
-    Crossfire,  // a line of darts lunges across the player's position
-    DataStorm,  // a shower of free experience shards
+    Ambush,    // a ring of swarmers or drifters closes in on the player
+    Crossfire, // a line of darts lunges across the player's position
+    DataStorm, // a shower of free experience shards
     Count
 };
 

@@ -10,20 +10,20 @@ namespace {
 constexpr float kSr = static_cast<float>(MusicEngine::kSampleRate);
 constexpr std::array<int, 7> kMinorScale{0, 2, 3, 5, 7, 8, 10};
 constexpr std::array<int, 7> kMajorScale{0, 2, 4, 5, 7, 9, 11};
-constexpr int kBassRoot = 33;  // A1
+constexpr int kBassRoot = 33; // A1
 
 // Chord progressions as scale degrees (0 = tonic).
 constexpr std::array<std::array<int, 4>, 6> kMinorProgressions{{
-    {0, 5, 2, 6},  // i  VI III VII
-    {0, 3, 5, 4},  // i  iv VI  v
-    {0, 6, 5, 6},  // i  VII VI VII
-    {5, 6, 0, 0},  // VI VII i  i
-    {0, 2, 6, 3},  // i  III VII iv
-    {3, 5, 6, 0},  // iv VI VII i
+    {0, 5, 2, 6}, // i  VI III VII
+    {0, 3, 5, 4}, // i  iv VI  v
+    {0, 6, 5, 6}, // i  VII VI VII
+    {5, 6, 0, 0}, // VI VII i  i
+    {0, 2, 6, 3}, // i  III VII iv
+    {3, 5, 6, 0}, // iv VI VII i
 }};
 constexpr std::array<std::array<int, 4>, 2> kMajorProgressions{{
-    {0, 4, 5, 3},  // I V vi IV
-    {3, 4, 0, 0},  // IV V I I
+    {0, 4, 5, 3}, // I V vi IV
+    {3, 4, 0, 0}, // IV V I I
 }};
 
 constexpr std::array<std::array<int, 16>, 4> kArpPatterns{{
@@ -172,11 +172,11 @@ void MusicEngine::BuildSection() {
     int tone = rng_.RangeInt(1, 3);
     for (const auto& [stepIndex, length] : rhythm) {
         if (rng_.Chance(0.12f) && motifLength_ > 0) {
-            continue;  // occasional rest
+            continue; // occasional rest
         }
         tone = std::clamp(tone + rng_.RangeInt(-2, 2), 0, 5);
         if (stepIndex % 8 == 0) {
-            tone = (tone / 2) * 2;  // land on stronger chord tones on strong beats
+            tone = (tone / 2) * 2; // land on stronger chord tones on strong beats
         }
         motif_[static_cast<std::size_t>(motifLength_++)] = NoteEvent{stepIndex, length, tone};
     }

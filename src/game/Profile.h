@@ -23,9 +23,9 @@ enum class FirmwareId : std::uint8_t {
 
 struct FirmwareInfo {
     const char* name;
-    const char* description;  // per rank
+    const char* description; // per rank
     int maxRank;
-    std::array<int, 5> cost;  // cost of rank 1..maxRank
+    std::array<int, 5> cost; // cost of rank 1..maxRank
 };
 
 const FirmwareInfo& GetFirmwareInfo(FirmwareId id);
@@ -33,7 +33,7 @@ const FirmwareInfo& GetFirmwareInfo(FirmwareId id);
 struct RunSummary {
     RunStats stats;
     RunConfig config;
-    UpgradeInventory build;  // final loadout
+    UpgradeInventory build; // final loadout
     int level = 1;
     int sectorReached = 1;
     bool victory = false;
@@ -49,7 +49,7 @@ public:
     bool ShipUnlocked(ShipId id) const { return unlockedShips_[static_cast<std::size_t>(id)]; }
     bool TryUnlockShip(ShipId id);
     int FirmwareRank(FirmwareId id) const { return firmware_[static_cast<std::size_t>(id)]; }
-    int FirmwareNextCost(FirmwareId id) const;  // -1 when maxed
+    int FirmwareNextCost(FirmwareId id) const; // -1 when maxed
     bool TryBuyFirmware(FirmwareId id);
     MetaBonuses Bonuses() const;
 

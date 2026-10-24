@@ -90,7 +90,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends ninja-build libx11-dev libxrandr-dev \
-            libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libasound2-dev xvfb mesa-utils
+            libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libasound2-dev xvfb mesa-utils \
+            clang-format-18
+
+      - name: Check formatting (.clang-format)
+        run: git ls-files 'src/*.cpp' 'src/*.h' 'tests/*.cpp' 'tools/*.cpp' | xargs clang-format-18 --dry-run --Werror
 
       - name: Configure
         run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DGB_WARNINGS_AS_ERRORS=ON

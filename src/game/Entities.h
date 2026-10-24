@@ -21,18 +21,18 @@ struct Player {
     float hitFlash = 0.0f;
     bool alive = true;
 
-    float dashTime = 0.0f;  // > 0 while dashing
+    float dashTime = 0.0f; // > 0 while dashing
     Vector2 dashDirection{1.0f, 0.0f};
     int dashCharges = 1;
     float dashRecharge = 0.0f;
 
     float fireCooldown = 0.0f;
-    float novaCharge = 0.0f;  // 0..1
+    float novaCharge = 0.0f; // 0..1
     int shieldCharges = 0;
     float shieldTimer = 0.0f;
     float regenTimer = 0.0f;
-    float recoil = 0.0f;      // cosmetic barrel kick
-    float muzzleSide = 1.0f;  // alternates for twin-barrel feel
+    float recoil = 0.0f;     // cosmetic barrel kick
+    float muzzleSide = 1.0f; // alternates for twin-barrel feel
 
     bool Dashing() const { return dashTime > 0.0f; }
 };
@@ -50,7 +50,7 @@ struct Enemy {
     float maxHp = 10.0f;
     float speed = 100.0f;
     float age = 0.0f;
-    float spawnDelay = 0.0f;  // telegraph time remaining; inactive while > 0
+    float spawnDelay = 0.0f; // telegraph time remaining; inactive while > 0
     float hitFlash = 0.0f;
     float slowTimer = 0.0f;
 
@@ -78,10 +78,10 @@ struct Enemy {
 
     bool elite = false;
     bool alive = true;
-    bool invulnerable = false;   // e.g. serpent bodies absorb shots without damage
+    bool invulnerable = false; // e.g. serpent bodies absorb shots without damage
     bool contactDamage = true;
     bool dropsLoot = true;
-    bool countsForClear = true;  // false for things like mines
+    bool countsForClear = true; // false for things like mines
 
     bool Active() const { return alive && spawnDelay <= 0.0f; }
 };
@@ -122,10 +122,10 @@ struct EnemyBullet {
     float radius = 8.0f;
     float life = 6.0f;
     float age = 0.0f;
-    float acceleration = 0.0f;  // speeds up (or slows down) along velocity
-    float turn = 0.0f;          // curving bullets (radians per second)
+    float acceleration = 0.0f; // speeds up (or slows down) along velocity
+    float turn = 0.0f;         // curving bullets (radians per second)
     EnemyBulletStyle style = EnemyBulletStyle::Orb;
-    EnemyKind source = EnemyKind::Count;  // who fired it (Count = unknown)
+    EnemyKind source = EnemyKind::Count; // who fired it (Count = unknown)
     Color color{255, 80, 60, 255};
     bool alive = true;
 };
@@ -140,7 +140,7 @@ struct Beam {
     float duration = 0.45f; // firing time remaining once warm
     float sweep = 0.0f;     // radians per second while firing
     EntityId owner = kInvalidId;
-    EnemyKind source = EnemyKind::Count;  // who fired it (Count = unknown)
+    EnemyKind source = EnemyKind::Count; // who fired it (Count = unknown)
     bool followOwner = true;
     bool alive = true;
     Color color{255, 60, 200, 255};
@@ -198,7 +198,7 @@ struct Shockwave {
     float knockback = 600.0f;
     bool clearsBullets = false;
     bool alive = true;
-    std::vector<EntityId> hit;  // each enemy is hit at most once
+    std::vector<EntityId> hit; // each enemy is hit at most once
 };
 
 // Visual record of a chain-lightning zap; the simulation applies damage
@@ -225,7 +225,7 @@ struct GameEvent {
     float magnitude = 1.0f;
     int value = 0;
     EnemyKind enemy = EnemyKind::Drifter;
-    EntityId source = kInvalidId;  // entity the event is about, when there is one
+    EntityId source = kInvalidId; // entity the event is about, when there is one
 };
 
 } // namespace gb

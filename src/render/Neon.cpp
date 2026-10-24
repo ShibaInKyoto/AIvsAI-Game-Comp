@@ -12,7 +12,7 @@ namespace gb {
 
 namespace {
 
-constexpr int kCell = 64;           // atlas cell size in pixels
+constexpr int kCell = 64; // atlas cell size in pixels
 constexpr int kAtlasWidth = kCell * 4;
 constexpr int kAtlasHeight = kCell;
 constexpr int kMaxPolylinePoints = 256;
@@ -43,7 +43,7 @@ struct Profile {
 };
 
 Profile LineProfile(float, float fy) {
-    const float d = std::abs(fy - 0.5f) * 2.0f;  // 0 at centre, 1 at quad edge
+    const float d = std::abs(fy - 0.5f) * 2.0f; // 0 at centre, 1 at quad edge
     const float core = 1.0f - SmoothStep(0.20f, 0.36f, d);
     const float halo = std::pow(1.0f - d, 2.4f) * 0.55f;
     return {core + halo * (1.0f - core), 1.0f - SmoothStep(0.0f, 0.22f, d)};
@@ -82,7 +82,7 @@ bool NeonRenderer::Init() {
     image.height = kAtlasHeight;
     image.mipmaps = 1;
     image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
-    atlas_ = LoadTextureFromImage(image);  // copies pixel data to the GPU
+    atlas_ = LoadTextureFromImage(image); // copies pixel data to the GPU
     if (atlas_.id == 0) {
         return false;
     }
@@ -257,13 +257,11 @@ void NeonRenderer::Ring(Vector2 center, float radius, Color color) {
     // Matches the sprite's look: a crisp core line plus a soft, wide halo.
     const int segments = std::clamp(static_cast<int>(radius / 9.0f), 32, 160);
     Circle(center, radius * 0.86f, std::max(2.5f, radius * 0.02f), color, segments);
-    Circle(center, radius * 0.86f, std::max(8.0f, radius * 0.07f), WithAlpha(color, static_cast<float>(color.a) / 255.0f * 0.3f),
-           segments);
+    Circle(center, radius * 0.86f, std::max(8.0f, radius * 0.07f),
+           WithAlpha(color, static_cast<float>(color.a) / 255.0f * 0.3f), segments);
 }
 
-void NeonRenderer::FillTriangle(Vector2 a, Vector2 b, Vector2 c, Color color) {
-    Quad(a, b, c, c, solidRegion_, color);
-}
+void NeonRenderer::FillTriangle(Vector2 a, Vector2 b, Vector2 c, Color color) { Quad(a, b, c, c, solidRegion_, color); }
 
 void NeonRenderer::FillConvex(Vector2 center, std::span<const Vector2> points, Color color) {
     for (std::size_t i = 0; i < points.size(); ++i) {

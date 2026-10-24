@@ -6,6 +6,7 @@ namespace gb {
 
 namespace {
 
+// clang-format off
 constexpr std::array<ShipInfo, static_cast<std::size_t>(ShipId::Count)> kShips{{
     {ShipId::Vector, "VECTOR", "Balanced interceptor",
      "Reliable twin blaster and solid handling. A clean slate for any build.", {120, 230, 255, 255}, 0,
@@ -25,6 +26,7 @@ constexpr std::array<ShipInfo, static_cast<std::size_t>(ShipId::Count)> kShips{{
     {ShipId::Hivemind, "HIVEMIND", "Drone carrier",
      "Starts with two Wingmen drones. Let the swarm do the work.", {255, 225, 80, 255}, 850, UpgradeId::Drones, 2},
 }};
+// clang-format on
 
 } // namespace
 

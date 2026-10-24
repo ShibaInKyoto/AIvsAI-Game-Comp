@@ -22,7 +22,10 @@ public:
     void Draw(App& app);
 
 private:
-    enum class Tab { Hostiles, Upgrades };
+    enum class Tab {
+        Hostiles,
+        Upgrades
+    };
 
     struct Layout {
         Rectangle panel;

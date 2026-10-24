@@ -75,9 +75,11 @@ void World::UpdateDrones(float dt) {
         const float interval = level >= 3 ? 0.3f : 0.45f;
         for (std::size_t i = 0; i < drones_.size(); ++i) {
             Drone& d = drones_[i];
-            const float slotAngle = player_.aimAngle + kPi + (static_cast<float>(i) - (drones_.size() - 1) * 0.5f) * 1.1f;
-            const Vector2 slot = origin + FromAngle(slotAngle, 64.0f) +
-                                 Vector2{std::sin(runStats_.time * 2.0f + i), std::cos(runStats_.time * 1.7f + i)} * 8.0f;
+            const float slotAngle =
+                player_.aimAngle + kPi + (static_cast<float>(i) - (drones_.size() - 1) * 0.5f) * 1.1f;
+            const Vector2 slot =
+                origin + FromAngle(slotAngle, 64.0f) +
+                Vector2{std::sin(runStats_.time * 2.0f + i), std::cos(runStats_.time * 1.7f + i)} * 8.0f;
             d.position = DampV(d.position, slot, 0.09f, dt);
             d.cooldown -= dt;
             Enemy* target = NearestEnemy(d.position, 650.0f);
@@ -285,7 +287,8 @@ void World::UpdateMines(float dt) {
             Explode(mine.position, mine.radius, mine.damage, kInvalidId, kMineColor);
             if (ModuleLevel(stats_, ModuleId::Mines) >= 5) {
                 for (int i = 0; i < 3; ++i) {
-                    const Vector2 p = mine.position + FromAngle(kTau * static_cast<float>(i) / 3.0f, mine.radius * 0.8f);
+                    const Vector2 p =
+                        mine.position + FromAngle(kTau * static_cast<float>(i) / 3.0f, mine.radius * 0.8f);
                     Explode(p, mine.radius * 0.6f, mine.damage * 0.5f, kInvalidId, kMineColor);
                 }
             }
@@ -330,6 +333,5 @@ void World::UpdatePrismLance(float dt) {
         }
     }
 }
-
 
 } // namespace gb

@@ -16,9 +16,21 @@ inline Vector2 operator-(Vector2 a) { return {-a.x, -a.y}; }
 inline Vector2 operator*(Vector2 a, float s) { return {a.x * s, a.y * s}; }
 inline Vector2 operator*(float s, Vector2 a) { return {a.x * s, a.y * s}; }
 inline Vector2 operator/(Vector2 a, float s) { return {a.x / s, a.y / s}; }
-inline Vector2& operator+=(Vector2& a, Vector2 b) { a.x += b.x; a.y += b.y; return a; }
-inline Vector2& operator-=(Vector2& a, Vector2 b) { a.x -= b.x; a.y -= b.y; return a; }
-inline Vector2& operator*=(Vector2& a, float s) { a.x *= s; a.y *= s; return a; }
+inline Vector2& operator+=(Vector2& a, Vector2 b) {
+    a.x += b.x;
+    a.y += b.y;
+    return a;
+}
+inline Vector2& operator-=(Vector2& a, Vector2 b) {
+    a.x -= b.x;
+    a.y -= b.y;
+    return a;
+}
+inline Vector2& operator*=(Vector2& a, float s) {
+    a.x *= s;
+    a.y *= s;
+    return a;
+}
 
 namespace gb {
 
@@ -28,7 +40,6 @@ inline constexpr float kTau = 2.0f * kPi;
 // ---------------------------------------------------------------------------
 // Vector helpers (raymath provides the basics; these fill in common gaps).
 // ---------------------------------------------------------------------------
-
 
 inline float Dot(Vector2 a, Vector2 b) { return a.x * b.x + a.y * b.y; }
 inline float Cross(Vector2 a, Vector2 b) { return a.x * b.y - a.y * b.x; }
@@ -74,9 +85,7 @@ inline float LerpF(float a, float b, float t) { return a + (b - a) * t; }
 
 inline Vector2 LerpV(Vector2 a, Vector2 b, float t) { return a + (b - a) * t; }
 
-inline float InverseLerp(float a, float b, float v) {
-    return std::abs(b - a) > 1e-6f ? (v - a) / (b - a) : 0.0f;
-}
+inline float InverseLerp(float a, float b, float v) { return std::abs(b - a) > 1e-6f ? (v - a) / (b - a) : 0.0f; }
 
 inline float RemapClamped(float inMin, float inMax, float outMin, float outMax, float v) {
     return LerpF(outMin, outMax, Saturate(InverseLerp(inMin, inMax, v)));

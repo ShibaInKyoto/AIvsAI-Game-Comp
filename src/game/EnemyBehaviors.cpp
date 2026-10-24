@@ -89,9 +89,7 @@ void World::UpdateEnemy(Enemy& e, float dt) {
     case EnemyKind::Hive: BehaveHive(e, dt); break;
     case EnemyKind::Singularity: BehaveSingularity(e, dt); break;
     case EnemyKind::Weaver: BehaveWeaver(e, dt); break;
-    case EnemyKind::WeaverBody:
-        BehaveWeaverBody(e, dt);
-        return;  // positioned rigidly by its leader
+    case EnemyKind::WeaverBody: BehaveWeaverBody(e, dt); return; // positioned rigidly by its leader
     case EnemyKind::Shielder: BehaveShielder(e, dt); break;
     case EnemyKind::Lancer: BehaveLancer(e, dt); break;
     case EnemyKind::Bomber: BehaveBomber(e, dt); break;
@@ -154,7 +152,7 @@ void World::BehaveDrifter(Enemy& e, float dt) {
 void World::BehaveDart(Enemy& e, float dt) {
     const Vector2 toPlayer = ToPlayer(e);
     switch (e.state) {
-    case 0:  // creep and line up
+    case 0: // creep and line up
         e.timer -= dt;
         e.velocity = DampV(e.velocity, Normalized(toPlayer) * 80.0f * SpeedScale(e), 0.3f, dt);
         e.angle = RotateToward(e.angle, AngleOf(toPlayer), 6.0f * dt);
@@ -163,7 +161,7 @@ void World::BehaveDart(Enemy& e, float dt) {
             e.timer = 0.55f;
         }
         break;
-    case 1:  // telegraph: brake and lock on
+    case 1: // telegraph: brake and lock on
         e.timer -= dt;
         e.velocity = DampV(e.velocity, {0.0f, 0.0f}, 0.06f, dt);
         if (e.timer > 0.25f) {
@@ -175,7 +173,7 @@ void World::BehaveDart(Enemy& e, float dt) {
             e.velocity = FromAngle(e.angle, e.speed * SpeedScale(e));
         }
         break;
-    case 2:  // lunge
+    case 2: // lunge
         e.timer -= dt;
         if (e.timer <= 0.0f || e.position.x <= kArena.x + e.radius + 1.0f ||
             e.position.x >= kArena.x + kArena.width - e.radius - 1.0f || e.position.y <= kArena.y + e.radius + 1.0f ||
@@ -184,7 +182,7 @@ void World::BehaveDart(Enemy& e, float dt) {
             e.timer = 0.45f;
         }
         break;
-    default:  // recover
+    default: // recover
         e.timer -= dt;
         e.velocity = DampV(e.velocity, {0.0f, 0.0f}, 0.1f, dt);
         if (e.timer <= 0.0f) {
@@ -237,13 +235,13 @@ void World::BehaveGunner(Enemy& e, float dt) {
     e.angle = RotateToward(e.angle, AngleOf(toPlayer), 5.0f * dt);
 
     e.timer2 -= dt;
-    if (e.timer2 <= -3.0f) {  // occasionally flip strafe direction
+    if (e.timer2 <= -3.0f) { // occasionally flip strafe direction
         e.timer2 = 0.0f;
         e.param = -e.param;
     }
     e.timer -= dt;
     if (e.state == 0 && e.timer <= 0.0f) {
-        e.state = 1;  // charging (rendered as a glow)
+        e.state = 1; // charging (rendered as a glow)
         e.timer = 0.4f;
     } else if (e.state == 1 && e.timer <= 0.0f) {
         const float speed = 330.0f;
@@ -285,7 +283,7 @@ void World::BehaveHive(Enemy& e, float dt) {
                 const Vector2 offset = FromAngle(e.angle + kTau * static_cast<float>(i) / count, e.radius + 14.0f);
                 Enemy& s = SpawnEnemy(EnemyKind::Swarmer, e.position + offset, 0.25f);
                 s.velocity = Normalized(offset) * 260.0f;
-                s.dropsLoot = rng_.Chance(0.5f);  // keep hives from being xp farms
+                s.dropsLoot = rng_.Chance(0.5f); // keep hives from being xp farms
             }
         }
     }
@@ -356,7 +354,7 @@ void World::BehaveShielder(Enemy& e, float dt) {
 void World::BehaveLancer(Enemy& e, float dt) {
     const Vector2 toPlayer = ToPlayer(e);
     switch (e.state) {
-    case 0: {  // reposition at a respectful distance
+    case 0: { // reposition at a respectful distance
         e.timer -= dt;
         const Vector2 dir = Normalized(toPlayer);
         const float dist = Length(toPlayer);
@@ -376,7 +374,7 @@ void World::BehaveLancer(Enemy& e, float dt) {
         }
         break;
     }
-    default:  // charging / firing: hold position
+    default: // charging / firing: hold position
         e.velocity = DampV(e.velocity, {0.0f, 0.0f}, 0.08f, dt);
         e.timer -= dt;
         if (e.timer <= 0.0f) {
@@ -404,7 +402,7 @@ void World::BehaveBomber(Enemy& e, float dt) {
     if (e.timer <= 0.0f) {
         e.timer = e.elite ? 0.55f : 0.9f;
         Enemy& mine = SpawnEnemy(EnemyKind::Mine, e.position - Normalized(e.velocity) * e.radius, 0.0f);
-        mine.timer = 0.7f;  // arming delay
+        mine.timer = 0.7f; // arming delay
         mine.contactDamage = false;
     }
 }
@@ -419,7 +417,7 @@ void World::BehaveMine(Enemy& e, float dt) {
     }
     const float distSq = DistanceSq(e.position, player_.position);
     if (e.state == 0 && e.timer <= 0.0f && player_.alive && distSq < 95.0f * 95.0f) {
-        e.state = 1;  // fuse lit
+        e.state = 1; // fuse lit
         e.timer = 0.55f;
         Emit(EventType::MineArmed, e.position, kMineColor);
     } else if (e.state == 1 && e.timer <= 0.0f) {
@@ -489,8 +487,7 @@ void World::OnEnemyDeath(Enemy& e) {
         // Collapsing wells take their neighbours with them.
         Explode(e.position, 240.0f, 150.0f * ModulePower(), e.id, GetEnemyInfo(e.kind).color);
         break;
-    default:
-        break;
+    default: break;
     }
     if (IsBoss(e.kind)) {
         for (Enemy& other : enemies_) {

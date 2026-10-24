@@ -77,8 +77,8 @@ void WarpGrid::Step() {
     for (const Spring& s : springs_) {
         PointMass& a = points_[static_cast<std::size_t>(s.a)];
         const bool anchored = s.b < 0;
-        const Vector3 bPos = anchored ? restPositions_[static_cast<std::size_t>(s.a)]
-                                      : points_[static_cast<std::size_t>(s.b)].position;
+        const Vector3 bPos =
+            anchored ? restPositions_[static_cast<std::size_t>(s.a)] : points_[static_cast<std::size_t>(s.b)].position;
         const Vector3 bVel = anchored ? Vector3{} : points_[static_cast<std::size_t>(s.b)].velocity;
 
         Vector3 x = Sub(a.position, bPos);
@@ -201,11 +201,14 @@ void WarpGrid::Draw(NeonRenderer& neon, Rectangle visible, Color minorColor, Col
     const float margin = spacing_ * 2.0f;
     const int x0 = std::max(0, static_cast<int>((visible.x - margin - bounds_.x) / spacing_));
     const int y0 = std::max(0, static_cast<int>((visible.y - margin - bounds_.y) / spacing_));
-    const int x1 = std::min(cols_ - 1, static_cast<int>((visible.x + visible.width + margin - bounds_.x) / spacing_) + 1);
-    const int y1 = std::min(rows_ - 1, static_cast<int>((visible.y + visible.height + margin - bounds_.y) / spacing_) + 1);
+    const int x1 =
+        std::min(cols_ - 1, static_cast<int>((visible.x + visible.width + margin - bounds_.x) / spacing_) + 1);
+    const int y1 =
+        std::min(rows_ - 1, static_cast<int>((visible.y + visible.height + margin - bounds_.y) / spacing_) + 1);
 
     auto displacement = [&](int i) {
-        const Vector3 d = Sub(points_[static_cast<std::size_t>(i)].position, restPositions_[static_cast<std::size_t>(i)]);
+        const Vector3 d =
+            Sub(points_[static_cast<std::size_t>(i)].position, restPositions_[static_cast<std::size_t>(i)]);
         return std::sqrt(LenSq(d));
     };
 

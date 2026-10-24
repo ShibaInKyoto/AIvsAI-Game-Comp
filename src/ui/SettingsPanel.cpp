@@ -24,12 +24,10 @@ void Step(float& value, int direction, float step, float lo, float hi) {
 void SettingsPanel::Open(App& app) {
     active_ = true;
     std::vector<ui::Menu::Item> items(ItemCount);
-    const char* labels[ItemCount] = {"MASTER VOLUME",   "MUSIC VOLUME",      "EFFECTS VOLUME",
-                                     "FULLSCREEN",      "V-SYNC",            "RENDER SCALE",
-                                     "SCREEN SHAKE",    "BLOOM",             "SCREEN DISTORTION",
-                                     "FILM GRAIN",      "SCANLINES",         "REDUCE FLASHING",
-                                     "DAMAGE NUMBERS",  "AUTO-FIRE",         "GAMEPAD AIM ASSIST",
-                                     "GAMEPAD VIBRATION", "SHOW FPS",        "BACK"};
+    const char* labels[ItemCount] = {
+        "MASTER VOLUME",  "MUSIC VOLUME", "EFFECTS VOLUME",     "FULLSCREEN",        "V-SYNC",    "RENDER SCALE",
+        "SCREEN SHAKE",   "BLOOM",        "SCREEN DISTORTION",  "FILM GRAIN",        "SCANLINES", "REDUCE FLASHING",
+        "DAMAGE NUMBERS", "AUTO-FIRE",    "GAMEPAD AIM ASSIST", "GAMEPAD VIBRATION", "SHOW FPS",  "BACK"};
     for (int i = 0; i < ItemCount; ++i) {
         items[static_cast<std::size_t>(i)].label = labels[i];
         items[static_cast<std::size_t>(i)].adjustable = i != Back;

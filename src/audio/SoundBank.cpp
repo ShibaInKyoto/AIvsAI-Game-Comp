@@ -9,27 +9,33 @@ namespace gb {
 
 namespace {
 
-enum class Osc { Sine, Square, Saw, Triangle, Noise };
+enum class Osc {
+    Sine,
+    Square,
+    Saw,
+    Triangle,
+    Noise
+};
 
 // One oscillator voice with pitch/amplitude/filter envelopes (sfxr-style).
 struct Layer {
     Osc osc = Osc::Square;
     float freqStart = 440.0f;
     float freqEnd = 440.0f;
-    float slideCurve = 1.0f;  // >1: pitch moves late, <1: early
+    float slideCurve = 1.0f; // >1: pitch moves late, <1: early
     float attack = 0.002f;
     float hold = 0.0f;
     float decay = 0.1f;
     float decayCurve = 2.0f;
     float volume = 1.0f;
     float duty = 0.5f;
-    float vibratoDepth = 0.0f;  // semitones
+    float vibratoDepth = 0.0f; // semitones
     float vibratoRate = 0.0f;
     float lowpassStart = 20000.0f;
     float lowpassEnd = 20000.0f;
     float highpass = 0.0f;
     float delay = 0.0f;
-    std::vector<float> arpeggio;  // semitone offsets cycled every arpStep
+    std::vector<float> arpeggio; // semitone offsets cycled every arpStep
     float arpStep = 0.06f;
     float tremoloRate = 0.0f;
     float tremoloDepth = 0.0f;
@@ -269,7 +275,7 @@ Recipe MakeRecipe(SfxId id) {
         Layer b = Tone(Osc::Sine, 150.0f, 32.0f, 0.55f, 1.0f);
         b.slideCurve = 0.4f;
         Layer c = Noise(1200.0f, 100.0f, 0.9f, 0.5f);
-        c.freqStart = c.freqEnd = 3000.0f;  // grainy rumble
+        c.freqStart = c.freqEnd = 3000.0f; // grainy rumble
         r.layers = {a, b, c};
         r.drive = 2.0f;
         r.gain = 0.85f;

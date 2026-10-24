@@ -80,8 +80,8 @@ private:
         int texel, radius;
     } upLocs_{};
     struct CompositeLocs {
-        int bloom, resolution, time, bloomStrength, exposure, vignette, aberration, grain, scanlines, saturation,
-            flash, ripples, rippleCount;
+        int bloom, resolution, time, bloomStrength, exposure, vignette, aberration, grain, scanlines, saturation, flash,
+            ripples, rippleCount;
     } compLocs_{};
 };
 

@@ -28,12 +28,12 @@ struct LaunchOptions {
     // Captures the screen to `screenshotPath` after `screenshotAt` seconds and exits.
     std::string screenshotPath;
     float screenshotAt = 3.0f;
-    std::string startScene;  // optional: jump straight to a scene ("game", "title", ...)
+    std::string startScene; // optional: jump straight to a scene ("game", "title", ...)
     std::string dataDirectory;
     std::uint64_t seed = 0;
-    int startSector = 0;     // debug: begin runs in this sector (0-based)
-    bool startAtBoss = false;  // debug: skip straight to the sector boss
-    bool perfOverlay = false;  // show the F3 performance overlay from the start
+    int startSector = 0;      // debug: begin runs in this sector (0-based)
+    bool startAtBoss = false; // debug: skip straight to the sector boss
+    bool perfOverlay = false; // show the F3 performance overlay from the start
 };
 
 using SceneFactory = std::function<std::unique_ptr<Scene>(App&)>;
@@ -94,7 +94,11 @@ private:
     std::unique_ptr<Scene> pendingScene_;
     float fadeDuration_ = 0.3f;
     float fadeAlpha_ = 1.0f;
-    enum class Fade { None, Out, In } fade_ = Fade::In;
+    enum class Fade {
+        None,
+        Out,
+        In
+    } fade_ = Fade::In;
 
     bool quitRequested_ = false;
     bool debugOverlay_ = false;

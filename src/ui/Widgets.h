@@ -28,8 +28,8 @@ class Menu {
 public:
     struct Item {
         std::string label;
-        std::string value;        // optional right-aligned value
-        bool adjustable = false;  // left/right/click cycle the value instead of activating
+        std::string value;       // optional right-aligned value
+        bool adjustable = false; // left/right/click cycle the value instead of activating
         bool enabled = true;
     };
 

@@ -13,10 +13,10 @@ struct EnemyInfo {
     float speed;
     float radius;
     Color color;
-    int xp;         // shard value dropped on death
+    int xp; // shard value dropped on death
     int score;
-    float threat;   // director budget cost
-    float mass;     // knockback resistance (higher = heavier)
+    float threat; // director budget cost
+    float mass;   // knockback resistance (higher = heavier)
 };
 
 const EnemyInfo& GetEnemyInfo(EnemyKind kind);

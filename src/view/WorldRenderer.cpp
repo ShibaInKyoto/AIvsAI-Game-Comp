@@ -36,8 +36,10 @@ void WorldRenderer::Update(const World& world, float dt) {
         stars_.reserve(260);
         for (int i = 0; i < 260; ++i) {
             const float depth = rng.Range(0.05f, 0.45f);
-            stars_.push_back({{rng.Range(-2600.0f, 2600.0f), rng.Range(-1800.0f, 1800.0f)}, depth,
-                              rng.Range(1.5f, 3.5f) * (0.5f + depth), rng.Angle()});
+            stars_.push_back({{rng.Range(-2600.0f, 2600.0f), rng.Range(-1800.0f, 1800.0f)},
+                              depth,
+                              rng.Range(1.5f, 3.5f) * (0.5f + depth),
+                              rng.Angle()});
         }
     }
     for (Afterimage& a : afterimages_) {
@@ -94,11 +96,11 @@ void WorldRenderer::DrawBackdrop(NeonRenderer& neon, const WorldDrawContext& ctx
     // Huge, faint nebula glows tinted by the sector colour sit far behind the grid.
     const Color nebula = ctx.arenaColor;
     static constexpr std::array<Vector3, 6> kNebulae{{{-900.0f, -500.0f, 900.0f},
-                                                     {1100.0f, -300.0f, 700.0f},
-                                                     {200.0f, 700.0f, 1000.0f},
-                                                     {-1400.0f, 900.0f, 650.0f},
-                                                     {1500.0f, 1000.0f, 800.0f},
-                                                     {-200.0f, -1200.0f, 750.0f}}};
+                                                      {1100.0f, -300.0f, 700.0f},
+                                                      {200.0f, 700.0f, 1000.0f},
+                                                      {-1400.0f, 900.0f, 650.0f},
+                                                      {1500.0f, 1000.0f, 800.0f},
+                                                      {-200.0f, -1200.0f, 750.0f}}};
     for (std::size_t i = 0; i < kNebulae.size(); ++i) {
         const Vector3 n = kNebulae[i];
         const Vector2 p = Vector2{n.x, n.y} + ctx.cameraCenter * 0.8f;
@@ -146,10 +148,9 @@ void WorldRenderer::DrawPickups(NeonRenderer& neon, const World& world, const Wo
         case PickupKind::Xp: {
             const Color c = XpColor(p.value);
             const float size = p.value >= 25 ? 12.0f : (p.value >= 5 ? 9.0f : 6.0f);
-            const std::array<Vector2, 4> diamond{p.position + FromAngle(spin, size),
-                                                 p.position + FromAngle(spin + kPi * 0.5f, size * 0.6f),
-                                                 p.position + FromAngle(spin + kPi, size),
-                                                 p.position + FromAngle(spin + kPi * 1.5f, size * 0.6f)};
+            const std::array<Vector2, 4> diamond{
+                p.position + FromAngle(spin, size), p.position + FromAngle(spin + kPi * 0.5f, size * 0.6f),
+                p.position + FromAngle(spin + kPi, size), p.position + FromAngle(spin + kPi * 1.5f, size * 0.6f)};
             neon.Polyline(diamond, true, 2.0f, c);
             neon.Glow(p.position, size * 2.2f, WithAlpha(c, 0.35f));
             break;
@@ -214,7 +215,7 @@ void WorldRenderer::DrawEnemies(NeonRenderer& neon, const World& world, const Wo
             c = LerpColor(c, Color{170, 230, 255, 255}, 0.5f);
         }
         if (e.invulnerable && IsBoss(e.kind) && e.kind == EnemyKind::BossArchitect) {
-            c = WithAlpha(c, 0.25f);  // teleporting
+            c = WithAlpha(c, 0.25f); // teleporting
         }
         shapes::DrawEnemyBody(neon, e, c, ctx.time);
         neon.Glow(e.position, e.radius * 2.0f, WithAlpha(base, IsBoss(e.kind) ? 0.22f : 0.14f));
@@ -238,8 +239,8 @@ void WorldRenderer::DrawEnemies(NeonRenderer& neon, const World& world, const Wo
         if (!IsBoss(e.kind) && e.maxHp > 60.0f && e.hp < e.maxHp && e.kind != EnemyKind::WeaverBody) {
             // Small health arc for tanky enemies.
             const float frac = Saturate(e.hp / e.maxHp);
-            neon.Arc(e.position, e.radius + 9.0f, -kPi * 0.5f, -kPi * 0.5f + kTau * frac, 2.0f,
-                     WithAlpha(base, 0.6f), 20);
+            neon.Arc(e.position, e.radius + 9.0f, -kPi * 0.5f, -kPi * 0.5f + kTau * frac, 2.0f, WithAlpha(base, 0.6f),
+                     20);
         }
     }
 }

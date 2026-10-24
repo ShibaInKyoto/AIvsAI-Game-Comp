@@ -70,7 +70,14 @@ enum class UpgradeId : std::uint8_t {
     Count
 };
 
-enum class UpgradeCategory : std::uint8_t { Weapon, Defense, Mobility, Utility, Module, Evolution };
+enum class UpgradeCategory : std::uint8_t {
+    Weapon,
+    Defense,
+    Mobility,
+    Utility,
+    Module,
+    Evolution
+};
 
 // Recipe for an evolution: which module (at max level) and catalyst unlock it.
 struct EvolutionRecipe {
@@ -86,11 +93,11 @@ const EvolutionRecipe* EvolutionForModule(UpgradeId module);
 struct UpgradeInfo {
     UpgradeId id;
     const char* name;
-    const char* description;  // shown on the card
+    const char* description; // shown on the card
     Rarity rarity;
     UpgradeCategory category;
-    int maxStacks;            // 0 = unlimited (consumables)
-    ModuleId module;          // only meaningful for UpgradeCategory::Module
+    int maxStacks;   // 0 = unlimited (consumables)
+    ModuleId module; // only meaningful for UpgradeCategory::Module
 };
 
 const UpgradeInfo& GetUpgradeInfo(UpgradeId id);
@@ -112,7 +119,10 @@ public:
     static constexpr int kMaxModules = 4;
 
     int Stacks(UpgradeId id) const { return stacks_[static_cast<std::size_t>(id)]; }
-    void Add(UpgradeId id) { stacks_[static_cast<std::size_t>(id)]++; order_.push_back(id); }
+    void Add(UpgradeId id) {
+        stacks_[static_cast<std::size_t>(id)]++;
+        order_.push_back(id);
+    }
     const std::vector<UpgradeId>& Order() const { return order_; }
     int ModuleCount() const;
     bool CanOffer(UpgradeId id, const PlayerStats& stats, int hp) const;

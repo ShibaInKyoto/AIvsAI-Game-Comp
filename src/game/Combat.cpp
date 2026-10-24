@@ -243,7 +243,8 @@ void World::UpdateBullets(float dt) {
         b.position += b.velocity * dt;
         if (b.position.x < kArena.x || b.position.x > right || b.position.y < kArena.y || b.position.y > bottom) {
             b.alive = false;
-            const Vector2 clamped{std::clamp(b.position.x, kArena.x, right), std::clamp(b.position.y, kArena.y, bottom)};
+            const Vector2 clamped{std::clamp(b.position.x, kArena.x, right),
+                                  std::clamp(b.position.y, kArena.y, bottom)};
             Emit(EventType::BulletWallHit, clamped, kPlayerBulletColor, 1.0f, b.velocity);
             continue;
         }

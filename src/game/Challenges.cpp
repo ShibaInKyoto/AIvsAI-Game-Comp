@@ -10,6 +10,7 @@ namespace {
 
 using C = ChallengeId;
 
+// clang-format off
 constexpr std::array<ChallengeInfo, static_cast<std::size_t>(ChallengeId::Count)> kChallenges{{
     {C::Exterminator, "EXTERMINATOR", "Destroy 1,000 enemies in a single run.", 60},
     {C::WardenDown, "GATECRASHER", "Defeat the Warden.", 60},
@@ -28,6 +29,7 @@ constexpr std::array<ChallengeInfo, static_cast<std::size_t>(ChallengeId::Count)
     {C::DailyDriver, "DAILY DRIVER", "Clear two sectors in a Daily run.", 100},
     {C::FleetCommander, "FLEET COMMANDER", "Unlock every ship in the hangar.", 150},
 }};
+// clang-format on
 
 bool BossDown(const World& world, EnemyKind kind) {
     return (world.Record().bossMask & (1u << static_cast<unsigned>(kind))) != 0;

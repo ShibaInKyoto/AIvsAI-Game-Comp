@@ -104,7 +104,7 @@ TEST_CASE("Offers are distinct and never contain maxed upgrades") {
         CHECK(offers[0] != offers[2]);
         for (UpgradeId id : offers) {
             CHECK(id != UpgradeId::Overclock);
-            CHECK(id != UpgradeId::NanoRepair);  // player is at full health
+            CHECK(id != UpgradeId::NanoRepair); // player is at full health
         }
     }
 }
@@ -135,10 +135,10 @@ TEST_CASE("Player takes damage, gets invulnerability and can die") {
     const int hp = world.GetPlayer().hp;
     world.DamagePlayer({100.0f, 0.0f});
     CHECK(world.GetPlayer().hp == hp - 1);
-    world.DamagePlayer({100.0f, 0.0f});  // invulnerable now
+    world.DamagePlayer({100.0f, 0.0f}); // invulnerable now
     CHECK(world.GetPlayer().hp == hp - 1);
     for (int i = 0; i < hp + 2; ++i) {
-        world.Update(2.0f, PlayerInput{});  // let invulnerability lapse
+        world.Update(2.0f, PlayerInput{}); // let invulnerability lapse
         world.DamagePlayer({100.0f, 0.0f}, EnemyKind::Lancer);
     }
     CHECK_FALSE(world.PlayerAlive());
@@ -182,7 +182,7 @@ TEST_CASE("Evolutions unlock from a maxed module plus its catalyst") {
     for (int i = 0; i < 5; ++i) {
         world.ApplyUpgrade(UpgradeId::OrbitBlades);
     }
-    CHECK_FALSE(canOffer(UpgradeId::SawStorm));  // catalyst missing
+    CHECK_FALSE(canOffer(UpgradeId::SawStorm)); // catalyst missing
     world.ApplyUpgrade(UpgradeId::Thrusters);
     CHECK(canOffer(UpgradeId::SawStorm));
 
@@ -192,5 +192,5 @@ TEST_CASE("Evolutions unlock from a maxed module plus its catalyst") {
     world.ApplyUpgrade(UpgradeId::SawStorm);
     CHECK(world.Stats().Evolved(ModuleId::OrbitBlades));
     CHECK(world.OrbitBladeCount() == 12);
-    CHECK_FALSE(canOffer(UpgradeId::SawStorm));  // only once
+    CHECK_FALSE(canOffer(UpgradeId::SawStorm)); // only once
 }

@@ -19,7 +19,7 @@ namespace {
 
 struct EnemyEntry {
     EnemyKind kind;
-    int sector;  // guardians only (1-based)
+    int sector; // guardians only (1-based)
     const char* description;
 };
 
@@ -34,9 +34,9 @@ constexpr std::array<EnemyEntry, 17> kEnemyEntries{{
     {EnemyKind::Splitter, 0, "Bursts into a spray of fast minis when destroyed. Pop it at range, never point-blank."},
     {EnemyKind::Gunner, 0, "Keeps its distance and fires aimed shots. Weave between volleys and close the gap."},
     {EnemyKind::Swarmer, 0, "Tiny flocking chaser that arrives in clouds. Area damage and orbiting blades shred them."},
-    {EnemyKind::Hive, 0, "Slow armoured carrier that keeps releasing swarmers. Destroy it first or drown in its brood."},
-    {EnemyKind::Singularity, 0,
-     "Gravity well that drags your ship and your bullets toward it. Dash against the pull."},
+    {EnemyKind::Hive, 0,
+     "Slow armoured carrier that keeps releasing swarmers. Destroy it first or drown in its brood."},
+    {EnemyKind::Singularity, 0, "Gravity well that drags your ship and your bullets toward it. Dash against the pull."},
     {EnemyKind::Weaver, 0,
      "Serpent head trailing an armoured tail that soaks up shots. Destroy the head and the tail detonates."},
     {EnemyKind::Shielder, 0,
@@ -45,7 +45,8 @@ constexpr std::array<EnemyEntry, 17> kEnemyEntries{{
     {EnemyKind::Bomber, 0, "Crosses the arena seeding mines in its wake. Clear a path or steer around the field."},
     {EnemyKind::BossWarden, 1,
      "A rotating fortress. Bullet rings and aimed volleys give way to summons, spirals and a telegraphed ram."},
-    {EnemyKind::BossHydra, 2, "A colossal serpent whose body is a wall of bullets. Where the head turns, the tail follows."},
+    {EnemyKind::BossHydra, 2,
+     "A colossal serpent whose body is a wall of bullets. Where the head turns, the tail follows."},
     {EnemyKind::BossSingularity, 3,
      "A gravity well that drags you into its spiralling arms. Fight the pull and strike between waves."},
     {EnemyKind::BossArchitect, 4,
@@ -330,14 +331,13 @@ void CodexPanel::DrawEnemyDetail(App& app, const Layout& layout, EnemyKind kind,
                          d.width - 80.0f, 26.0f, palette::kUiFaint, 1.12f, Align::Center);
         return;
     }
-    text.DrawGlow(FontId::Heading, ToUpper(info.name), {center.x, y}, 34.0f, WHITE, info.color,
-                  Align::Center, 0.08f);
+    text.DrawGlow(FontId::Heading, ToUpper(info.name), {center.x, y}, 34.0f, WHITE, info.color, Align::Center, 0.08f);
     y += 50.0f;
     const char* role = boss ? TextFormat("SECTOR %02d GUARDIAN", entry.sector) : "HOSTILE";
     text.Draw(FontId::Heading, role, {center.x, y}, 18.0f, info.color, Align::Center, 0.25f);
     y += 46.0f;
-    y += text.DrawWrapped(FontId::Body, entry.description, {d.x + 40.0f, y}, d.width - 80.0f, 27.0f,
-                          palette::kUiText, 1.12f, Align::Center);
+    y += text.DrawWrapped(FontId::Body, entry.description, {d.x + 40.0f, y}, d.width - 80.0f, 27.0f, palette::kUiText,
+                          1.12f, Align::Center);
     if (boss) {
         return;
     }
@@ -392,14 +392,14 @@ void CodexPanel::DrawUpgradeDetail(App& app, const Layout& layout, UpgradeId id,
         text.Draw(FontId::Heading, "ENCRYPTED", {center.x, y}, 32.0f, palette::kUiDim, Align::Center, 0.1f);
         const char* hint = "Draft this upgrade in a run to decode its data.";
         if (const EvolutionRecipe* recipe = recipeOf(id); recipe != nullptr) {
-            const bool partsKnown = profile.UpgradeDiscovered(recipe->module) &&
-                                    profile.UpgradeDiscovered(recipe->catalyst);
+            const bool partsKnown =
+                profile.UpgradeDiscovered(recipe->module) && profile.UpgradeDiscovered(recipe->catalyst);
             hint = partsKnown ? TextFormat("Max out %s while holding %s to evolve it.",
                                            GetUpgradeInfo(recipe->module).name, GetUpgradeInfo(recipe->catalyst).name)
                               : "An evolution. Max out a module while holding its catalyst.";
         }
-        text.DrawWrapped(FontId::Body, hint, {d.x + 40.0f, y + 70.0f}, d.width - 80.0f, 26.0f, palette::kUiFaint,
-                         1.12f, Align::Center);
+        text.DrawWrapped(FontId::Body, hint, {d.x + 40.0f, y + 70.0f}, d.width - 80.0f, 26.0f, palette::kUiFaint, 1.12f,
+                         Align::Center);
         return;
     }
     text.DrawGlow(FontId::Heading, info.name, {center.x, y}, 34.0f, WHITE, rarity, Align::Center, 0.05f);
@@ -413,8 +413,8 @@ void CodexPanel::DrawUpgradeDetail(App& app, const Layout& layout, UpgradeId id,
     const char* footer = nullptr;
     Color footerColor = palette::kUiDim;
     if (const EvolutionRecipe* recipe = recipeOf(id); recipe != nullptr) {
-        footer = TextFormat("%s (LV 5)  +  %s", GetUpgradeInfo(recipe->module).name,
-                            GetUpgradeInfo(recipe->catalyst).name);
+        footer =
+            TextFormat("%s (LV 5)  +  %s", GetUpgradeInfo(recipe->module).name, GetUpgradeInfo(recipe->catalyst).name);
         footerColor = palette::kElite;
     } else if (const EvolutionRecipe* evolves = EvolutionForModule(id); evolves != nullptr) {
         footer = TextFormat("EVOLVES WITH %s", GetUpgradeInfo(evolves->catalyst).name);

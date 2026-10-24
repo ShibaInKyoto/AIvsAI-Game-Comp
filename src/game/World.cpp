@@ -11,12 +11,14 @@ namespace gb {
 
 namespace {
 
+// clang-format off
 constexpr std::array<DifficultyTuning, static_cast<std::size_t>(Difficulty::Count)> kDifficulty{{
     // hp     speed  spawn  bullets score  bonusHp
     {0.75f, 0.88f, 0.75f, 0.85f, 0.6f, 2},  // Relaxed
     {1.00f, 1.00f, 1.00f, 1.00f, 1.0f, 0},  // Standard
     {1.6f, 1.15f, 1.4f, 1.2f, 1.6f, 0},     // Overclocked
 }};
+// clang-format on
 
 } // namespace
 
@@ -84,10 +86,11 @@ void World::RecomputeStats() {
 
     // Keep the drone wing in sync with the module level.
     static constexpr std::array<int, 6> kDroneCount{0, 1, 2, 2, 3, 3};
-    const auto drones = stats_.Evolved(ModuleId::Drones)
-                            ? std::size_t{6}
-                            : static_cast<std::size_t>(kDroneCount[static_cast<std::size_t>(
-                                  std::clamp(stats_.Module(ModuleId::Drones), 0, 5))]);
+    const auto drones =
+        stats_.Evolved(ModuleId::Drones)
+            ? std::size_t{6}
+            : static_cast<std::size_t>(
+                  kDroneCount[static_cast<std::size_t>(std::clamp(stats_.Module(ModuleId::Drones), 0, 5))]);
     while (drones_.size() < drones) {
         Drone d;
         d.position = player_.position;
@@ -317,9 +320,8 @@ Enemy& World::SpawnEnemy(EnemyKind kind, Vector2 position, float telegraph, bool
                   std::clamp(position.y, kArena.y + 20.0f, kArena.y + kArena.height - 20.0f)};
     e.radius = info.radius * (elite ? 1.45f : 1.0f);
     const float hpScale = director_.EnemyHpMultiplier() * tuning_.enemyHp * (elite ? 7.0f : 1.0f);
-    e.maxHp = e.hp = info.hp * (IsBoss(kind) ? (1.0f + 0.9f * static_cast<float>(director_.Loop())) *
-                                                   tuning_.enemyHp
-                                             : hpScale);
+    e.maxHp = e.hp =
+        info.hp * (IsBoss(kind) ? (1.0f + 0.9f * static_cast<float>(director_.Loop())) * tuning_.enemyHp : hpScale);
     e.speed = info.speed;
     e.spawnDelay = telegraph;
     e.elite = elite;

@@ -16,12 +16,20 @@ namespace gb {
 
 namespace {
 
-constexpr float kDraftDelay = 0.45f;   // let the level-up burst play before pausing
+constexpr float kDraftDelay = 0.45f; // let the level-up burst play before pausing
 constexpr float kDeathDelay = 2.6f;
 constexpr float kTutorialDuration = 16.0f;
 
-enum PauseItem { PauseResume, PauseSettings, PauseRestart, PauseQuit };
-enum VictoryItem { VictoryEndless, VictoryFinish };
+enum PauseItem {
+    PauseResume,
+    PauseSettings,
+    PauseRestart,
+    PauseQuit
+};
+enum VictoryItem {
+    VictoryEndless,
+    VictoryFinish
+};
 
 } // namespace
 
@@ -192,10 +200,10 @@ void GameScene::Update(float dt) {
     }
 
     const Director& director = world.GetDirector();
-    if (director.Phase() == SectorPhase::Cleared && director.PhaseTime() > 2.6f &&
-        world.PendingLevelUps() == 0 && world.PendingCaches() == 0) {
-        const bool campaignEnd = config_.mode != GameMode::Endless && director.Sector() + 1 >= Director::kCampaignSectors &&
-                                 director.Loop() == 0;
+    if (director.Phase() == SectorPhase::Cleared && director.PhaseTime() > 2.6f && world.PendingLevelUps() == 0 &&
+        world.PendingCaches() == 0) {
+        const bool campaignEnd = config_.mode != GameMode::Endless &&
+                                 director.Sector() + 1 >= Director::kCampaignSectors && director.Loop() == 0;
         if (!campaignEnd) {
             if (autopilot_) {
                 UpdateAutopilotOverlays();
@@ -323,7 +331,8 @@ void GameScene::UpdateOverlays(float dt) {
         const Vector2 ui = app_.Gfx().UiSize();
         int clicked = -1;
         for (int i = 0; i < 2; ++i) {
-            const Rectangle r{ui.x * 0.5f - 470.0f + static_cast<float>(i) * 500.0f, ui.y * 0.5f - 120.0f, 440.0f, 300.0f};
+            const Rectangle r{ui.x * 0.5f - 470.0f + static_cast<float>(i) * 500.0f, ui.y * 0.5f - 120.0f, 440.0f,
+                              300.0f};
             if (ui::MouseOver(app_, r)) {
                 if (in.MouseMoved()) {
                     modifierSelected_ = i;
@@ -368,7 +377,7 @@ void GameScene::UpdateMusic(float dt) {
     const World& world = view_.GetWorld();
     MusicEngine& music = app_.Audio().Music();
     const Director& director = world.GetDirector();
-    const int key = (director.Sector() % Director::kCampaignSectors) * 5 % 12;  // walk the circle of fourths
+    const int key = (director.Sector() % Director::kCampaignSectors) * 5 % 12; // walk the circle of fourths
     if (!world.PlayerAlive()) {
         music.SetMood(MusicMood::GameOver, key);
         return;
@@ -522,16 +531,14 @@ void GameScene::DrawTutorial() {
         const char* key;
         const char* label;
     };
-    const std::array<Hint, 5> hints = pad ? std::array<Hint, 5>{{{"L-STICK", "MOVE"},
-                                                                {"R-STICK", "AIM + FIRE"},
-                                                                {"LT / A", "DASH"},
-                                                                {"RB / B", "NOVA"},
-                                                                {"START", "PAUSE"}}}
-                                          : std::array<Hint, 5>{{{"WASD", "MOVE"},
-                                                                {"MOUSE", "AIM"},
-                                                                {"L-CLICK", "FIRE"},
-                                                                {"SPACE", "DASH"},
-                                                                {"Q", "NOVA"}}};
+    const std::array<Hint, 5> hints =
+        pad ? std::array<Hint, 5>{{{"L-STICK", "MOVE"},
+                                   {"R-STICK", "AIM + FIRE"},
+                                   {"LT / A", "DASH"},
+                                   {"RB / B", "NOVA"},
+                                   {"START", "PAUSE"}}}
+            : std::array<Hint, 5>{
+                  {{"WASD", "MOVE"}, {"MOUSE", "AIM"}, {"L-CLICK", "FIRE"}, {"SPACE", "DASH"}, {"Q", "NOVA"}}};
     const float width = 1040.0f;
     const Rectangle r{ui.x * 0.5f - width * 0.5f, ui.y - 190.0f, width, 74.0f};
     ui::Panel(app_, r, WithAlpha(palette::kUiAccent, a), a);
@@ -565,15 +572,16 @@ void GameScene::DrawPause() {
     const ShipInfo& ship = GetShipInfo(config_.ship);
     text.Draw(FontId::Heading, ship.name, {panel.x + 30.0f, panel.y + 26.0f}, 30.0f, ship.color, Align::Left, 0.12f);
     text.Draw(FontId::BodyBold,
-              TextFormat("%s  -  %s", DifficultyName(config_.difficulty), config_.mode == GameMode::Daily ? "DAILY RUN"
-                                                                           : config_.mode == GameMode::Endless
-                                                                               ? "ENDLESS"
-                                                                               : "CAMPAIGN"),
+              TextFormat("%s  -  %s", DifficultyName(config_.difficulty),
+                         config_.mode == GameMode::Daily     ? "DAILY RUN"
+                         : config_.mode == GameMode::Endless ? "ENDLESS"
+                                                             : "CAMPAIGN"),
               {panel.x + 30.0f, panel.y + 66.0f}, 22.0f, palette::kUiDim);
     const int seconds = static_cast<int>(stats.time);
-    text.Draw(FontId::BodyBold,
-              TextFormat("TIME %d:%02d     KILLS %d     LEVEL %d", seconds / 60, seconds % 60, stats.kills, world.Level()),
-              {panel.x + 30.0f, panel.y + 100.0f}, 22.0f, palette::kUiText);
+    text.Draw(
+        FontId::BodyBold,
+        TextFormat("TIME %d:%02d     KILLS %d     LEVEL %d", seconds / 60, seconds % 60, stats.kills, world.Level()),
+        {panel.x + 30.0f, panel.y + 100.0f}, 22.0f, palette::kUiText);
 
     text.Draw(FontId::Heading, "BUILD", {panel.x + 30.0f, panel.y + 150.0f}, 20.0f, palette::kUiAccent, Align::Left,
               0.2f);
@@ -607,7 +615,8 @@ void GameScene::DrawPause() {
         if (c.y > panel.y + panel.height - 30.0f) {
             break;
         }
-        const char* label = stacks > 1 ? TextFormat("%s  %d", GetUpgradeInfo(id).name, stacks) : GetUpgradeInfo(id).name;
+        const char* label =
+            stacks > 1 ? TextFormat("%s  %d", GetUpgradeInfo(id).name, stacks) : GetUpgradeInfo(id).name;
         text.Draw(FontId::BodyBold, label, {c.x + 24.0f, c.y - 11.0f}, 20.0f, palette::kUiText);
         ++row;
     }

@@ -156,8 +156,9 @@ Every push is built by GitHub Actions:
 * **Windows (MSVC, x64):** warnings as errors, unit tests, a check that the
   executable has no VC++ redistributable dependency, and a smoke test that runs
   the real `.exe` with the AI pilot under Mesa's software OpenGL.
-* **Linux (GCC):** warnings as errors, unit tests, and a 90-second bot smoke
-  test under a virtual display.
+* **Linux (GCC):** warnings as errors, a `clang-format` style check (see
+  `.clang-format`), unit tests, and a 90-second bot smoke test under a virtual
+  display.
 * A rolling *nightly* pre-release is published from the latest build; tagged
   versions publish a proper release.
 

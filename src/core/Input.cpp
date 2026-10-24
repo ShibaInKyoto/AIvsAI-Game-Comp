@@ -70,12 +70,10 @@ bool Input::RawDown(Action action) const {
         return AnyKeyDown({KEY_Q, KEY_E, KEY_F}) || IsMouseButtonDown(MOUSE_BUTTON_MIDDLE) ||
                PadDown(pad, GAMEPAD_BUTTON_RIGHT_TRIGGER_1) || PadDown(pad, GAMEPAD_BUTTON_LEFT_TRIGGER_1) ||
                PadDown(pad, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);
-    case Action::Pause:
-        return AnyKeyDown({KEY_ESCAPE, KEY_P}) || PadDown(pad, GAMEPAD_BUTTON_MIDDLE_RIGHT);
+    case Action::Pause: return AnyKeyDown({KEY_ESCAPE, KEY_P}) || PadDown(pad, GAMEPAD_BUTTON_MIDDLE_RIGHT);
     case Action::Confirm:
         return AnyKeyDown({KEY_ENTER, KEY_KP_ENTER, KEY_SPACE}) || PadDown(pad, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
-    case Action::Back:
-        return AnyKeyDown({KEY_ESCAPE, KEY_BACKSPACE}) || PadDown(pad, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);
+    case Action::Back: return AnyKeyDown({KEY_ESCAPE, KEY_BACKSPACE}) || PadDown(pad, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);
     case Action::Up:
         return AnyKeyDown({KEY_UP, KEY_W}) || PadDown(pad, GAMEPAD_BUTTON_LEFT_FACE_UP) || leftStick_.y < -0.5f;
     case Action::Down:
@@ -84,14 +82,11 @@ bool Input::RawDown(Action action) const {
         return AnyKeyDown({KEY_LEFT, KEY_A}) || PadDown(pad, GAMEPAD_BUTTON_LEFT_FACE_LEFT) || leftStick_.x < -0.5f;
     case Action::Right:
         return AnyKeyDown({KEY_RIGHT, KEY_D}) || PadDown(pad, GAMEPAD_BUTTON_LEFT_FACE_RIGHT) || leftStick_.x > 0.5f;
-    case Action::TabPrev:
-        return AnyKeyDown({KEY_Q, KEY_PAGE_UP}) || PadDown(pad, GAMEPAD_BUTTON_LEFT_TRIGGER_1);
+    case Action::TabPrev: return AnyKeyDown({KEY_Q, KEY_PAGE_UP}) || PadDown(pad, GAMEPAD_BUTTON_LEFT_TRIGGER_1);
     case Action::TabNext:
         return AnyKeyDown({KEY_E, KEY_PAGE_DOWN, KEY_TAB}) || PadDown(pad, GAMEPAD_BUTTON_RIGHT_TRIGGER_1);
-    case Action::Alt:
-        return AnyKeyDown({KEY_R}) || PadDown(pad, GAMEPAD_BUTTON_RIGHT_FACE_UP);
-    case Action::Count:
-        break;
+    case Action::Alt: return AnyKeyDown({KEY_R}) || PadDown(pad, GAMEPAD_BUTTON_RIGHT_FACE_UP);
+    case Action::Count: break;
     }
     return false;
 }

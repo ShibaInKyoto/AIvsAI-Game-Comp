@@ -32,7 +32,8 @@ public:
     void Line(Vector2 a, Vector2 b, float width, Color color);
     void Polyline(std::span<const Vector2> points, bool closed, float width, Color color);
     void Circle(Vector2 center, float radius, float width, Color color, int segments = 0);
-    void Arc(Vector2 center, float radius, float startAngle, float endAngle, float width, Color color, int segments = 0);
+    void Arc(Vector2 center, float radius, float startAngle, float endAngle, float width, Color color,
+             int segments = 0);
     void RegularPolygon(Vector2 center, int sides, float radius, float rotation, float width, Color color);
 
     // Soft round glow sprite.

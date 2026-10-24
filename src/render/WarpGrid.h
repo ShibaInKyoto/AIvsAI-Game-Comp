@@ -41,7 +41,7 @@ private:
 
     struct Spring {
         int a;
-        int b;  // -1 when anchored to a fixed rest position
+        int b; // -1 when anchored to a fixed rest position
         float targetLength;
         float stiffness;
         float damping;

@@ -11,6 +11,7 @@ namespace gb::shapes {
 
 namespace {
 
+// clang-format off
 constexpr std::array<Vector2, 4> kVector{{{1.0f, 0.0f}, {-0.75f, 0.68f}, {-0.35f, 0.0f}, {-0.75f, -0.68f}}};
 constexpr std::array<Vector2, 8> kLancer{{{1.35f, 0.0f}, {0.15f, 0.2f}, {-0.45f, 0.62f}, {-0.3f, 0.14f},
                                           {-0.75f, 0.0f}, {-0.3f, -0.14f}, {-0.45f, -0.62f}, {0.15f, -0.2f}}};
@@ -22,6 +23,7 @@ constexpr std::array<Vector2, 6> kSpecter{{{1.15f, 0.0f}, {-0.15f, 0.32f}, {-0.9
                                            {-0.95f, -0.95f}, {-0.15f, -0.32f}}};
 constexpr std::array<Vector2, 6> kHivemind{{{0.95f, 0.0f}, {-0.6f, 0.85f}, {-0.3f, 0.28f}, {-0.62f, 0.0f},
                                             {-0.3f, -0.28f}, {-0.6f, -0.85f}}};
+// clang-format on
 
 // Transforms a local outline into world space in a small stack buffer.
 template <std::size_t N>
@@ -84,14 +86,15 @@ void DrawEnemyBody(NeonRenderer& neon, const Enemy& e, Color c, float time) {
     switch (e.kind) {
     case EnemyKind::Drifter: {
         const std::array<Vector2, 4> outer{p + FromAngle(e.angle, r), p + FromAngle(e.angle + kPi * 0.5f, r * 0.7f),
-                                           p + FromAngle(e.angle + kPi, r), p + FromAngle(e.angle + kPi * 1.5f, r * 0.7f)};
+                                           p + FromAngle(e.angle + kPi, r),
+                                           p + FromAngle(e.angle + kPi * 1.5f, r * 0.7f)};
         neon.Polyline(outer, true, 3.0f, c);
         neon.RegularPolygon(p, 4, r * 0.35f, -e.angle * 2.0f, 2.0f, Faint(c, 0.7f));
         break;
     }
     case EnemyKind::Dart: {
-        const auto pts = Transform(std::array<Vector2, 4>{{{1.1f, 0.0f}, {-0.8f, 0.75f}, {-0.35f, 0.0f}, {-0.8f, -0.75f}}},
-                                   p, e.angle, r);
+        const auto pts = Transform(
+            std::array<Vector2, 4>{{{1.1f, 0.0f}, {-0.8f, 0.75f}, {-0.35f, 0.0f}, {-0.8f, -0.75f}}}, p, e.angle, r);
         neon.Polyline(pts, true, 3.0f, c);
         if (e.state == 1) {
             // Lock-on line: tells the player exactly where the lunge will go.
@@ -130,7 +133,8 @@ void DrawEnemyBody(NeonRenderer& neon, const Enemy& e, Color c, float time) {
         break;
     }
     case EnemyKind::Swarmer: {
-        const auto pts = Transform(std::array<Vector2, 3>{{{1.2f, 0.0f}, {-0.8f, 0.7f}, {-0.8f, -0.7f}}}, p, e.angle, r);
+        const auto pts =
+            Transform(std::array<Vector2, 3>{{{1.2f, 0.0f}, {-0.8f, 0.7f}, {-0.8f, -0.7f}}}, p, e.angle, r);
         neon.Polyline(pts, true, 2.2f, c);
         break;
     }
@@ -178,16 +182,18 @@ void DrawEnemyBody(NeonRenderer& neon, const Enemy& e, Color c, float time) {
         break;
     }
     case EnemyKind::Bomber: {
-        const auto pts = Transform(std::array<Vector2, 6>{{{1.0f, 0.0f}, {0.3f, 0.9f}, {-0.5f, 0.4f}, {-1.0f, 0.0f},
-                                                           {-0.5f, -0.4f}, {0.3f, -0.9f}}},
-                                   p, e.angle, r);
+        const auto pts = Transform(
+            std::array<Vector2, 6>{
+                {{1.0f, 0.0f}, {0.3f, 0.9f}, {-0.5f, 0.4f}, {-1.0f, 0.0f}, {-0.5f, -0.4f}, {0.3f, -0.9f}}},
+            p, e.angle, r);
         neon.Polyline(pts, true, 3.0f, c);
         neon.Circle(p, r * 0.3f, 2.0f, c, 10);
         break;
     }
     case EnemyKind::Mine: {
         const bool fused = e.state == 1;
-        const bool blink = fused ? std::fmod(time * 16.0f, 1.0f) < 0.5f : std::fmod(time * 2.0f + e.timer, 1.0f) < 0.15f;
+        const bool blink =
+            fused ? std::fmod(time * 16.0f, 1.0f) < 0.5f : std::fmod(time * 2.0f + e.timer, 1.0f) < 0.15f;
         const Color mc = fused ? palette::kDanger : c;
         Star(neon, p, 6, r, r * 0.55f, e.angle, 2.0f, Faint(mc, 0.9f));
         if (blink) {
@@ -216,8 +222,13 @@ void DrawEnemyBody(NeonRenderer& neon, const Enemy& e, Color c, float time) {
         break;
     }
     case EnemyKind::BossHydra: {
-        const auto pts = Transform(std::array<Vector2, 7>{{{1.5f, 0.0f}, {0.6f, 0.55f}, {0.2f, 1.1f}, {-0.9f, 0.6f},
-                                                           {-0.9f, -0.6f}, {0.2f, -1.1f}, {0.6f, -0.55f}}},
+        const auto pts = Transform(std::array<Vector2, 7>{{{1.5f, 0.0f},
+                                                           {0.6f, 0.55f},
+                                                           {0.2f, 1.1f},
+                                                           {-0.9f, 0.6f},
+                                                           {-0.9f, -0.6f},
+                                                           {0.2f, -1.1f},
+                                                           {0.6f, -0.55f}}},
                                    p, e.angle, r);
         neon.Polyline(pts, true, 4.0f, c);
         neon.Glow(p + FromAngle(e.angle + 0.5f, r * 0.7f), 9.0f, palette::kDanger);
@@ -327,16 +338,12 @@ void DrawUpgradeIcon(NeonRenderer& neon, UpgradeId id, Vector2 c, float s, Color
         line({0.0f, 0.2f}, {0.0f, 0.45f});
         dot({0.0f, 0.0f}, 0.08f);
         break;
-    case UpgradeId::Exploit:
-        Star(neon, c, 4, s * 0.45f, s * 0.14f, time, w, color);
-        break;
+    case UpgradeId::Exploit: Star(neon, c, 4, s * 0.45f, s * 0.14f, time, w, color); break;
     case UpgradeId::SeekerRounds:
         neon.Arc(c + Vector2{-0.1f, 0.25f} * s, s * 0.4f, -kPi * 0.9f, -kPi * 0.2f, w, color);
         poly(4, 0.12f, time);
         break;
-    case UpgradeId::FragRounds:
-        Star(neon, c, 8, s * 0.42f, s * 0.2f, time * 0.5f, w, color);
-        break;
+    case UpgradeId::FragRounds: Star(neon, c, 8, s * 0.42f, s * 0.2f, time * 0.5f, w, color); break;
     case UpgradeId::CryoRounds:
         for (int i = 0; i < 3; ++i) {
             const Vector2 d = FromAngle(kPi * static_cast<float>(i) / 3.0f, 0.42f);
@@ -352,24 +359,36 @@ void DrawUpgradeIcon(NeonRenderer& neon, UpgradeId id, Vector2 c, float s, Color
         arrow({0.0f, 0.0f}, {0.0f, -0.48f});
         arrow({0.0f, 0.0f}, {0.0f, 0.48f});
         break;
-    case UpgradeId::HullPlating: poly(6, 0.4f, kPi / 6.0f); poly(6, 0.22f, kPi / 6.0f); break;
+    case UpgradeId::HullPlating:
+        poly(6, 0.4f, kPi / 6.0f);
+        poly(6, 0.22f, kPi / 6.0f);
+        break;
     case UpgradeId::NanoRepair:
         line({-0.35f, 0.0f}, {0.35f, 0.0f});
         line({0.0f, -0.35f}, {0.0f, 0.35f});
         break;
-    case UpgradeId::Deflector: neon.Arc(c, s * 0.4f, -kPi * 0.8f, -kPi * 0.2f, w * 1.5f, color); poly(3, 0.15f, 0.0f); break;
+    case UpgradeId::Deflector:
+        neon.Arc(c, s * 0.4f, -kPi * 0.8f, -kPi * 0.2f, w * 1.5f, color);
+        poly(3, 0.15f, 0.0f);
+        break;
     case UpgradeId::AutoRepair:
         neon.Arc(c, s * 0.38f, 0.0f, kPi * 1.6f, w, color);
         line({-0.15f, 0.0f}, {0.15f, 0.0f});
         line({0.0f, -0.15f}, {0.0f, 0.15f});
         break;
-    case UpgradeId::ReactiveArmor: poly(6, 0.25f, 0.0f); ring(0.42f); break;
+    case UpgradeId::ReactiveArmor:
+        poly(6, 0.25f, 0.0f);
+        ring(0.42f);
+        break;
     case UpgradeId::Thrusters:
         poly(3, 0.25f, -kPi * 0.5f);
         line({-0.12f, 0.2f}, {-0.12f, 0.45f});
         line({0.12f, 0.2f}, {0.12f, 0.45f});
         break;
-    case UpgradeId::Reflex: arrow({-0.4f, 0.3f}, {0.4f, -0.3f}); ring(0.12f); break;
+    case UpgradeId::Reflex:
+        arrow({-0.4f, 0.3f}, {0.4f, -0.3f});
+        ring(0.12f);
+        break;
     case UpgradeId::ExtraDash:
         arrow({-0.4f, -0.15f}, {0.3f, -0.15f});
         arrow({-0.4f, 0.2f}, {0.3f, 0.2f});

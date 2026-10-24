@@ -8,14 +8,18 @@
 namespace gb {
 
 enum class FontId {
-    Display,   // Orbitron Black: logo and big headings
-    Heading,   // Orbitron Bold: titles, numbers
-    Body,      // Rajdhani SemiBold: descriptions
-    BodyBold,  // Rajdhani Bold: emphasised body text, buttons
+    Display,  // Orbitron Black: logo and big headings
+    Heading,  // Orbitron Bold: titles, numbers
+    Body,     // Rajdhani SemiBold: descriptions
+    BodyBold, // Rajdhani Bold: emphasised body text, buttons
     Count
 };
 
-enum class Align { Left, Center, Right };
+enum class Align {
+    Left,
+    Center,
+    Right
+};
 
 // Owns the embedded fonts (each rasterised at two sizes with mipmaps so text
 // stays crisp from tiny HUD labels to the title logo).
@@ -24,8 +28,8 @@ public:
     bool Init();
     void Shutdown();
 
-    void Draw(FontId font, std::string_view text, Vector2 position, float size, Color color,
-              Align align = Align::Left, float spacing = 0.0f) const;
+    void Draw(FontId font, std::string_view text, Vector2 position, float size, Color color, Align align = Align::Left,
+              float spacing = 0.0f) const;
 
     // Draws text with a soft coloured halo behind it.
     void DrawGlow(FontId font, std::string_view text, Vector2 position, float size, Color color, Color glow,
