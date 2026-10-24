@@ -203,9 +203,9 @@ void World::UpdateBossHydra(Enemy& e, float dt) {
         }
     }
 
-    static constexpr std::array<int, 2> kPhase0{0, 1};
-    static constexpr std::array<int, 3> kPhase1{0, 2, 1};
-    static constexpr std::array<int, 4> kPhase2{3, 2, 0, 1};
+    static constexpr std::array<int, 3> kPhase0{0, 4, 1};
+    static constexpr std::array<int, 4> kPhase1{0, 2, 4, 1};
+    static constexpr std::array<int, 5> kPhase2{3, 4, 2, 0, 1};
     const std::span<const int> sequence = PhaseSequence(phase, kPhase0, kPhase1, kPhase2);
     const int attack = CurrentAttack(e, sequence);
 
@@ -272,6 +272,24 @@ void World::UpdateBossHydra(Enemy& e, float dt) {
             run.Finish(0.8f);
         }
         break;
+    case 4: // venom trail: the body leaves lingering orbs that wall off its path
+        if (run.ShotReady(dt)) {
+            e.timer2 = 0.2f;
+            forEachSegment([&](Enemy& body) {
+                if (body.segment % 3 == e.counter % 3) {
+                    EnemyBullet& b = FireEnemyBullet(body.position, rng_.UnitVector() * 12.0f, EnemyBulletStyle::BigOrb,
+                                                     color, 10.0f);
+                    b.life = 3.0f + 0.4f * static_cast<float>(phase);
+                }
+            });
+            if (e.counter % 4 == 0) {
+                Emit(EventType::EnemyShot, e.position, color, 1.0f);
+            }
+            if (++e.counter >= 16) {
+                run.Finish(0.6f);
+            }
+        }
+        break;
     case 3: // tail spray: segments aim at the player one after another
         if (run.ShotReady(dt)) {
             e.timer2 = 0.06f;
@@ -306,9 +324,9 @@ void World::UpdateBossSingularity(Enemy& e, float dt) {
     SteerToward(e, anchor, e.speed, 1.2f, dt);
     e.angle += dt * (0.8f + 0.5f * static_cast<float>(phase));
 
-    static constexpr std::array<int, 2> kPhase0{0, 1};
-    static constexpr std::array<int, 3> kPhase1{0, 2, 1};
-    static constexpr std::array<int, 4> kPhase2{3, 0, 1, 2};
+    static constexpr std::array<int, 3> kPhase0{0, 4, 1};
+    static constexpr std::array<int, 4> kPhase1{0, 2, 4, 1};
+    static constexpr std::array<int, 5> kPhase2{3, 0, 4, 1, 2};
     const std::span<const int> sequence = PhaseSequence(phase, kPhase0, kPhase1, kPhase2);
     const int attack = CurrentAttack(e, sequence);
 
@@ -317,6 +335,32 @@ void World::UpdateBossSingularity(Enemy& e, float dt) {
     }
 
     switch (attack) {
+    case 4: // accretion: a far ring of debris falls inward, with one gap to slip through
+        if (run.ShotReady(dt)) {
+            e.timer2 = 1.6f;
+            constexpr int kCount = 44;
+            constexpr int kGap = 5;
+            constexpr float kRadius = 760.0f;
+            const int gapStart = rng_.RangeInt(0, kCount - 1);
+            for (int i = 0; i < kCount; ++i) {
+                if ((i - gapStart + kCount) % kCount < kGap) {
+                    continue;
+                }
+                const float a = kTau * static_cast<float>(i) / static_cast<float>(kCount);
+                const Vector2 p = e.position + FromAngle(a, kRadius);
+                if (!CheckCollisionPointRec(p, kArena)) {
+                    continue;
+                }
+                EnemyBullet& b = FireEnemyBullet(p, FromAngle(a + kPi, 120.0f), EnemyBulletStyle::Orb, bullet);
+                b.acceleration = 60.0f;
+                b.life = 3.3f; // swallowed just before reaching the core
+            }
+            Emit(EventType::EnemyShot, e.position, color, 1.5f);
+            if (++e.counter >= 2 + phase / 2) {
+                run.Finish(1.6f);
+            }
+        }
+        break;
     case 0: // spiral arms
         if (run.ShotReady(dt)) {
             e.timer2 = 0.11f;
