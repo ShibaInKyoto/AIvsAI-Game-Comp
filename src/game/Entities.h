@@ -68,6 +68,10 @@ struct Enemy {
     float lanceCooldown = 0.0f;
     float dashHitCooldown = 0.0f;
 
+    // Visual warning line toward telegraphTarget while telegraph > 0 (0..1 = charge).
+    float telegraph = 0.0f;
+    Vector2 telegraphTarget{};
+
     // Linked bodies (serpent segments, boss parts).
     EntityId leader = kInvalidId;
     int segment = 0;

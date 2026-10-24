@@ -164,8 +164,11 @@ void World::UpdateBossWarden(Enemy& e, float dt) {
         }
         if (e.timer < 0.8f) {
             e.velocity = DampV(e.velocity, {0.0f, 0.0f}, 0.05f, dt);
+            e.telegraph = e.timer / 0.8f;
+            e.telegraphTarget = e.target;
         } else if (e.counter == 1) {
             e.counter = 2;
+            e.telegraph = 0.0f;
             e.velocity = Normalized(e.target - e.position) * 950.0f;
         } else if (e.timer > 1.45f) {
             FireRing(e.position, 20, 240.0f, e.param, EnemyBulletStyle::Orb, bullet);

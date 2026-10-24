@@ -218,6 +218,14 @@ void WorldRenderer::DrawEnemies(NeonRenderer& neon, const World& world, const Wo
         }
         shapes::DrawEnemyBody(neon, e, c, ctx.time);
         neon.Glow(e.position, e.radius * 2.0f, WithAlpha(base, IsBoss(e.kind) ? 0.22f : 0.14f));
+        if (e.telegraph > 0.0f) {
+            // Charge-up warning: a widening, flickering lane toward the target.
+            const Vector2 dir = Normalized(e.telegraphTarget - e.position);
+            const Vector2 end = e.position + dir * (Distance(e.position, e.telegraphTarget) + 400.0f);
+            const float flicker = 0.6f + 0.4f * std::sin(ctx.time * 35.0f);
+            neon.Line(e.position, end, 2.0f + e.radius * 0.6f * e.telegraph,
+                      WithAlpha(palette::kDanger, (0.15f + 0.35f * e.telegraph) * flicker));
+        }
 
         if (e.elite) {
             const float a = ctx.time * 1.5f;

@@ -321,6 +321,12 @@ void Director::AdvanceSector(SectorModifier modifier) {
 
 void Director::ContinueEndless() { Start(sector_ + 1); }
 
+void Director::JumpToWaves(int sector, float waveTime) {
+    Start(sector);
+    SetPhase(SectorPhase::Waves);
+    waveTime_ = std::clamp(waveTime, 0.0f, Info().duration - 5.0f);
+}
+
 void Director::DebugJump(int sector, bool boss) {
     Start(sector);
     if (boss) {

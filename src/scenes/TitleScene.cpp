@@ -39,6 +39,17 @@ void TitleScene::ResetDemo() {
     ++demoCounter_;
     demo_ = std::make_unique<GameView>(app_, config);
     demo_->Effects().SetMuted(true);
+    // Drop the demo into the thick of a sector with a matching loadout so the
+    // backdrop is always busy.
+    World& world = demo_->GetWorld();
+    const int sector = demoCounter_ % 3;
+    world.GetDirector().JumpToWaves(sector, 35.0f);
+    for (int i = 0; i < 8 + sector * 6; ++i) {
+        const auto offers = world.RollOffers(3);
+        if (!offers.empty()) {
+            world.ApplyUpgrade(Bot::ChooseUpgrade(world, offers));
+        }
+    }
     demoDeathTimer_ = 0.0f;
 }
 

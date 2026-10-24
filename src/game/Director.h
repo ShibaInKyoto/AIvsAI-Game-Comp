@@ -73,6 +73,8 @@ public:
 
     // Debug/testing: jump to a sector, optionally straight to its boss.
     void DebugJump(int sector, bool boss);
+    // Starts a sector already part-way through its waves (attract mode).
+    void JumpToWaves(int sector, float waveTime);
 
     float EnemyHpMultiplier() const;
     float EnemySpeedMultiplier() const;
