@@ -209,6 +209,26 @@ TEST_CASE("Boss rush starts with a head-start build and skips the waves") {
     CHECK(world.Record().kills == 0);
 }
 
+TEST_CASE("Daily mutators reshape the run") {
+    RunConfig plain;
+    const World baseline(plain);
+
+    RunConfig glass = plain;
+    glass.mutator = Mutator::GlassCannon;
+    const World cannon(glass);
+    CHECK(cannon.Stats().damage == doctest::Approx(baseline.Stats().damage * 2.0f));
+    CHECK(cannon.Stats().maxHp == std::max(1, baseline.Stats().maxHp - 2));
+
+    RunConfig horde = plain;
+    horde.mutator = Mutator::Horde;
+    const World crowded(horde);
+    CHECK(crowded.GetDirector().EnemyHpMultiplier() < baseline.GetDirector().EnemyHpMultiplier());
+
+    for (int day = 0; day < 60; ++day) {
+        CHECK(DailyMutator(DailySeed(20261001 + day)) != Mutator::None);
+    }
+}
+
 TEST_CASE("Spatial hash finds every nearby item") {
     SpatialHash hash;
     hash.Configure({-1000.0f, -1000.0f, 2000.0f, 2000.0f}, 64.0f);

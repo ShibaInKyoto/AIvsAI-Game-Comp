@@ -410,6 +410,15 @@ void Director::SpawnBoss(World& world) {
     bossId_ = boss.id;
 }
 
+void Director::ApplyMutator(const MutatorInfo& mutator) {
+    hpMultiplier_ *= mutator.enemyHp;
+    speedMultiplier_ *= mutator.enemySpeed;
+    spawnMultiplier_ *= mutator.spawnRate;
+    eliteRate_ *= mutator.eliteRate;
+    xpMultiplier_ *= mutator.xp;
+    scoreMultiplier_ *= mutator.score;
+}
+
 void Director::AdvanceSector(SectorModifier modifier) {
     switch (modifier) {
     case SectorModifier::Swarm:

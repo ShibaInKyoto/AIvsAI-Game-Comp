@@ -171,5 +171,7 @@ int TodayStamp();
 std::uint64_t DailySeed(int stamp);
 // The daily ship rotates through the full roster, unlocked or not.
 ShipId DailyShip(std::uint64_t seed);
+// Each day also brings one rule twist.
+Mutator DailyMutator(std::uint64_t seed);
 
 } // namespace gb

@@ -378,6 +378,13 @@ void Hud::DrawBanners(App& app, const GameView& view) const {
                   WithAlpha(view.AccentColor(), a), Align::Center, 0.4f);
         text.DrawGlow(FontId::Display, info.subtitle, {cx, cy - 18.0f}, 86.0f, WithAlpha(WHITE, a),
                       WithAlpha(view.AccentColor(), a), Align::Center, 0.08f);
+        if (const Mutator mutator = world.Config().mutator; mutator != Mutator::None && director.Sector() == 0) {
+            const MutatorInfo& twist = GetMutatorInfo(mutator);
+            text.Draw(FontId::BodyBold, TextFormat("DAILY MUTATOR: %s", twist.name), {cx, cy + 82.0f}, 28.0f,
+                      WithAlpha(palette::kUiWarn, a), Align::Center, 0.1f);
+            text.Draw(FontId::Body, twist.description, {cx, cy + 120.0f}, 24.0f, WithAlpha(palette::kUiText, a),
+                      Align::Center);
+        }
         if (director.Loop() > 0) {
             text.Draw(FontId::BodyBold, TextFormat("ENDLESS LOOP %d", director.Loop()), {cx, cy + 82.0f}, 28.0f,
                       WithAlpha(palette::kUiWarn, a), Align::Center, 0.1f);

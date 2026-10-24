@@ -313,6 +313,11 @@ int TodayStamp() {
 
 ShipId DailyShip(std::uint64_t seed) { return static_cast<ShipId>(seed % static_cast<std::uint64_t>(ShipId::Count)); }
 
+Mutator DailyMutator(std::uint64_t seed) {
+    const auto twists = static_cast<std::uint64_t>(Mutator::Count) - 1;
+    return static_cast<Mutator>(1 + (seed >> 17) % twists);
+}
+
 std::uint64_t DailySeed(int stamp) {
     std::uint64_t x = static_cast<std::uint64_t>(stamp) * 0x9E3779B97F4A7C15ULL;
     x ^= x >> 31;

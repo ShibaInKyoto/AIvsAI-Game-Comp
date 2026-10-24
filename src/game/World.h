@@ -41,7 +41,21 @@ struct RunConfig {
     ShipId ship = ShipId::Vector;
     std::uint64_t seed = 1;
     MetaBonuses meta;
+    Mutator mutator = Mutator::None;
 };
+
+struct MutatorInfo {
+    const char* name;
+    const char* description;
+    // Multipliers on the hostile side...
+    float enemyHp, enemySpeed, bulletSpeed, spawnRate, eliteRate, xp, score;
+    // ...and on the player's.
+    float playerDamage;
+    int playerHp;
+    float playerSpeed;
+};
+
+const MutatorInfo& GetMutatorInfo(Mutator mutator);
 
 struct RunStats {
     float time = 0.0f;

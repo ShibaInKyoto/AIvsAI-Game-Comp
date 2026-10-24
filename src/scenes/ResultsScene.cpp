@@ -112,7 +112,10 @@ void ResultsScene::DrawUi() {
                   {cx, 70.0f - (1.0f - titleIn) * 40.0f}, 86.0f, WithAlpha(WHITE, titleIn), WithAlpha(accent, titleIn),
                   Align::Center, 0.08f);
     const ShipInfo& ship = GetShipInfo(summary_.config.ship);
-    const char* mode = GameModeName(summary_.config.mode);
+    const char* mode = summary_.config.mutator == Mutator::None
+                           ? GameModeName(summary_.config.mode)
+                           : TextFormat("%s  //  %s", GameModeName(summary_.config.mode),
+                                        GetMutatorInfo(summary_.config.mutator).name);
     text.Draw(FontId::Heading,
               TextFormat("%s  //  %s  //  %s", ship.name, DifficultyName(summary_.config.difficulty), mode),
               {cx, 178.0f}, 22.0f, WithAlpha(palette::kUiDim, titleIn), Align::Center, 0.2f);

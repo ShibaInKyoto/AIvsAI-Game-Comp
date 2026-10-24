@@ -22,6 +22,17 @@ enum class GameMode : std::uint8_t {
     Count
 };
 
+// Daily-run twists on the rules (see GetMutatorInfo).
+enum class Mutator : std::uint8_t {
+    None,
+    Hyperdrive,
+    GlassCannon,
+    Horde,
+    BountyBoard,
+    Armored,
+    Count
+};
+
 enum class EnemyKind : std::uint8_t {
     Drifter,  // slow homing diamond
     Dart,     // aims, telegraphs, then lunges in a straight line

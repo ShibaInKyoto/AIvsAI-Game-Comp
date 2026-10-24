@@ -74,6 +74,7 @@ void TitleScene::StartDaily() {
     const int stamp = TodayStamp();
     config.seed = DailySeed(stamp);
     config.ship = DailyShip(config.seed);
+    config.mutator = DailyMutator(config.seed);
     config.meta = app_.Progress().Bonuses();
     app_.ChangeScene(std::make_unique<GameScene>(app_, config), 0.5f);
 }
@@ -225,12 +226,15 @@ void TitleScene::DrawUi() {
     ui::Prompt(app_, {ui.x * 0.5f, ui.y - 52.0f}, "ENTER", "A", "SELECT", Align::Center, 22.0f);
     if (menu_.Selected() == ItemDaily) {
         const int today = TodayStamp();
-        const ShipInfo& ship = GetShipInfo(DailyShip(DailySeed(today)));
+        const std::uint64_t seed = DailySeed(today);
+        const ShipInfo& ship = GetShipInfo(DailyShip(seed));
+        const MutatorInfo& mutator = GetMutatorInfo(DailyMutator(seed));
         const Vector2 at{600.0f, 430.0f + 70.0f + 18.0f};
-        const float used = text.DrawWrapped(
-            FontId::Body,
-            TextFormat("Today's ship: %s. Same seed and ship for everyone; your best score counts.", ship.name), at,
-            std::min(880.0f, ui.x - 640.0f), 22.0f, palette::kUiDim);
+        const float used =
+            text.DrawWrapped(FontId::Body,
+                             TextFormat("Today: %s with %s. %s Same seed for everyone; your best score counts.",
+                                        ship.name, mutator.name, mutator.description),
+                             at, std::min(880.0f, ui.x - 640.0f), 22.0f, palette::kUiDim);
         if (profile.DailyDate() == today && profile.DailyBest() > 0) {
             text.Draw(FontId::BodyBold, TextFormat("TODAY'S BEST  %lld", profile.DailyBest()),
                       {at.x, at.y + used + 8.0f}, 22.0f, palette::kUiWarn);

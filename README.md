@@ -89,7 +89,8 @@ Prompts adapt automatically to whichever device you used last.
   numbers, and *corruption* makes destroyed hostiles fire back.
 * **Boss rush:** the five guardians back to back. You start with fourteen
   upgrades and draft eight more after every kill. Great for a quick session.
-* **Daily run:** a fixed seed and ship for everyone each day.
+* **Daily run:** a fixed seed, ship and rule twist (a *mutator* such as
+  Hyperdrive, Glass Cannon or Horde) for everyone each day.
 * **Relaxed / Standard / Overclocked:** Relaxed adds two integrity and softens
   enemies; Overclocked is denser and faster, with bigger rewards.
 

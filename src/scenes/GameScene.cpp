@@ -650,8 +650,11 @@ void GameScene::DrawPause() {
     const RunStats& stats = world.Record();
     const ShipInfo& ship = GetShipInfo(config_.ship);
     text.Draw(FontId::Heading, ship.name, {panel.x + 30.0f, panel.y + 26.0f}, 30.0f, ship.color, Align::Left, 0.12f);
-    text.Draw(FontId::BodyBold, TextFormat("%s  -  %s", DifficultyName(config_.difficulty), GameModeName(config_.mode)),
-              {panel.x + 30.0f, panel.y + 66.0f}, 22.0f, palette::kUiDim);
+    const char* modeLine = config_.mutator == Mutator::None
+                               ? TextFormat("%s  -  %s", DifficultyName(config_.difficulty), GameModeName(config_.mode))
+                               : TextFormat("%s  -  %s  -  %s", DifficultyName(config_.difficulty),
+                                            GameModeName(config_.mode), GetMutatorInfo(config_.mutator).name);
+    text.Draw(FontId::BodyBold, modeLine, {panel.x + 30.0f, panel.y + 66.0f}, 22.0f, palette::kUiDim);
     const int seconds = static_cast<int>(stats.time);
     text.Draw(
         FontId::BodyBold,

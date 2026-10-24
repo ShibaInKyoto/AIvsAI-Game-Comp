@@ -9,6 +9,7 @@
 namespace gb {
 
 class World;
+struct MutatorInfo;
 
 enum class SectorPhase : std::uint8_t {
     Intro,       // title card, no spawns yet
@@ -82,6 +83,8 @@ public:
     SectorEvent ActiveEvent() const { return event_; }
     float EventTime() const { return eventTime_; }
 
+    // Run-wide rule changes (daily mutators), applied once at the start.
+    void ApplyMutator(const MutatorInfo& mutator);
     // Called (via World) once the player picked a sector modifier.
     void AdvanceSector(SectorModifier modifier);
     void ContinueEndless();

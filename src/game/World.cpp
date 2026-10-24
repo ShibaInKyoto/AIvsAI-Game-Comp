@@ -26,6 +26,20 @@ const DifficultyTuning& GetDifficultyTuning(Difficulty difficulty) {
     return kDifficulty[static_cast<std::size_t>(difficulty)];
 }
 
+// clang-format off
+constexpr std::array<MutatorInfo, static_cast<std::size_t>(Mutator::Count)> kMutators{{
+    //  name             description                                                   hp     speed  bullet spawn  elite  xp     score  dmg   hp  move
+    {"NONE",          "",                                                              1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f, 0,  1.0f},
+    {"HYPERDRIVE",    "Everything moves faster, including you.",                       1.0f,  1.25f, 1.2f,  1.0f,  1.0f,  1.0f,  1.2f,  1.0f, 0,  1.15f},
+    {"GLASS CANNON",  "Your shots hit twice as hard, but you start two integrity down.", 1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  2.0f, -2, 1.0f},
+    {"HORDE",         "Half again as many hostiles, each a little weaker.",            0.75f, 1.0f,  1.0f,  1.5f,  1.0f,  1.2f,  1.0f,  1.0f, 0,  1.0f},
+    {"BOUNTY BOARD",  "Elites appear three times as often.",                           1.0f,  1.0f,  1.0f,  1.0f,  3.0f,  1.0f,  1.2f,  1.0f, 0,  1.0f},
+    {"ARMORED",       "Hostiles are half again as tough; data and score pay more.",    1.5f,  1.0f,  1.0f,  1.0f,  1.0f,  1.3f,  1.5f,  1.0f, 0,  1.0f},
+}};
+// clang-format on
+
+const MutatorInfo& GetMutatorInfo(Mutator mutator) { return kMutators[static_cast<std::size_t>(mutator)]; }
+
 const char* GameModeName(GameMode mode) {
     switch (mode) {
     case GameMode::Campaign: return "CAMPAIGN";
@@ -75,6 +89,9 @@ World::World(const RunConfig& config)
     rerolls_ = stats_.rerolls;
     xpToNext_ = XpForLevel(1);
     director_.Start(0);
+    const MutatorInfo& mutator = GetMutatorInfo(config.mutator);
+    tuning_.bulletSpeed *= mutator.bulletSpeed;
+    director_.ApplyMutator(mutator);
     if (config.mode == GameMode::BossRush) {
         GrantLevels(kBossRushStartLevels);
     }
@@ -94,6 +111,10 @@ void World::RecomputeStats() {
     s.magnetRadius *= 1.0f + config_.meta.magnet;
     s.rerolls += config_.meta.rerolls;
     s.dashCooldown *= 1.0f - config_.meta.dashCooldown;
+    const MutatorInfo& mutator = GetMutatorInfo(config_.mutator);
+    s.damage *= mutator.playerDamage;
+    s.maxHp = std::max(1, s.maxHp + mutator.playerHp);
+    s.moveSpeed *= mutator.playerSpeed;
 
     std::array<int, static_cast<std::size_t>(UpgradeId::Count)> stacks{};
     for (UpgradeId id : inventory_.Order()) {
