@@ -1,5 +1,7 @@
 #include "game/EnemyCatalog.h"
 
+#include "core/Format.h"
+
 #include <array>
 
 namespace gb {
@@ -37,5 +39,16 @@ constexpr std::array<EnemyInfo, static_cast<std::size_t>(EnemyKind::Count)> kEne
 } // namespace
 
 const EnemyInfo& GetEnemyInfo(EnemyKind kind) { return kEnemies[static_cast<std::size_t>(kind)]; }
+
+std::string EnemyDisplayName(EnemyKind kind) {
+    switch (kind) {
+    case EnemyKind::SplitterMini: return "SPLITTER SHARD";
+    case EnemyKind::WeaverBody: return "WEAVER";
+    case EnemyKind::Mine: return "BOMBER MINE";
+    case EnemyKind::BossMinion: return "GUARDIAN TURRET";
+    case EnemyKind::Count: return "UNKNOWN";
+    default: return ToUpper(GetEnemyInfo(kind).name);
+    }
+}
 
 } // namespace gb

@@ -24,16 +24,6 @@ enum ResultItem {
     ItemTitle
 };
 
-// Sub-parts read better under their parent's name.
-std::string KillerName(EnemyKind kind) {
-    switch (kind) {
-    case EnemyKind::SplitterMini: return "SPLITTER SHARD";
-    case EnemyKind::WeaverBody: return "WEAVER";
-    case EnemyKind::Mine: return "BOMBER MINE";
-    case EnemyKind::BossMinion: return "GUARDIAN TURRET";
-    default: return ToUpper(GetEnemyInfo(kind).name);
-    }
-}
 constexpr int kRowCount = 8;
 constexpr float kRowInterval = 0.14f;
 
@@ -263,7 +253,7 @@ void ResultsScene::DrawLoadout(Rectangle panel, Color accent, float alpha) {
         const float y = panel.y + panel.height - 110.0f;
         text.Draw(FontId::Heading, "DESTROYED BY", {panel.x + 130.0f, y + 26.0f}, 16.0f,
                   WithAlpha(palette::kUiDim, alpha), Align::Left, 0.2f);
-        text.Draw(FontId::Heading, KillerName(killer), {panel.x + 130.0f, y + 52.0f}, 28.0f,
+        text.Draw(FontId::Heading, EnemyDisplayName(killer), {panel.x + 130.0f, y + 52.0f}, 28.0f,
                   WithAlpha(GetEnemyInfo(killer).color, alpha), Align::Left, 0.08f);
     }
 }

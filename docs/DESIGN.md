@@ -69,7 +69,8 @@ Implemented:
 - Campaign / Endless / Boss Rush / Daily, 3 difficulties, credits + firmware + 16 challenges.
 - Codex of hostiles and upgrades, decoded as they are met or drafted.
 - Sector events (ambush, crossfire, data storm) every ~40 s of waves.
-- Results show the run's loadout and what destroyed the ship.
+- Results show the run's loadout and what destroyed the ship; Records keep
+  the last ten runs.
 - Procedural SFX + adaptive music; XInput rumble on Windows.
 - Render scale (auto caps 4K), F3 perf overlay, auto-pause on focus loss.
 - CI: MSVC + GCC with -Werror, clang-format check, unit/sim tests, ASan +
@@ -96,4 +97,4 @@ Testing helpers:
 
 Remaining ideas / TODO:
 - Tag the v1.0.0 release at the end (push a `[release]` commit or a tag).
-- Optional: run history in Records, more evolutions.
+- Optional: more evolutions.

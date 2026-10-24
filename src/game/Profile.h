@@ -6,6 +6,7 @@
 
 #include <array>
 #include <string>
+#include <vector>
 
 namespace gb {
 
@@ -37,6 +38,19 @@ struct RunSummary {
     int level = 1;
     int sectorReached = 1;
     bool victory = false;
+};
+
+// One line of the run history shown in Records.
+struct RunRecord {
+    ShipId ship = ShipId::Vector;
+    Difficulty difficulty = Difficulty::Standard;
+    GameMode mode = GameMode::Campaign;
+    bool victory = false;
+    int sector = 1;
+    int level = 1;
+    long long score = 0;
+    EnemyKind killedBy = EnemyKind::Count;
+    float time = 0.0f;
 };
 
 // Persistent player progression and records, stored in profile.sav.
@@ -91,6 +105,10 @@ public:
         lastMode_ = mode;
     }
 
+    // Most recent runs, newest first.
+    static constexpr std::size_t kRecentRuns = 10;
+    const std::vector<RunRecord>& RecentRuns() const { return recentRuns_; }
+
     // Daily challenge bookkeeping (date as YYYYMMDD).
     int DailyDate() const { return dailyDate_; }
     long long DailyBest() const { return dailyBest_; }
@@ -120,6 +138,7 @@ private:
     std::uint32_t challenges_ = 0;
     std::uint32_t seenEnemies_ = 0;
     std::uint64_t seenUpgrades_ = 0;
+    std::vector<RunRecord> recentRuns_;
 };
 
 // Today's date as YYYYMMDD in local time, and a seed derived from it.

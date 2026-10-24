@@ -4,6 +4,8 @@
 
 #include <raylib.h>
 
+#include <string>
+
 namespace gb {
 
 // Static per-kind tuning data. Behaviour lives in EnemyBehaviors.cpp.
@@ -20,5 +22,7 @@ struct EnemyInfo {
 };
 
 const EnemyInfo& GetEnemyInfo(EnemyKind kind);
+// Upper-case name for UI; sub-parts read under their parent's name.
+std::string EnemyDisplayName(EnemyKind kind);
 
 } // namespace gb

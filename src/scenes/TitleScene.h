@@ -26,6 +26,8 @@ private:
     void ResetDemo();
     void StartDaily();
     void DrawRecords();
+    void DrawChallenges(Rectangle area);
+    void DrawRecentRuns(Rectangle area);
     void DrawLogo(Vector2 center, float scale);
 
     std::unique_ptr<GameView> demo_;
@@ -34,6 +36,7 @@ private:
     SettingsPanel settings_;
     CodexPanel codex_;
     bool showRecords_ = false;
+    bool showRecentRuns_ = false; // records: recent runs instead of challenges
     float time_ = 0.0f;
     float demoDeathTimer_ = 0.0f;
     int demoCounter_ = 0;

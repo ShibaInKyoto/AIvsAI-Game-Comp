@@ -4,10 +4,41 @@
 
 #include <algorithm>
 #include <ctime>
+#include <optional>
+#include <sstream>
 
 namespace gb {
 
 namespace {
+
+// Run history lines: "ship difficulty mode victory sector level score killer time".
+std::string EncodeRun(const RunRecord& r) {
+    std::ostringstream out;
+    out << static_cast<int>(r.ship) << ' ' << static_cast<int>(r.difficulty) << ' ' << static_cast<int>(r.mode) << ' '
+        << (r.victory ? 1 : 0) << ' ' << r.sector << ' ' << r.level << ' ' << r.score << ' '
+        << static_cast<int>(r.killedBy) << ' ' << r.time;
+    return out.str();
+}
+
+std::optional<RunRecord> DecodeRun(const std::string& line) {
+    std::istringstream in(line);
+    int ship = 0, difficulty = 0, mode = 0, victory = 0, killer = 0;
+    RunRecord r;
+    if (!(in >> ship >> difficulty >> mode >> victory >> r.sector >> r.level >> r.score >> killer >> r.time)) {
+        return std::nullopt;
+    }
+    if (ship < 0 || ship >= static_cast<int>(ShipId::Count) || difficulty < 0 ||
+        difficulty >= static_cast<int>(Difficulty::Count) || mode < 0 || mode >= static_cast<int>(GameMode::Count) ||
+        killer < 0 || killer > static_cast<int>(EnemyKind::Count)) {
+        return std::nullopt;
+    }
+    r.ship = static_cast<ShipId>(ship);
+    r.difficulty = static_cast<Difficulty>(difficulty);
+    r.mode = static_cast<GameMode>(mode);
+    r.victory = victory != 0;
+    r.killedBy = static_cast<EnemyKind>(killer);
+    return r;
+}
 
 constexpr const char* kFileName = "profile.sav";
 constexpr int kFormatVersion = 1;
@@ -77,6 +108,14 @@ bool Profile::Load() {
     challenges_ = static_cast<std::uint32_t>(doc.GetInt("challenges", 0));
     seenEnemies_ = static_cast<std::uint32_t>(doc.GetInt("codex_enemies", 0));
     seenUpgrades_ = static_cast<std::uint64_t>(doc.GetInt("codex_upgrades", 0));
+    recentRuns_.clear();
+    for (std::size_t i = 0; i < kRecentRuns; ++i) {
+        if (const auto line = doc.Get("recent_" + std::to_string(i))) {
+            if (const auto run = DecodeRun(*line)) {
+                recentRuns_.push_back(*run);
+            }
+        }
+    }
     return true;
 }
 
@@ -111,6 +150,9 @@ bool Profile::Save() const {
     doc.SetInt("challenges", challenges_);
     doc.SetInt("codex_enemies", seenEnemies_);
     doc.SetInt("codex_upgrades", static_cast<long long>(seenUpgrades_));
+    for (std::size_t i = 0; i < recentRuns_.size(); ++i) {
+        doc.Set("recent_" + std::to_string(i), EncodeRun(recentRuns_[i]));
+    }
     return storage::WriteTextFileAtomic(storage::DataDirectory() / kFileName, doc.Serialize());
 }
 
@@ -216,6 +258,20 @@ int Profile::RecordRun(const RunSummary& run) {
     playTime_ += run.stats.time;
     bestSector_ = std::max(bestSector_, run.sectorReached);
     seenEnemies_ |= run.stats.enemiesSeen;
+    RunRecord record;
+    record.ship = run.config.ship;
+    record.difficulty = run.config.difficulty;
+    record.mode = run.config.mode;
+    record.victory = run.victory;
+    record.sector = run.sectorReached;
+    record.level = run.level;
+    record.score = run.stats.score;
+    record.killedBy = run.stats.killedBy;
+    record.time = run.stats.time;
+    recentRuns_.insert(recentRuns_.begin(), record);
+    if (recentRuns_.size() > kRecentRuns) {
+        recentRuns_.resize(kRecentRuns);
+    }
     seenUpgrades_ |= run.stats.upgradesTaken;
     auto& best = run.config.mode == GameMode::BossRush ? bossRushBest_
                                                        : bestScore_[static_cast<std::size_t>(run.config.difficulty)];

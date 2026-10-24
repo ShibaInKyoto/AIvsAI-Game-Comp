@@ -79,6 +79,33 @@ TEST_CASE("Codex discoveries accumulate across runs and persist") {
     CHECK_FALSE(loaded.UpgradeDiscovered(UpgradeId::HiveSwarm));
 }
 
+TEST_CASE("Recent runs are kept newest first, capped and persisted") {
+    TempDataDir dir;
+    {
+        Profile profile;
+        for (int i = 0; i < 12; ++i) {
+            RunSummary run;
+            run.stats.score = 1000 * (i + 1);
+            run.stats.killedBy = EnemyKind::Gunner;
+            run.config.mode = i == 11 ? GameMode::BossRush : GameMode::Campaign;
+            run.sectorReached = 2;
+            profile.RecordRun(run);
+        }
+        REQUIRE(profile.RecentRuns().size() == Profile::kRecentRuns);
+        CHECK(profile.RecentRuns().front().score == 12000);
+    }
+    Profile loaded;
+    REQUIRE(loaded.Load());
+    REQUIRE(loaded.RecentRuns().size() == Profile::kRecentRuns);
+    const RunRecord& newest = loaded.RecentRuns().front();
+    CHECK(newest.score == 12000);
+    CHECK(newest.mode == GameMode::BossRush);
+    CHECK(newest.killedBy == EnemyKind::Gunner);
+    CHECK(newest.sector == 2);
+    CHECK(loaded.RecentRuns().back().score == 3000);
+    CHECK(loaded.BossRushBest() == 12000);
+}
+
 TEST_CASE("Firmware purchases respect cost and rank limits") {
     TempDataDir dir;
     Profile profile;

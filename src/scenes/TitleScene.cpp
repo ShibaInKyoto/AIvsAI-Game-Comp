@@ -4,10 +4,12 @@
 #include "core/App.h"
 #include "core/BuildInfo.h"
 #include "core/Format.h"
+#include "game/EnemyCatalog.h"
 #include "game/Profile.h"
 #include "scenes/GameScene.h"
 #include "scenes/HangarScene.h"
 #include "view/Palette.h"
+#include "view/Shapes.h"
 
 #include <algorithm>
 
@@ -113,7 +115,13 @@ void TitleScene::Update(float dt) {
         return;
     }
     if (showRecords_) {
-        if (app_.In().Pressed(Action::Back) || app_.In().Pressed(Action::Confirm) || app_.In().MouseClicked()) {
+        const Input& in = app_.In();
+        if (in.Pressed(Action::TabPrev) || in.Pressed(Action::TabNext) || in.Pressed(Action::Left) ||
+            in.Pressed(Action::Right)) {
+            showRecentRuns_ = !showRecentRuns_;
+            app_.Audio().Play(SfxId::UiMove, 0.6f);
+        }
+        if (in.Pressed(Action::Back) || in.Pressed(Action::Confirm) || in.MouseClicked()) {
             showRecords_ = false;
             app_.Audio().Play(SfxId::UiBack, 0.7f);
             app_.In().ConsumeAll();
@@ -194,7 +202,6 @@ void TitleScene::DrawRecords() {
     const Rectangle panel{ui.x * 0.5f - width * 0.5f, ui.y * 0.5f - 400.0f, width, 800.0f};
     ui::Panel(app_, panel, palette::kUiAccent);
     TextRenderer& text = app_.Gfx().Text();
-    NeonRenderer& neon = app_.Gfx().Neon();
     text.Draw(FontId::Heading, "RECORDS", {panel.x + 40.0f, panel.y + 30.0f}, 34.0f, WHITE, Align::Left, 0.15f);
     const int minutes = static_cast<int>(p.PlayTime() / 60.0f);
     struct Row {
@@ -225,18 +232,34 @@ void TitleScene::DrawRecords() {
                   {panel.x + 40.0f, panel.y + 620.0f}, 24.0f, palette::kUiWarn);
     }
 
-    // Challenges column.
+    // Right column: challenges or the recent run history.
     const float cx = panel.x + leftWidth + 70.0f;
-    const float columnWidth = panel.x + width - 40.0f - cx;
+    const Rectangle column{cx, panel.y + 34.0f, panel.x + width - 40.0f - cx, panel.height - 80.0f};
+    if (showRecentRuns_) {
+        DrawRecentRuns(column);
+    } else {
+        DrawChallenges(column);
+    }
+    ui::Prompt(app_, {panel.x + width - 40.0f, panel.y + panel.height - 40.0f}, "Q / E", "LB / RB",
+               showRecentRuns_ ? "CHALLENGES" : "RECENT RUNS", Align::Right, 20.0f);
+}
+
+void TitleScene::DrawChallenges(Rectangle area) {
+    const Profile& p = app_.Progress();
+    TextRenderer& text = app_.Gfx().Text();
+    NeonRenderer& neon = app_.Gfx().Neon();
+    const float cx = area.x;
+    const float columnWidth = area.width;
     text.Draw(FontId::Heading,
               TextFormat("CHALLENGES  %d / %d", p.CompletedChallengeCount(), static_cast<int>(AllChallenges().size())),
-              {cx, panel.y + 34.0f}, 26.0f, palette::kCache, Align::Left, 0.1f);
+              {cx, area.y}, 26.0f, palette::kCache, Align::Left, 0.1f);
     const auto challenges = AllChallenges();
     const float rowHeight = 41.0f;
+    const float top = area.y + 66.0f;
     neon.Begin();
     for (std::size_t i = 0; i < challenges.size(); ++i) {
         const bool done = p.ChallengeCompleted(challenges[i].id);
-        const Vector2 c{cx + 12.0f, panel.y + 100.0f + static_cast<float>(i) * rowHeight + 13.0f};
+        const Vector2 c{cx + 12.0f, top + static_cast<float>(i) * rowHeight + 13.0f};
         neon.RegularPolygon(c, 4, 9.0f, kPi * 0.25f, 2.0f, done ? palette::kCache : WithAlpha(palette::kUiFaint, 0.8f));
         if (done) {
             neon.Glow(c, 10.0f, palette::kCache);
@@ -246,13 +269,58 @@ void TitleScene::DrawRecords() {
     for (std::size_t i = 0; i < challenges.size(); ++i) {
         const ChallengeInfo& info = challenges[i];
         const bool done = p.ChallengeCompleted(info.id);
-        const float y = panel.y + 100.0f + static_cast<float>(i) * rowHeight;
+        const float y = top + static_cast<float>(i) * rowHeight;
         text.Draw(FontId::Heading, info.name, {cx + 36.0f, y}, 19.0f, done ? WHITE : palette::kUiDim, Align::Left,
                   0.08f);
         text.Draw(FontId::Body, info.description, {cx + 300.0f, y - 2.0f}, 23.0f,
                   done ? palette::kUiText : palette::kUiFaint);
         text.Draw(FontId::BodyBold, TextFormat("%d CR", info.reward), {cx + columnWidth, y - 2.0f}, 22.0f,
                   done ? palette::kUiFaint : palette::kCache, Align::Right);
+    }
+}
+
+void TitleScene::DrawRecentRuns(Rectangle area) {
+    const auto& runs = app_.Progress().RecentRuns();
+    TextRenderer& text = app_.Gfx().Text();
+    NeonRenderer& neon = app_.Gfx().Neon();
+    text.Draw(FontId::Heading, "RECENT RUNS", {area.x, area.y}, 26.0f, palette::kUiAccent, Align::Left, 0.1f);
+    if (runs.empty()) {
+        text.Draw(FontId::Body, "No runs yet. Your last ten runs will be listed here.", {area.x, area.y + 70.0f}, 24.0f,
+                  palette::kUiFaint);
+        return;
+    }
+    const float rowHeight = 64.0f;
+    const float top = area.y + 66.0f;
+    neon.Begin();
+    for (std::size_t i = 0; i < runs.size(); ++i) {
+        const ShipInfo& ship = GetShipInfo(runs[i].ship);
+        const Vector2 c{area.x + 18.0f, top + static_cast<float>(i) * rowHeight + 22.0f};
+        shapes::DrawShip(neon, runs[i].ship, c, -kPi * 0.5f, 15.0f, ship.color, 1.0f, 2.0f);
+    }
+    neon.End();
+    for (std::size_t i = 0; i < runs.size(); ++i) {
+        const RunRecord& run = runs[i];
+        const ShipInfo& ship = GetShipInfo(run.ship);
+        const float y = top + static_cast<float>(i) * rowHeight;
+        text.Draw(FontId::Heading, ship.name, {area.x + 48.0f, y}, 19.0f, ship.color, Align::Left, 0.08f);
+        text.Draw(FontId::Body, TextFormat("%s  //  %s", DifficultyName(run.difficulty), GameModeName(run.mode)),
+                  {area.x + 48.0f, y + 24.0f}, 20.0f, palette::kUiFaint);
+        const float mid = area.x + area.width * 0.42f;
+        if (run.victory) {
+            text.Draw(FontId::Heading, "LIBERATED", {mid, y + 8.0f}, 19.0f, palette::kUiGood, Align::Left, 0.1f);
+        } else {
+            text.Draw(FontId::Heading, TextFormat("SECTOR %d", run.sector), {mid, y}, 19.0f, palette::kUiDim,
+                      Align::Left, 0.1f);
+            if (run.killedBy != EnemyKind::Count) {
+                text.Draw(FontId::Body, TextFormat("by %s", EnemyDisplayName(run.killedBy).c_str()), {mid, y + 24.0f},
+                          20.0f, WithAlpha(palette::kDanger, 0.85f));
+            }
+        }
+        const int seconds = static_cast<int>(run.time);
+        text.Draw(FontId::BodyBold, FormatThousands(run.score), {area.x + area.width, y - 2.0f}, 26.0f,
+                  palette::kUiText, Align::Right);
+        text.Draw(FontId::Body, TextFormat("LV %d  //  %d:%02d", run.level, seconds / 60, seconds % 60),
+                  {area.x + area.width, y + 26.0f}, 19.0f, palette::kUiFaint, Align::Right);
     }
 }
 
