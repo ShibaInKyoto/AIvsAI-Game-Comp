@@ -58,6 +58,7 @@ constexpr float kPurgeDuration = 1.2f;
 constexpr float kBossWarningDuration = 3.2f;
 constexpr float kClearedDelay = 2.5f;
 constexpr float kMinSpawnDistance = 380.0f;
+constexpr float kGentleOpening = 18.0f;
 
 // Typical group sizes for each kind (min, max).
 std::pair<int, int> GroupSize(EnemyKind kind) {
@@ -208,6 +209,10 @@ void Director::UpdateWaves(World& world, float dt) {
 }
 
 EnemyKind Director::PickKind(World& world) const {
+    // The opening seconds of a run only field slow, readable enemies.
+    if (sector_ == 0 && waveTime_ < kGentleOpening) {
+        return world.Random().Chance(0.7f) ? EnemyKind::Drifter : EnemyKind::Pinwheel;
+    }
     Weights weights = Info().weights;
     // Ramp in the tougher kinds over the first part of each sector.
     const float early = std::clamp(waveTime_ / 25.0f, 0.0f, 1.0f);

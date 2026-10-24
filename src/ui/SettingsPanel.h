@@ -23,6 +23,7 @@ private:
         SfxVolume,
         Fullscreen,
         VSync,
+        RenderScale,
         ScreenShake,
         Bloom,
         Aberration,

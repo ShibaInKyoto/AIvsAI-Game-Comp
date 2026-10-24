@@ -56,8 +56,10 @@ public:
     Profile& Progress() { return *profile_; }
     const LaunchOptions& Options() const { return options_; }
 
-    // Applies display-related settings (fullscreen, vsync) after they change.
+    // Applies display-related settings (fullscreen, vsync, render scale) after they change.
     void ApplyDisplaySettings();
+    // Scene render scale actually in use (resolves "automatic").
+    float EffectiveRenderScale() const;
 
     // Queues a scene change; the current scene fades out first.
     void ChangeScene(std::unique_ptr<Scene> next, float fadeSeconds = 0.3f);
@@ -96,6 +98,7 @@ private:
     bool vsyncApplied_ = false;
     float realTime_ = 0.0f;
     float frameTimeMs_ = 0.0f;
+    float appliedRenderScale_ = 1.0f;
     int lastWidth_ = 0;
     int lastHeight_ = 0;
 };

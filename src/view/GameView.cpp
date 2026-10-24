@@ -49,25 +49,30 @@ void GameView::Update(float dt, const PlayerInput& input, bool simulate) {
     const Player& p = world_->GetPlayer();
     const Vector2 lookAhead = FromAngle(p.aimAngle, 70.0f) + p.velocity * 0.12f;
     camera_.SetShakeScale(app_.Prefs().screenShake);
-    camera_.Update(dt, p.position, lookAhead, static_cast<float>(GetRenderWidth()),
-                   static_cast<float>(GetRenderHeight()));
+    const Vector2 scene = app_.Gfx().SceneSize();
+    camera_.Update(dt, p.position, lookAhead, scene.x, scene.y);
     updateMs_ = static_cast<float>((GetTime() - start) * 1000.0);
 }
 
 Camera2D GameView::CurrentCamera() const {
-    return camera_.Get(static_cast<float>(GetRenderWidth()), static_cast<float>(GetRenderHeight()));
+    const Vector2 scene = app_.Gfx().SceneSize();
+    return camera_.Get(scene.x, scene.y);
 }
 
-Vector2 GameView::ScreenToWorld(Vector2 screen) const { return GetScreenToWorld2D(screen, CurrentCamera()); }
+Vector2 GameView::ScreenToWorld(Vector2 screen) const {
+    return GetScreenToWorld2D(app_.Gfx().ScreenToScene(screen), CurrentCamera());
+}
 
 Vector2 GameView::WorldToUi(Vector2 world) const {
-    return app_.Gfx().ScreenToUi(GetWorldToScreen2D(world, CurrentCamera()));
+    const Vector2 scene = GetWorldToScreen2D(world, CurrentCamera());
+    return app_.Gfx().ScreenToUi(app_.Gfx().SceneToScreen(scene));
 }
 
 void GameView::DrawWorld(Vector2 reticle, bool showReticle) {
     const double start = GetTime();
-    const float w = static_cast<float>(GetRenderWidth());
-    const float h = static_cast<float>(GetRenderHeight());
+    const Vector2 scene = app_.Gfx().SceneSize();
+    const float w = scene.x;
+    const float h = scene.y;
     BeginMode2D(CurrentCamera());
     WorldDrawContext ctx;
     ctx.visible = camera_.VisibleWorld(w, h);

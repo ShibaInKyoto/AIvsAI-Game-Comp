@@ -10,6 +10,7 @@ struct Settings {
 
     bool fullscreen = true;
     bool vsync = true;
+    int renderScale = 0;  // percent of native resolution for the 3D-ish scene; 0 = automatic
     bool showFps = false;
 
     float screenShake = 1.0f;

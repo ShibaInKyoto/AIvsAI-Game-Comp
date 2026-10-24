@@ -23,6 +23,7 @@ bool Settings::Load() {
     sfxVolume = doc.GetFloat("sfx_volume", sfxVolume);
     fullscreen = doc.GetBool("fullscreen", fullscreen);
     vsync = doc.GetBool("vsync", vsync);
+    renderScale = static_cast<int>(doc.GetInt("render_scale", renderScale));
     showFps = doc.GetBool("show_fps", showFps);
     screenShake = doc.GetFloat("screen_shake", screenShake);
     bloom = doc.GetBool("bloom", bloom);
@@ -45,6 +46,7 @@ bool Settings::Save() const {
     doc.SetFloat("sfx_volume", sfxVolume);
     doc.SetBool("fullscreen", fullscreen);
     doc.SetBool("vsync", vsync);
+    doc.SetInt("render_scale", renderScale);
     doc.SetBool("show_fps", showFps);
     doc.SetFloat("screen_shake", screenShake);
     doc.SetBool("bloom", bloom);
@@ -65,6 +67,9 @@ void Settings::Sanitize() {
     sfxVolume = std::clamp(sfxVolume, 0.0f, 1.0f);
     screenShake = std::clamp(screenShake, 0.0f, 1.5f);
     bloomIntensity = std::clamp(bloomIntensity, 0.0f, 2.0f);
+    if (renderScale != 0) {
+        renderScale = std::clamp(renderScale, 50, 100);
+    }
 }
 
 } // namespace gb

@@ -469,7 +469,8 @@ void GameScene::DrawDebugOverlay() {
         TextFormat("enemy bullets %d", static_cast<int>(world.EnemyBullets().size())),
         TextFormat("pickups %d", static_cast<int>(world.Pickups().size())),
         TextFormat("particles %d", static_cast<int>(view_.ParticleCount())),
-        TextFormat("render %dx%d", GetRenderWidth(), GetRenderHeight()),
+        TextFormat("window %dx%d  scene %dx%d", GetRenderWidth(), GetRenderHeight(),
+                   static_cast<int>(app_.Gfx().SceneSize().x), static_cast<int>(app_.Gfx().SceneSize().y)),
     }};
     const Rectangle r{20.0f, 140.0f, 330.0f, 30.0f * static_cast<float>(lines.size()) + 20.0f};
     DrawRectangleRec(r, Color{0, 0, 0, 170});

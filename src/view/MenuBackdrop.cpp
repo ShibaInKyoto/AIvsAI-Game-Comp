@@ -49,8 +49,9 @@ void MenuBackdrop::Update(float dt) {
 }
 
 void MenuBackdrop::Draw(App& app) {
-    const float w = static_cast<float>(GetRenderWidth());
-    const float h = static_cast<float>(GetRenderHeight());
+    const Vector2 scene = app.Gfx().SceneSize();
+    const float w = scene.x;
+    const float h = scene.y;
     Camera2D camera{};
     camera.offset = {w * 0.5f, h * 0.5f};
     camera.target = {std::sin(time_ * 0.05f) * 60.0f, std::cos(time_ * 0.04f) * 30.0f};

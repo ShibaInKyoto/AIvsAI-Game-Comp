@@ -15,7 +15,8 @@ public:
 
     bool Init(int width, int height);
     void Shutdown();
-    void Resize(int width, int height);
+    // Window resolution changed and/or the scene render scale (0..1].
+    void Resize(int width, int height, float renderScale = 1.0f);
 
     NeonRenderer& Neon() { return neon_; }
     TextRenderer& Text() { return text_; }
@@ -23,6 +24,12 @@ public:
     PostFx& Post() { return post_; }
 
     // UI is authored for a 1080-unit tall canvas; width follows the aspect ratio.
+    // Resolution of the HDR scene buffer (window size times render scale).
+    Vector2 SceneSize() const { return {static_cast<float>(post_.Width()), static_cast<float>(post_.Height())}; }
+    // Converts between window pixels and scene-buffer pixels.
+    Vector2 ScreenToScene(Vector2 screen) const;
+    Vector2 SceneToScreen(Vector2 scene) const;
+
     float UiScale() const { return uiScale_; }
     Vector2 UiSize() const { return uiSize_; }
     Vector2 ScreenToUi(Vector2 screen) const { return {screen.x / uiScale_, screen.y / uiScale_}; }
@@ -34,6 +41,7 @@ private:
     TextRenderer text_;
     PostFx post_;
     float uiScale_ = 1.0f;
+    float renderScale_ = 1.0f;
     Vector2 uiSize_{1920.0f, 1080.0f};
 };
 

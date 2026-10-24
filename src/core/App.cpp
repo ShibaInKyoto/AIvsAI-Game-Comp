@@ -78,6 +78,7 @@ bool App::Init() {
     }
     lastWidth_ = GetRenderWidth();
     lastHeight_ = GetRenderHeight();
+    graphics_.Resize(lastWidth_, lastHeight_, EffectiveRenderScale());
 
     audio_ = std::make_unique<AudioSystem>();
     audio_->Init(!options_.noAudio);
@@ -133,6 +134,16 @@ void App::ApplyDisplaySettings() {
     // Without vsync, cap at the monitor refresh rate to avoid burning a CPU core.
     const int refresh = GetMonitorRefreshRate(GetCurrentMonitor());
     SetTargetFPS(settings_.vsync ? 0 : std::max(60, refresh > 0 ? refresh : 144));
+}
+
+float App::EffectiveRenderScale() const {
+    if (settings_.renderScale > 0) {
+        return static_cast<float>(settings_.renderScale) / 100.0f;
+    }
+    // Automatic: cap the scene buffer around 1440p-class pixel counts so 4K
+    // screens on integrated GPUs stay smooth; UI is always native resolution.
+    const float width = static_cast<float>(std::max(GetRenderWidth(), 1));
+    return std::min(1.0f, 2560.0f / width);
 }
 
 void App::ChangeScene(std::unique_ptr<Scene> next, float fadeSeconds) {
@@ -202,8 +213,11 @@ void App::Frame() {
 
     const int width = GetRenderWidth();
     const int height = GetRenderHeight();
-    if ((width != lastWidth_ || height != lastHeight_) && width > 0 && height > 0) {
-        graphics_.Resize(width, height);
+    const float renderScale = EffectiveRenderScale();
+    if ((width != lastWidth_ || height != lastHeight_ || renderScale != appliedRenderScale_) && width > 0 &&
+        height > 0) {
+        graphics_.Resize(width, height, renderScale);
+        appliedRenderScale_ = renderScale;
         lastWidth_ = width;
         lastHeight_ = height;
     }

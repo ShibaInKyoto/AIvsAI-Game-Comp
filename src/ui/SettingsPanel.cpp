@@ -5,6 +5,7 @@
 #include "view/Palette.h"
 
 #include <algorithm>
+#include <array>
 #include <cstdio>
 
 namespace gb {
@@ -24,6 +25,7 @@ void SettingsPanel::Open(App& app) {
     active_ = true;
     std::vector<ui::Menu::Item> items(ItemCount);
     const char* labels[ItemCount] = {"MASTER VOLUME", "MUSIC VOLUME", "EFFECTS VOLUME", "FULLSCREEN", "V-SYNC",
+                                     "RENDER SCALE",
                                      "SCREEN SHAKE", "BLOOM", "CHROMATIC ABERRATION", "FILM GRAIN", "SCANLINES",
                                      "REDUCE FLASHING", "DAMAGE NUMBERS", "AUTO-FIRE", "GAMEPAD AIM ASSIST",
                                      "SHOW FPS", "BACK"};
@@ -44,6 +46,7 @@ void SettingsPanel::Refresh(App& app) {
     menu_.SetValue(SfxVolume, Percent(s.sfxVolume));
     menu_.SetValue(Fullscreen, OnOff(s.fullscreen));
     menu_.SetValue(VSync, OnOff(s.vsync));
+    menu_.SetValue(RenderScale, s.renderScale == 0 ? "AUTO" : Percent(static_cast<float>(s.renderScale) / 100.0f));
     menu_.SetValue(ScreenShake, Percent(s.screenShake));
     menu_.SetValue(Bloom, s.bloom ? Percent(s.bloomIntensity) : "OFF");
     menu_.SetValue(Aberration, OnOff(s.chromaticAberration));
@@ -70,6 +73,13 @@ void SettingsPanel::Adjust(App& app, int item, int direction) {
         s.vsync = !s.vsync;
         app.ApplyDisplaySettings();
         break;
+    case RenderScale: {
+        static constexpr std::array<int, 4> kScales{0, 100, 75, 50};
+        const auto it = std::find(kScales.begin(), kScales.end(), s.renderScale);
+        const int index = it == kScales.end() ? 0 : static_cast<int>(it - kScales.begin());
+        s.renderScale = kScales[static_cast<std::size_t>((index + direction + 4) % 4)];
+        break;
+    }
     case ScreenShake: Step(s.screenShake, direction, 0.25f, 0.0f, 1.5f); break;
     case Bloom:
         if (!s.bloom) {

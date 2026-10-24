@@ -24,12 +24,26 @@ void Graphics::Shutdown() {
     neon_.Shutdown();
 }
 
-void Graphics::Resize(int width, int height) {
+void Graphics::Resize(int width, int height, float renderScale) {
     width = std::max(width, 1);
     height = std::max(height, 1);
-    post_.Resize(width, height);
+    renderScale_ = std::clamp(renderScale, 0.25f, 1.0f);
+    post_.Resize(std::max(1, static_cast<int>(static_cast<float>(width) * renderScale_)),
+                 std::max(1, static_cast<int>(static_cast<float>(height) * renderScale_)));
     uiScale_ = static_cast<float>(height) / kUiHeight;
     uiSize_ = {static_cast<float>(width) / uiScale_, kUiHeight};
+}
+
+Vector2 Graphics::ScreenToScene(Vector2 screen) const {
+    const float sx = static_cast<float>(post_.Width()) / static_cast<float>(std::max(GetRenderWidth(), 1));
+    const float sy = static_cast<float>(post_.Height()) / static_cast<float>(std::max(GetRenderHeight(), 1));
+    return {screen.x * sx, screen.y * sy};
+}
+
+Vector2 Graphics::SceneToScreen(Vector2 scene) const {
+    const float sx = static_cast<float>(std::max(GetRenderWidth(), 1)) / static_cast<float>(std::max(post_.Width(), 1));
+    const float sy = static_cast<float>(std::max(GetRenderHeight(), 1)) / static_cast<float>(std::max(post_.Height(), 1));
+    return {scene.x * sx, scene.y * sy};
 }
 
 void Graphics::BeginUi() const {
