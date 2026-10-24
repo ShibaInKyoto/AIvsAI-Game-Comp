@@ -55,7 +55,7 @@ endless mode after that. Short runs (15–20 min), lots of build variety.
 - `src/game`     — simulation: world, enemies, bosses, modules, upgrades, ships,
                    director, challenges, profile, bot
 - `src/view`     — presentation of the simulation: renderer, effects, HUD, shapes, backdrop
-- `src/ui`       — widgets, upgrade draft, settings panel, codex
+- `src/ui`       — widgets, upgrade draft, settings, codex and records panels
 - `src/scenes`   — boot, title, hangar, game, results
 - `src/platform` — OS-specific bits (XInput rumble)
 - `tests`        — doctest unit tests (simulation runs headless)

@@ -188,7 +188,7 @@ src/render   Neon line/sprite batcher, HDR bloom post-processing, warp grid, par
 src/audio    Sound-effect synthesiser, real-time music engine, audio device/voice management
 src/game     Simulation: world, enemies, bosses, weapon modules, upgrades, ships, director, bot, profile
 src/view     Presentation of the simulation: world renderer, effects director, HUD, shapes
-src/ui       Widgets, upgrade draft, settings panel, codex
+src/ui       Widgets, upgrade draft, settings, codex and records panels
 src/scenes   Title, hangar, game and results screens
 assets       Fonts (OFL), GLSL shaders, icon; all compiled into the executable
 tests        doctest unit and headless simulation tests
