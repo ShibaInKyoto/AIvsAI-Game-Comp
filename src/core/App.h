@@ -45,7 +45,9 @@ public:
     int Run(const SceneFactory& firstScene);
 
     Graphics& Gfx() { return graphics_; }
+    const Graphics& Gfx() const { return graphics_; }
     Input& In() { return input_; }
+    const Input& In() const { return input_; }
     Settings& Prefs() { return settings_; }
     AudioSystem& Audio() { return *audio_; }
     Profile& Progress() { return *profile_; }

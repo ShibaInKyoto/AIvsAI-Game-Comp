@@ -1,5 +1,7 @@
 #include "core/App.h"
-#include "scenes/SandboxScene.h"
+#include "game/Profile.h"
+#include "scenes/GameScene.h"
+#include "scenes/TitleScene.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -63,5 +65,15 @@ gb::LaunchOptions ParseArgs(int argc, char** argv) {
 
 int main(int argc, char** argv) {
     gb::App app(ParseArgs(argc, argv));
-    return app.Run([](gb::App& a) { return std::make_unique<gb::SandboxScene>(a); });
+    return app.Run([](gb::App& a) -> std::unique_ptr<gb::Scene> {
+        const gb::LaunchOptions& options = a.Options();
+        // Automated runs and "--scene game" jump straight into a run.
+        if (options.autotestSeconds > 0.0f || options.startScene == "game") {
+            gb::RunConfig config;
+            config.seed = options.seed != 0 ? options.seed : 1234u;
+            config.meta = a.Progress().Bonuses();
+            return std::make_unique<gb::GameScene>(a, config);
+        }
+        return std::make_unique<gb::TitleScene>(a);
+    });
 }

@@ -24,7 +24,8 @@ public:
 
     // Begin/End wrap a block of neon drawing: they bind the additive shader and
     // blend mode. Plain raylib drawing must not happen inside the block.
-    void Begin(float boost = 1.0f);
+    // boost scales brightness (HDR); whiteCore pushes line centres toward white.
+    void Begin(float boost = 1.0f, float whiteCore = 0.85f);
     void End();
     bool Active() const { return active_; }
 

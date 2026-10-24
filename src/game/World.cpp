@@ -122,8 +122,10 @@ void World::ApplyUpgrade(UpgradeId id) {
     }
 }
 
-std::vector<UpgradeId> World::RollOffers(int count, std::span<const UpgradeId> banned) {
-    return inventory_.RollOffers(rng_, count, stats_, player_.hp, banned);
+std::vector<UpgradeId> World::RollOffers(int count, std::span<const UpgradeId> banned, float luckBonus) {
+    PlayerStats rollStats = stats_;
+    rollStats.luck += luckBonus;
+    return inventory_.RollOffers(rng_, count, rollStats, player_.hp, banned);
 }
 
 bool World::UseReroll() {

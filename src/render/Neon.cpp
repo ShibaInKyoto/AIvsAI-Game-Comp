@@ -124,9 +124,8 @@ void NeonRenderer::Shutdown() {
     }
 }
 
-void NeonRenderer::Begin(float boost) {
+void NeonRenderer::Begin(float boost, float whiteCore) {
     BeginShaderMode(shader_);
-    const float whiteCore = 0.85f;
     SetShaderValue(shader_, boostLoc_, &boost, SHADER_UNIFORM_FLOAT);
     SetShaderValue(shader_, whiteCoreLoc_, &whiteCore, SHADER_UNIFORM_FLOAT);
     BeginBlendMode(BLEND_ADD_COLORS);

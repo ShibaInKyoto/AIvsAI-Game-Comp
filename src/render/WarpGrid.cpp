@@ -49,8 +49,9 @@ void WarpGrid::Build(Rectangle bounds, float spacing) {
             const bool border = x == 0 || y == 0 || x == cols_ - 1 || y == rows_ - 1;
             if (border) {
                 springs_.push_back({i, -1, 0.0f, 0.1f, 0.1f});
-            } else if (x % 3 == 0 && y % 3 == 0) {
-                springs_.push_back({i, -1, 0.0f, 0.002f, 0.02f});
+            } else if (x % 2 == 0 && y % 2 == 0) {
+                // Loose anchors pull the mesh back to rest after big impacts.
+                springs_.push_back({i, -1, 0.0f, 0.006f, 0.03f});
             }
             // Slightly shorter than rest length keeps the mesh taut.
             if (x > 0) {

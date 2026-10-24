@@ -86,7 +86,8 @@ public:
     // --- Build -------------------------------------------------------------
     void ApplyUpgrade(UpgradeId id);
     const UpgradeInventory& Inventory() const { return inventory_; }
-    std::vector<UpgradeId> RollOffers(int count, std::span<const UpgradeId> banned = {});
+    // luckBonus shifts the roll toward rarer cards (data caches use it).
+    std::vector<UpgradeId> RollOffers(int count, std::span<const UpgradeId> banned = {}, float luckBonus = 0.0f);
     const PlayerStats& Stats() const { return stats_; }
     int Rerolls() const { return rerolls_; }
     bool UseReroll();
@@ -145,6 +146,7 @@ public:
     float OrbitRadius() const;
 
     Enemy* FindEnemy(EntityId id);
+    const Enemy* FindEnemy(EntityId id) const { return const_cast<World*>(this)->FindEnemy(id); }
     Enemy* NearestEnemy(Vector2 position, float maxRange, EntityId exclude = kInvalidId);
     int ActiveEnemyCount() const { return activeEnemies_; }
 
