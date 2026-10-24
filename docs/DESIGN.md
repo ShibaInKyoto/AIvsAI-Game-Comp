@@ -56,3 +56,27 @@ endless mode after that. Short runs (15–20 min), lots of build variety.
 - `src/scenes` — title, hangar, game, settings, results
 - `src/ui`     — widgets and HUD
 - `tests`      — doctest unit tests (simulation runs headless)
+
+## Status (living section)
+
+Implemented:
+- Full loop: boot → title (attract demo) → hangar → run → results; pause/settings.
+- 6 ships, 39 upgrades + 7 evolutions, 14 enemies, 5 bosses, 5 sector modifiers.
+- Campaign / Endless / Daily, 3 difficulties, credits + firmware + 16 challenges.
+- Procedural SFX + adaptive music; XInput rumble on Windows.
+- Render scale (auto caps 4K), F3 perf overlay, auto-pause on focus loss.
+- CI: MSVC + GCC with -Werror, unit/sim tests, smoke tests (Linux Xvfb,
+  Windows Mesa llvmpipe), dependency check, rolling nightly release.
+
+Balance targets (tools/BalanceSim, bot skill = reaction speed):
+- Standard @ skill 0.45 ≈ 50–60 % wins; Relaxed @ 0.2 ≈ 90 %;
+  Overclocked @ 0.6 ≈ 30–50 %, punishing for weak-start ships.
+
+Testing helpers:
+- `--scene title|game|draft|evolution|pause|hangar|firmware|results|records`
+- `--sector N --boss`, `--autotest S`, `--screenshot P --screenshot-at S`, `--perf`
+- xdotool scripts under Xvfb drive real key presses through the menus.
+
+Remaining ideas / TODO:
+- Final README screenshot refresh; tag v1.0.0 release at the end.
+- Optional: more boss attack variety, codex screen, extra sector events.
