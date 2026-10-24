@@ -68,6 +68,7 @@ void GameView::DrawWorld(Vector2 reticle, bool showReticle) {
     BeginMode2D(CurrentCamera());
     WorldDrawContext ctx;
     ctx.visible = camera_.VisibleWorld(w, h);
+    ctx.cameraCenter = camera_.Position();
     ctx.time = time_;
     ctx.gridMinor = WithAlpha(gridColor_, 0.075f);
     ctx.gridMajor = WithAlpha(gridColor_, 0.16f);

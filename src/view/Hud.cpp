@@ -25,6 +25,17 @@ void Hexagon(NeonRenderer& neon, Vector2 c, float r, Color color, bool filled, f
     neon.Polyline(pts, true, width, color);
 }
 
+const char* BossTitle(EnemyKind kind) {
+    switch (kind) {
+    case EnemyKind::BossWarden: return "PERIMETER GUARDIAN";
+    case EnemyKind::BossHydra: return "THE DATA SERPENT";
+    case EnemyKind::BossSingularity: return "COLLAPSED MEMORY WELL";
+    case EnemyKind::BossArchitect: return "FIREWALL ENGINEER";
+    case EnemyKind::BossCore: return "HEART OF THE MAINFRAME";
+    default: return "";
+    }
+}
+
 const char* KeyHint(const App& app, const char* keyboard, const char* pad) {
     return app.In().LastDevice() == InputDevice::Gamepad ? pad : keyboard;
 }
@@ -333,6 +344,23 @@ void Hud::DrawBanners(App& app, const GameView& view) const {
                       WithAlpha(palette::kDanger, a), Align::Center, 0.25f);
         text.Draw(FontId::Heading, "HOSTILE CORE PROCESS DETECTED", {cx, cy + 26.0f}, 24.0f,
                   WithAlpha(palette::kDanger, a), Align::Center, 0.2f);
+        break;
+    }
+    case SectorPhase::Boss: {
+        // Title card as the guardian materialises.
+        if (t > 3.6f) {
+            break;
+        }
+        const Enemy* boss = world.FindEnemy(director.BossId());
+        if (boss == nullptr) {
+            break;
+        }
+        const Color c = GetEnemyInfo(boss->kind).color;
+        const float a = fade(t, 0.25f, 2.6f, 0.7f);
+        const float slide = (1.0f - EaseOutCubic(Saturate(t / 0.6f))) * 80.0f;
+        text.Draw(FontId::Heading, BossTitle(boss->kind), {cx, cy - 70.0f}, 26.0f, WithAlpha(c, a), Align::Center, 0.35f);
+        text.DrawGlow(FontId::Display, GetEnemyInfo(boss->kind).name, {cx - slide, cy - 34.0f}, 96.0f,
+                      WithAlpha(WHITE, a), WithAlpha(c, a), Align::Center, 0.12f);
         break;
     }
     case SectorPhase::Cleared:

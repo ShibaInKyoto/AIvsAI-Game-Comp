@@ -30,6 +30,16 @@ Color XpColor(int value) {
 } // namespace
 
 void WorldRenderer::Update(const World& world, float dt) {
+    if (stars_.empty()) {
+        // Deterministic starfield spread wider than the arena for parallax.
+        Rng rng(0x57A25u);
+        stars_.reserve(260);
+        for (int i = 0; i < 260; ++i) {
+            const float depth = rng.Range(0.05f, 0.45f);
+            stars_.push_back({{rng.Range(-2600.0f, 2600.0f), rng.Range(-1800.0f, 1800.0f)}, depth,
+                              rng.Range(1.5f, 3.5f) * (0.5f + depth), rng.Angle()});
+        }
+    }
     for (Afterimage& a : afterimages_) {
         a.life = std::max(0.0f, a.life - dt * 3.0f);
     }
@@ -47,6 +57,7 @@ void WorldRenderer::Draw(NeonRenderer& neon, const World& world, const WarpGrid&
     // The grid is a backdrop: drawn dimmer than gameplay entities, which get
     // an HDR boost so they punch through the bloom.
     neon.Begin(1.6f, 0.15f);
+    DrawBackdrop(neon, ctx);
     grid.Draw(neon, ctx.visible, ctx.gridMinor, ctx.gridMajor);
     neon.End();
     neon.Begin(kEntityBoost);
@@ -77,6 +88,32 @@ void WorldRenderer::Draw(NeonRenderer& neon, const World& world, const WarpGrid&
         neon.Glow(r, 3.0f, WHITE);
     }
     neon.End();
+}
+
+void WorldRenderer::DrawBackdrop(NeonRenderer& neon, const WorldDrawContext& ctx) const {
+    // Huge, faint nebula glows tinted by the sector colour sit far behind the grid.
+    const Color nebula = ctx.arenaColor;
+    static constexpr std::array<Vector3, 6> kNebulae{{{-900.0f, -500.0f, 900.0f},
+                                                     {1100.0f, -300.0f, 700.0f},
+                                                     {200.0f, 700.0f, 1000.0f},
+                                                     {-1400.0f, 900.0f, 650.0f},
+                                                     {1500.0f, 1000.0f, 800.0f},
+                                                     {-200.0f, -1200.0f, 750.0f}}};
+    for (std::size_t i = 0; i < kNebulae.size(); ++i) {
+        const Vector3 n = kNebulae[i];
+        const Vector2 p = Vector2{n.x, n.y} + ctx.cameraCenter * 0.8f;
+        const float pulse = 0.8f + 0.2f * std::sin(ctx.time * 0.15f + static_cast<float>(i));
+        const Color tint = i % 2 == 0 ? nebula : LerpColor(nebula, Color{120, 60, 255, 255}, 0.5f);
+        neon.Glow(p, n.z, WithAlpha(tint, 0.055f * pulse));
+    }
+    for (const Star& star : stars_) {
+        const Vector2 p = star.position + ctx.cameraCenter * (1.0f - star.depth);
+        if (!Visible(p, 8.0f, ctx.visible)) {
+            continue;
+        }
+        const float twinkle = 0.6f + 0.4f * std::sin(ctx.time * (0.8f + star.depth * 2.0f) + star.phase);
+        neon.Glow(p, star.size * 2.0f, WithAlpha(Color{180, 200, 255, 255}, 0.25f * twinkle * (0.4f + star.depth)));
+    }
 }
 
 void WorldRenderer::DrawArena(NeonRenderer& neon, const WorldDrawContext& ctx) const {

@@ -5,6 +5,7 @@
 #include <raylib.h>
 
 #include <array>
+#include <vector>
 
 namespace gb {
 
@@ -14,6 +15,7 @@ class ParticleSystem;
 
 struct WorldDrawContext {
     Rectangle visible{};
+    Vector2 cameraCenter{};
     float time = 0.0f;
     Color gridMinor{};
     Color gridMajor{};
@@ -31,6 +33,7 @@ public:
               const WorldDrawContext& ctx);
 
 private:
+    void DrawBackdrop(NeonRenderer& neon, const WorldDrawContext& ctx) const;
     void DrawArena(NeonRenderer& neon, const WorldDrawContext& ctx) const;
     void DrawPickups(NeonRenderer& neon, const World& world, const WorldDrawContext& ctx) const;
     void DrawEnemies(NeonRenderer& neon, const World& world, const WorldDrawContext& ctx) const;
@@ -41,6 +44,14 @@ private:
     void DrawEnemyBullets(NeonRenderer& neon, const World& world, const WorldDrawContext& ctx) const;
     void DrawEnemyBulletShadows(const World& world, const WorldDrawContext& ctx) const;
     void DrawEffectsOverlay(NeonRenderer& neon, const World& world, const WorldDrawContext& ctx) const;
+
+    struct Star {
+        Vector2 position;
+        float depth;  // 0 = infinitely far (moves with camera), 1 = world-locked
+        float size;
+        float phase;
+    };
+    std::vector<Star> stars_;
 
     struct Afterimage {
         Vector2 position;
