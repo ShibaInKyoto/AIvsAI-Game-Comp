@@ -78,6 +78,10 @@ Balance targets (tools/BalanceSim, bot skill = reaction speed):
   the Architect (difficulty should rise through the run, not peak at boss 1);
   Relaxed @ 0.2 ≈ 95 %; Overclocked @ 0.6 ≈ 55 %, punishing for fragile ships.
 - A run's first sector event is always a Data Storm (teaches events safely).
+- Endless loops compound (enemy hp x4, spawn rate x1.4, guardian hp x3 per
+  loop) and add corruption (destroyed hostiles may fire back). Overcharge
+  stacks additively so builds cannot outgrow loops forever. The bot dodges
+  far better than people, so endless pacing is tuned by design, not by sim.
 
 Testing helpers:
 - `--scene title|game|draft|evolution|pause|hangar|firmware|results|records|codex`

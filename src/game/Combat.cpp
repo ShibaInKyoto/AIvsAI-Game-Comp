@@ -487,6 +487,14 @@ void World::KillEnemy(Enemy& e, bool dropLoot) {
         player_.novaCharge = std::min(1.0f, player_.novaCharge + kNovaPerThreat * std::max(info.threat, 0.4f) *
                                                                      stats_.novaChargeRate * (e.elite ? 8.0f : 1.0f));
     }
+    // Endless loops corrupt the grid: destroyed hostiles may spit one last shot,
+    // so the danger grows with the player's kill rate instead of lagging it.
+    const int loop = director_.Loop();
+    if (loop > 0 && e.countsForClear && !IsBoss(e.kind) && DistanceSq(e.position, player_.position) > 160.0f * 160.0f &&
+        rng_.Chance(std::min(0.12f * static_cast<float>(loop), 0.5f))) {
+        const Vector2 aim = Normalized(player_.position - e.position);
+        FireEnemyBullet(e.position, aim * 170.0f, EnemyBulletStyle::Needle, info.color, 7.0f).source = e.kind;
+    }
     if (e.elite) {
         runStats_.elitesKilled++;
     }

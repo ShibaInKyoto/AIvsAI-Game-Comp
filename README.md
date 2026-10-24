@@ -78,7 +78,8 @@ Prompts adapt automatically to whichever device you used last.
 
 * **Campaign:** clear five sectors and destroy the Core. Optionally keep going
   in endless mode afterwards.
-* **Endless:** sectors loop forever with rising threat.
+* **Endless:** sectors loop forever. Each loop compounds enemy toughness and
+  numbers, and *corruption* makes destroyed hostiles fire back.
 * **Daily run:** a fixed seed and ship for everyone each day.
 * **Relaxed / Standard / Overclocked:** Relaxed adds two integrity and softens
   enemies; Overclocked is denser and faster, with bigger rewards.

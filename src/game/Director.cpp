@@ -4,6 +4,7 @@
 #include "game/World.h"
 
 #include <algorithm>
+#include <cmath>
 #include <initializer_list>
 #include <utility>
 
@@ -127,7 +128,7 @@ void Director::Start(int sector) {
     budget_ = 2.0f;
     waveTime_ = 0.0f;
     surgeTimer_ = 38.0f;
-    eliteTimer_ = 45.0f / eliteRate_;
+    eliteTimer_ = 45.0f / (eliteRate_ * LoopScale(1.5f));
     bossId_ = kInvalidId;
     SetPhase(SectorPhase::Intro);
 }
@@ -146,8 +147,14 @@ float Director::WaveProgress() const {
     }
 }
 
+float Director::LoopScale(float perLoop) const {
+    // Endless loops compound: the player's build compounds too (levels,
+    // stacking overcharge), and linear scaling never caught up with it.
+    return std::pow(perLoop, static_cast<float>(Loop()));
+}
+
 float Director::EnemyHpMultiplier() const {
-    const float loopScale = 1.0f + 0.9f * static_cast<float>(Loop());
+    const float loopScale = LoopScale(4.0f); // x4 keeps loop starts at least as tough as the sector before
     const float sectorScale = 1.0f + 0.75f * static_cast<float>(sector_ % kCampaignSectors);
     const float rampWithinSector = 1.0f + 0.8f * WaveProgress();
     return sectorScale * loopScale * rampWithinSector * hpMultiplier_;
@@ -156,7 +163,7 @@ float Director::EnemyHpMultiplier() const {
 float Director::EnemySpeedMultiplier() const { return (1.0f + 0.05f * static_cast<float>(sector_)) * speedMultiplier_; }
 
 float Director::CurrentThreatRate() const {
-    const float loopScale = 1.0f + 0.5f * static_cast<float>(Loop());
+    const float loopScale = LoopScale(1.4f);
     // The very first sector eases in so new players can learn the controls.
     const float warmup = sector_ == 0 ? 0.55f + 0.45f * Saturate(waveTime_ / 25.0f) : 1.0f;
     return Info().threatRate * (1.0f + 1.3f * WaveProgress()) * loopScale * spawnMultiplier_ * warmup;
@@ -223,7 +230,7 @@ void Director::UpdateWaves(World& world, float dt) {
 
     eliteTimer_ -= dt;
     if (eliteTimer_ <= 0.0f) {
-        eliteTimer_ = world.Random().Range(42.0f, 55.0f) / eliteRate_;
+        eliteTimer_ = world.Random().Range(42.0f, 55.0f) / (eliteRate_ * LoopScale(1.5f));
         SpawnGroup(world, PickKind(world), true);
     }
 

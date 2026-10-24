@@ -93,6 +93,8 @@ public:
     void DebugTriggerEvent(World& world, SectorEvent event) { StartEvent(world, event); }
 
     float EnemyHpMultiplier() const;
+    // perLoop^loop: compounding difficulty for endless loops (1 in the campaign).
+    float LoopScale(float perLoop) const;
     float EnemySpeedMultiplier() const;
     float XpMultiplier() const { return xpMultiplier_; }
     float ScoreMultiplier() const { return scoreMultiplier_; }

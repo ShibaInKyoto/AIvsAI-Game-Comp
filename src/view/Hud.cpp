@@ -372,6 +372,10 @@ void Hud::DrawBanners(App& app, const GameView& view) const {
         if (director.Loop() > 0) {
             text.Draw(FontId::BodyBold, TextFormat("ENDLESS LOOP %d", director.Loop()), {cx, cy + 82.0f}, 28.0f,
                       WithAlpha(palette::kUiWarn, a), Align::Center, 0.1f);
+            text.Draw(
+                FontId::Heading,
+                TextFormat("CORRUPTION %d%%  //  DESTROYED HOSTILES RETALIATE", std::min(12 * director.Loop(), 50)),
+                {cx, cy + 122.0f}, 18.0f, WithAlpha(palette::kDanger, a), Align::Center, 0.15f);
         }
         break;
     }

@@ -320,8 +320,7 @@ Enemy& World::SpawnEnemy(EnemyKind kind, Vector2 position, float telegraph, bool
                   std::clamp(position.y, kArena.y + 20.0f, kArena.y + kArena.height - 20.0f)};
     e.radius = info.radius * (elite ? 1.45f : 1.0f);
     const float hpScale = director_.EnemyHpMultiplier() * tuning_.enemyHp * (elite ? 7.0f : 1.0f);
-    e.maxHp = e.hp =
-        info.hp * (IsBoss(kind) ? (1.0f + 0.9f * static_cast<float>(director_.Loop())) * tuning_.enemyHp : hpScale);
+    e.maxHp = e.hp = info.hp * (IsBoss(kind) ? director_.LoopScale(3.0f) * tuning_.enemyHp : hpScale);
     e.speed = info.speed;
     e.spawnDelay = telegraph;
     e.elite = elite;

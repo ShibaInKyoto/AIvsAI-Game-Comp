@@ -284,10 +284,14 @@ void ApplyUpgradeStack(UpgradeId id, int stack, PlayerStats& s) {
         s.fireRate *= 1.25f;
         break;
     case U::OverdriveCore: s.novaChargeRate *= 2.0f; break;
-    case U::Overcharge:
-        s.damage *= 1.06f;
-        s.fireRate *= 1.04f;
+    case U::Overcharge: {
+        // Additive across stacks (the factors telescope to 1 + 0.06n and
+        // 1 + 0.04n): compounding made endless builds grow without bound.
+        const float k = static_cast<float>(stack - 1);
+        s.damage *= 1.0f + 0.06f / (1.0f + 0.06f * k);
+        s.fireRate *= 1.0f + 0.04f / (1.0f + 0.04f * k);
         break;
+    }
     case U::SawStorm:
     case U::HiveSwarm:
     case U::StormCore:
