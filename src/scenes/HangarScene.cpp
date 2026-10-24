@@ -317,25 +317,33 @@ void HangarScene::DrawFirmware() {
 void HangarScene::DrawUi() {
     const Vector2 ui = app_.Gfx().UiSize();
     TextRenderer& text = app_.Gfx().Text();
-    text.DrawGlow(FontId::Display, "HANGAR", {90.0f, 60.0f}, 64.0f, WHITE, palette::kUiAccent, Align::Left, 0.1f);
-    text.Draw(FontId::BodyBold, TextFormat("CREDITS  %d", app_.Progress().Credits()), {ui.x - 90.0f, 70.0f}, 38.0f,
+    // Menu and ship card are centred as one group so wide screens do not leave
+    // a hole in the middle.
+    constexpr float kMenuWidth = 560.0f;
+    constexpr float kGap = 100.0f;
+    const float detailWidth = std::min(720.0f, ui.x - 820.0f);
+    const float left = std::max(90.0f, (ui.x - (kMenuWidth + kGap + detailWidth)) * 0.5f);
+    const float right = left + kMenuWidth + kGap + detailWidth;
+
+    text.DrawGlow(FontId::Display, "HANGAR", {left, 60.0f}, 64.0f, WHITE, palette::kUiAccent, Align::Left, 0.1f);
+    text.Draw(FontId::BodyBold, TextFormat("CREDITS  %d", app_.Progress().Credits()), {right, 70.0f}, 38.0f,
               LerpColor(palette::kCache, WHITE, purchaseFlash_), Align::Right, 0.05f);
 
-    menu_.Draw(app_, {90.0f, 190.0f}, 560.0f, 62.0f, palette::kUiAccent);
+    menu_.Draw(app_, {left, 190.0f}, kMenuWidth, 62.0f, palette::kUiAccent);
     const int selected = menu_.Selected();
+    const Vector2 blurb{left + 20.0f, 190.0f + 62.0f * 11.0f + 10.0f};
     if (selected == ItemDifficulty) {
-        text.DrawWrapped(FontId::Body, DifficultyBlurb(difficulty_), {110.0f, 190.0f + 62.0f * 11.0f + 10.0f}, 520.0f,
-                         24.0f, palette::kUiDim);
+        text.DrawWrapped(FontId::Body, DifficultyBlurb(difficulty_), blurb, kMenuWidth - 40.0f, 24.0f, palette::kUiDim);
     } else if (selected == ItemMode) {
         text.DrawWrapped(FontId::Body,
-                         mode_ == GameMode::Campaign ? "Clear five sectors and destroy the Core."
-                                                     : "No finish line. Sectors loop with rising threat.",
-                         {110.0f, 190.0f + 62.0f * 11.0f + 10.0f}, 520.0f, 24.0f, palette::kUiDim);
+                         mode_ == GameMode::Campaign
+                             ? "Clear five sectors and destroy the Core."
+                             : "No finish line. Sectors loop forever with compounding threat and corruption.",
+                         blurb, kMenuWidth - 40.0f, 24.0f, palette::kUiDim);
     }
 
-    const float detailWidth = std::min(720.0f, ui.x - 820.0f);
-    DrawShipDetails({ui.x - detailWidth - 90.0f, 150.0f, detailWidth, 860.0f});
-    ui::Prompt(app_, {90.0f, ui.y - 50.0f}, "ESC", "B", "BACK", Align::Left, 22.0f);
+    DrawShipDetails({right - detailWidth, 150.0f, detailWidth, 860.0f});
+    ui::Prompt(app_, {left, ui.y - 50.0f}, "ESC", "B", "BACK", Align::Left, 22.0f);
 
     if (firmwareOpen_) {
         DrawFirmware();
