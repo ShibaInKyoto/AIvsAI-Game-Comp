@@ -100,4 +100,5 @@ Testing helpers:
 Remaining ideas / TODO:
 - Releases: a commit whose message contains `[release]` (or a `v*` tag)
   publishes `v<project version>`; re-running it replaces that release.
-- Optional: more evolutions.
+- Optional: more evolutions, late-game enemies (e.g. a blinking Phantom and a
+  Sentinel turret).
