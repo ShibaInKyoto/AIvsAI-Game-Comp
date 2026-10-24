@@ -68,10 +68,14 @@ Implemented:
 - 6 ships, 39 upgrades + 7 evolutions, 14 enemies, 5 bosses, 5 sector modifiers.
 - Campaign / Endless / Boss Rush / Daily, 3 difficulties, credits + firmware + 16 challenges.
 - Codex of hostiles and upgrades, decoded as they are met or drafted.
+- Sector events (ambush, crossfire, data storm) every ~40 s of waves.
+- Results show the run's loadout and what destroyed the ship.
 - Procedural SFX + adaptive music; XInput rumble on Windows.
 - Render scale (auto caps 4K), F3 perf overlay, auto-pause on focus loss.
-- CI: MSVC + GCC with -Werror, unit/sim tests, smoke tests (Linux Xvfb,
-  Windows Mesa llvmpipe), dependency check, rolling nightly release.
+- CI: MSVC + GCC with -Werror, clang-format check, unit/sim tests, ASan +
+  UBSan job, smoke tests (Linux Xvfb, Windows Mesa llvmpipe), dependency
+  check, rolling nightly release.
+- Audio: soft peak limiter on the final mix.
 
 Balance targets (tools/BalanceSim, bot skill = reaction speed):
 - Standard @ skill 0.45 ≈ 85 % wins, losses split between the Warden and
@@ -91,5 +95,5 @@ Testing helpers:
 - xdotool scripts under Xvfb drive real key presses through the menus.
 
 Remaining ideas / TODO:
-- Final README screenshot refresh; tag v1.0.0 release at the end.
-- Optional: more boss attack variety, extra sector events.
+- Tag the v1.0.0 release at the end (push a `[release]` commit or a tag).
+- Optional: run history in Records, more evolutions.
