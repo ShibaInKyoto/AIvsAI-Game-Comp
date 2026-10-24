@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cmath>
 #include <cstdint>
 #include <cstring>
 
@@ -21,6 +22,29 @@ void MusicCallback(void* buffer, unsigned int frames) {
         music->Render(static_cast<float*>(buffer), frames);
     } else {
         std::memset(buffer, 0, static_cast<std::size_t>(frames) * 2 * sizeof(float));
+    }
+}
+
+// Peak limiter on the final mix (stereo float frames, audio thread only):
+// instant attack, smooth release, so stacked explosions duck instead of
+// clipping harshly.
+float g_limiterGain = 1.0f;
+
+void MasterLimiter(void* buffer, unsigned int frames) {
+    constexpr float kCeiling = 0.95f;
+    constexpr float kRelease = 0.0001f; // ~0.25 s back to unity at 44.1 kHz
+    float* samples = static_cast<float*>(buffer);
+    for (unsigned int i = 0; i < frames; ++i) {
+        float& left = samples[2 * i];
+        float& right = samples[2 * i + 1];
+        const float peak = std::max(std::abs(left), std::abs(right)) * g_limiterGain;
+        if (peak > kCeiling) {
+            g_limiterGain *= kCeiling / peak;
+        } else {
+            g_limiterGain += (1.0f - g_limiterGain) * kRelease;
+        }
+        left *= g_limiterGain;
+        right *= g_limiterGain;
     }
 }
 
@@ -71,6 +95,7 @@ bool AudioSystem::Init(bool enabled) {
     g_music.store(music_.get());
     SetAudioStreamCallback(stream_, MusicCallback);
     PlayAudioStream(stream_);
+    AttachAudioMixedProcessor(MasterLimiter);
     return true;
 }
 
@@ -78,6 +103,7 @@ void AudioSystem::Shutdown() {
     if (!enabled_) {
         return;
     }
+    DetachAudioMixedProcessor(MasterLimiter);
     StopAudioStream(stream_);
     UnloadAudioStream(stream_);
     g_music.store(nullptr);
