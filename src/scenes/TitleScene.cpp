@@ -361,6 +361,9 @@ void TitleScene::DrawUi() {
     }
     text.Draw(FontId::Body, TextFormat("v%s  (%s)", build::kVersion, build::kGitHash), {24.0f, ui.y - 40.0f}, 20.0f,
               palette::kUiFaint);
+    if (app_.In().LastDevice() == InputDevice::KeyboardMouse) {
+        text.Draw(FontId::Body, "F11 / ALT+ENTER  TOGGLE FULLSCREEN", {24.0f, ui.y - 66.0f}, 20.0f, palette::kUiFaint);
+    }
     ui::Prompt(app_, {ui.x * 0.5f, ui.y - 52.0f}, "ENTER", "A", "SELECT", Align::Center, 22.0f);
     if (menu_.Selected() == ItemDaily) {
         text.Draw(FontId::Body, "Same seed and ship for everyone today. One shot at glory.",
