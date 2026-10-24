@@ -1,5 +1,6 @@
 #include "core/App.h"
 #include "game/Profile.h"
+#include "scenes/BootScene.h"
 #include "scenes/GameScene.h"
 #include "scenes/HangarScene.h"
 #include "scenes/ResultsScene.h"
@@ -105,6 +106,9 @@ int main(int argc, char** argv) {
             summary.sectorReached = 4;
             return std::make_unique<gb::ResultsScene>(a, summary, 512);
         }
-        return std::make_unique<gb::TitleScene>(a);
+        if (scene == "title") {
+            return std::make_unique<gb::TitleScene>(a);
+        }
+        return std::make_unique<gb::BootScene>(a);
     });
 }
