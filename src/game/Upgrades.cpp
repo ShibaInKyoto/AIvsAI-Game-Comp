@@ -63,6 +63,31 @@ constexpr std::array<UpgradeInfo, static_cast<std::size_t>(UpgradeId::Count)> kU
      kNoModule},
     {U::Overcharge, "OVERCHARGE", "+6% damage and +4% fire rate. Stacks forever.", R::Common, C::Weapon, 0,
      kNoModule},
+
+    {U::SawStorm, "SAW STORM", "Twelve blades in a pulsing storm. +80% blade damage.", R::Legendary, C::Evolution, 1,
+     ModuleId::OrbitBlades},
+    {U::HiveSwarm, "HIVE SWARM", "Six drones, each firing a three-way spread.", R::Legendary, C::Evolution, 1,
+     ModuleId::Drones},
+    {U::StormCore, "STORM CORE", "Rapid chain lightning that jumps 12 times and can crit.", R::Legendary,
+     C::Evolution, 1, ModuleId::ArcCoil},
+    {U::ClusterBarrage, "CLUSTER BARRAGE", "Ten missiles whose blasts split into clusters.", R::Legendary,
+     C::Evolution, 1, ModuleId::Missiles},
+    {U::ShockReactor, "SHOCK REACTOR", "Pulses every 1.5s with 60% more force.", R::Legendary, C::Evolution, 1,
+     ModuleId::PulseNova},
+    {U::GravityMines, "GRAVITY MINES", "Mines drag enemies in before a huge blast.", R::Legendary, C::Evolution, 1,
+     ModuleId::Mines},
+    {U::SpectrumCannon, "SPECTRUM CANNON", "A five-beam prism that fires twice as often.", R::Legendary,
+     C::Evolution, 1, ModuleId::PrismLance},
+}};
+
+constexpr std::array<EvolutionRecipe, 7> kEvolutions{{
+    {U::SawStorm, U::OrbitBlades, U::Thrusters},
+    {U::HiveSwarm, U::Drones, U::SplitShot},
+    {U::StormCore, U::ArcCoil, U::CriticalCode},
+    {U::ClusterBarrage, U::SwarmMissiles, U::FragRounds},
+    {U::ShockReactor, U::PulseNova, U::ReactiveArmor},
+    {U::GravityMines, U::ProxMines, U::Magnet},
+    {U::SpectrumCannon, U::PrismLance, U::Velocity},
 }};
 
 constexpr std::array<float, static_cast<std::size_t>(Rarity::Count)> kRarityWeights{60.0f, 28.0f, 10.0f, 2.5f};
@@ -70,6 +95,17 @@ constexpr std::array<float, static_cast<std::size_t>(Rarity::Count)> kRarityWeig
 } // namespace
 
 const UpgradeInfo& GetUpgradeInfo(UpgradeId id) { return kUpgrades[static_cast<std::size_t>(id)]; }
+
+std::span<const EvolutionRecipe> AllEvolutions() { return kEvolutions; }
+
+const EvolutionRecipe* EvolutionForModule(UpgradeId module) {
+    for (const EvolutionRecipe& recipe : kEvolutions) {
+        if (recipe.module == module) {
+            return &recipe;
+        }
+    }
+    return nullptr;
+}
 
 std::span<const UpgradeInfo> AllUpgrades() { return kUpgrades; }
 
@@ -102,6 +138,7 @@ const char* CategoryName(UpgradeCategory category) {
     case UpgradeCategory::Mobility: return "MOBILITY";
     case UpgradeCategory::Utility: return "UTILITY";
     case UpgradeCategory::Module: return "MODULE";
+    case UpgradeCategory::Evolution: return "EVOLUTION";
     }
     return "";
 }
@@ -252,6 +289,13 @@ void ApplyUpgradeStack(UpgradeId id, int stack, PlayerStats& s) {
         s.damage *= 1.06f;
         s.fireRate *= 1.04f;
         break;
+    case U::SawStorm:
+    case U::HiveSwarm:
+    case U::StormCore:
+    case U::ClusterBarrage:
+    case U::ShockReactor:
+    case U::GravityMines:
+    case U::SpectrumCannon: s.evolved[static_cast<std::size_t>(GetUpgradeInfo(id).module)] = true; break;
     case U::Count: break;
     }
 }
@@ -276,6 +320,14 @@ bool UpgradeInventory::CanOffer(UpgradeId id, const PlayerStats& stats, int hp) 
         return false;
     }
     if (id == U::NanoRepair && hp >= stats.maxHp) {
+        return false;
+    }
+    if (info.category == UpgradeCategory::Evolution) {
+        for (const EvolutionRecipe& recipe : kEvolutions) {
+            if (recipe.evolution == id) {
+                return Stacks(recipe.module) >= GetUpgradeInfo(recipe.module).maxStacks && Stacks(recipe.catalyst) > 0;
+            }
+        }
         return false;
     }
     if (id == U::GlassCannon && stats.maxHp <= 3) {
@@ -303,6 +355,10 @@ std::vector<UpgradeId> UpgradeInventory::RollOffers(Rng& rng, int count, const P
         // Already-owned modules are favoured so builds can actually come together.
         if (info.category == UpgradeCategory::Module && Stacks(info.id) > 0) {
             w *= 2.2f;
+        }
+        // An unlocked evolution should show up almost immediately.
+        if (info.category == UpgradeCategory::Evolution) {
+            w = 400.0f;
         }
         // Overcharge is a filler: rare while the pool is rich, common once it thins out.
         if (info.id == U::Overcharge) {

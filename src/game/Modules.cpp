@@ -31,10 +31,11 @@ void World::UpdateModules(float dt) {
 
     // --- Orbit blades ------------------------------------------------------
     if (const int level = ModuleLevel(stats_, ModuleId::OrbitBlades); level > 0) {
+        const bool evolved = stats_.Evolved(ModuleId::OrbitBlades);
         orbitAngle_ += dt * (level >= 5 ? 4.4f : 3.3f);
         const int blades = OrbitBladeCount();
         const float radius = OrbitRadius();
-        const float damage = (level >= 3 ? 26.0f : 19.0f) * power;
+        const float damage = (level >= 3 ? 26.0f : 19.0f) * power * (evolved ? 1.8f : 1.0f);
         for (int i = 0; i < blades; ++i) {
             const Vector2 blade = origin + FromAngle(orbitAngle_ + kTau * static_cast<float>(i) / blades, radius);
             enemyIndex_.Query(blade, 18.0f, [&](int index) {
@@ -60,6 +61,7 @@ void World::UpdateModules(float dt) {
 
     // --- Drones ------------------------------------------------------------
     if (const int level = ModuleLevel(stats_, ModuleId::Drones); level > 0 && !drones_.empty()) {
+        const bool hive = stats_.Evolved(ModuleId::Drones);
         const float interval = level >= 3 ? 0.3f : 0.45f;
         for (std::size_t i = 0; i < drones_.size(); ++i) {
             Drone& d = drones_[i];
@@ -76,13 +78,14 @@ void World::UpdateModules(float dt) {
             }
             if (target != nullptr && d.cooldown <= 0.0f) {
                 d.cooldown = interval;
-                const int shots = level >= 5 ? 2 : 1;
+                const int shots = hive ? 3 : (level >= 5 ? 2 : 1);
                 for (int s = 0; s < shots; ++s) {
                     if (static_cast<int>(bullets_.size()) >= 3000) {
                         break;
                     }
                     Bullet b;
-                    const float spread = shots > 1 ? (s == 0 ? -0.06f : 0.06f) : 0.0f;
+                    const float spread =
+                        hive ? (static_cast<float>(s) - 1.0f) * 0.16f : (shots > 1 ? (s == 0 ? -0.06f : 0.06f) : 0.0f);
                     b.position = d.position;
                     b.velocity = FromAngle(d.angle + spread, 1350.0f);
                     b.radius = 4.5f;
@@ -101,7 +104,8 @@ void World::UpdateModules(float dt) {
         arcTimer_ -= dt;
         if (arcTimer_ <= 0.0f) {
             static constexpr std::array<int, 6> kChains{0, 3, 5, 5, 7, 7};
-            const int chains = kChains[static_cast<std::size_t>(level)];
+            const bool storm = stats_.Evolved(ModuleId::ArcCoil);
+            const int chains = storm ? 12 : kChains[static_cast<std::size_t>(level)];
             const float damage = (level >= 3 ? 34.0f : 24.0f) * power;
             const int arcs = level >= 5 ? 2 : 1;
             bool fired = false;
@@ -132,7 +136,9 @@ void World::UpdateModules(float dt) {
                     trace.points.push_back(best->position);
                     from = best->position;
                     range = 280.0f;
-                    DamageEnemy(*best, damage, false, Normalized(best->position - origin), 60.0f);
+                    const bool crit = storm && rng_.Chance(stats_.critChance);
+                    DamageEnemy(*best, damage * (crit ? stats_.critMultiplier : 1.0f), crit,
+                                Normalized(best->position - origin), 60.0f);
                 }
                 if (trace.points.size() > 1) {
                     fired = true;
@@ -140,7 +146,7 @@ void World::UpdateModules(float dt) {
                     arcs_.push_back(std::move(trace));
                 }
             }
-            arcTimer_ = fired ? (level >= 3 ? 1.5f : 2.0f) : 0.3f;
+            arcTimer_ = fired ? (storm ? 0.8f : (level >= 3 ? 1.5f : 2.0f)) : 0.3f;
         }
     }
 
@@ -150,7 +156,7 @@ void World::UpdateModules(float dt) {
         if (missileTimer_ <= 0.0f && NearestEnemy(origin, 900.0f) != nullptr) {
             static constexpr std::array<int, 6> kCount{0, 2, 3, 3, 5, 5};
             missileTimer_ = level >= 5 ? 2.2f : 3.0f;
-            const int count = kCount[static_cast<std::size_t>(level)];
+            const int count = stats_.Evolved(ModuleId::Missiles) ? 10 : kCount[static_cast<std::size_t>(level)];
             for (int i = 0; i < count; ++i) {
                 Missile m;
                 m.position = origin;
@@ -190,6 +196,12 @@ void World::UpdateModules(float dt) {
         if (hitTarget || outside || m.life <= 0.0f) {
             m.alive = false;
             Explode(m.position, m.radius, m.damage, kInvalidId, kMissileColor);
+            if (stats_.Evolved(ModuleId::Missiles)) {
+                for (int i = 0; i < 3; ++i) {
+                    const Vector2 p = m.position + FromAngle(rng_.Angle(), m.radius * 0.7f);
+                    Explode(p, m.radius * 0.55f, m.damage * 0.5f, kInvalidId, kMissileColor);
+                }
+            }
         }
     }
 
@@ -197,11 +209,12 @@ void World::UpdateModules(float dt) {
     if (const int level = ModuleLevel(stats_, ModuleId::PulseNova); level > 0) {
         pulseTimer_ -= dt;
         if (pulseTimer_ <= 0.0f) {
-            pulseTimer_ = level >= 3 ? 3.0f : 4.0f;
-            float radius = 260.0f;
+            const bool reactor = stats_.Evolved(ModuleId::PulseNova);
+            pulseTimer_ = reactor ? 1.5f : (level >= 3 ? 3.0f : 4.0f);
+            float radius = 260.0f * (reactor ? 1.15f : 1.0f);
             if (level >= 2) radius *= 1.3f;
             if (level >= 4) radius *= 1.3f;
-            const float damage = (level >= 3 ? 32.0f : 22.0f) * power;
+            const float damage = (level >= 3 ? 32.0f : 22.0f) * power * (reactor ? 1.6f : 1.0f);
             AddShockwave(origin, radius, 1300.0f, damage, 750.0f, level >= 5);
             Emit(EventType::PulseNova, origin, kPulseColor, radius);
         }
@@ -214,8 +227,9 @@ void World::UpdateModules(float dt) {
             mineTimer_ = level >= 2 ? 0.85f : 1.15f;
             PlayerMine mine;
             mine.position = origin - Normalized(player_.velocity, FromAngle(player_.aimAngle)) * 20.0f;
-            mine.damage = (level >= 4 ? 66.0f : 44.0f) * power;
-            mine.radius = level >= 3 ? 155.0f : 110.0f;
+            const float gravity = stats_.Evolved(ModuleId::Mines) ? 1.5f : 1.0f;
+            mine.damage = (level >= 4 ? 66.0f : 44.0f) * power * gravity;
+            mine.radius = (level >= 3 ? 155.0f : 110.0f) * gravity;
             playerMines_.push_back(mine);
         }
     }
@@ -237,6 +251,15 @@ void World::UpdateModules(float dt) {
         }
         if (triggered) {
             mine.alive = false;
+            if (stats_.Evolved(ModuleId::Mines)) {
+                // Gravity mines yank everything nearby into the blast first.
+                enemyIndex_.Query(mine.position, mine.radius * 2.0f, [&](int index) {
+                    Enemy& e = enemies_[static_cast<std::size_t>(index)];
+                    if (e.Active() && !IsBoss(e.kind)) {
+                        e.position = LerpV(e.position, mine.position, 0.55f);
+                    }
+                });
+            }
             Explode(mine.position, mine.radius, mine.damage, kInvalidId, kMineColor);
             if (ModuleLevel(stats_, ModuleId::Mines) >= 5) {
                 for (int i = 0; i < 3; ++i) {
@@ -251,15 +274,17 @@ void World::UpdateModules(float dt) {
     if (const int level = ModuleLevel(stats_, ModuleId::PrismLance); level > 0) {
         lanceTimer_ -= dt;
         if (lanceTimer_ <= 0.0f) {
-            lanceTimer_ = level >= 3 ? 2.0f : 2.5f;
+            const bool spectrum = stats_.Evolved(ModuleId::PrismLance);
+            lanceTimer_ = spectrum ? 1.0f : (level >= 3 ? 2.0f : 2.5f);
             float damage = 48.0f * power;
             if (level >= 2) damage *= 1.4f;
             if (level >= 4) damage *= 1.4f;
             const float width = level >= 3 ? 34.0f : 22.0f;
             const float length = 1500.0f;
-            const int beams = level >= 5 ? 3 : 1;
+            const int beams = spectrum ? 5 : (level >= 5 ? 3 : 1);
+            const float fan = spectrum ? 0.22f : 0.32f;
             for (int i = 0; i < beams; ++i) {
-                const float angle = player_.aimAngle + (static_cast<float>(i) - (beams - 1) * 0.5f) * 0.32f;
+                const float angle = player_.aimAngle + (static_cast<float>(i) - (beams - 1) * 0.5f) * fan;
                 const Vector2 dir = FromAngle(angle);
                 const Vector2 end = origin + dir * length;
                 // Damage everything whose body touches the beam segment.

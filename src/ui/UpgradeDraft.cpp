@@ -47,7 +47,11 @@ Rectangle UpgradeDraft::CardRect(const App& app, int index) const {
 void UpgradeDraft::Pick(App& app, World& world, int index) {
     picked_ = index;
     pickTime_ = 0.0f;
-    world.ApplyUpgrade(offers_[static_cast<std::size_t>(index)]);
+    const UpgradeId id = offers_[static_cast<std::size_t>(index)];
+    world.ApplyUpgrade(id);
+    if (GetUpgradeInfo(id).category == UpgradeCategory::Evolution) {
+        app.Audio().Play(SfxId::SectorClear, 0.9f, 1.2f);
+    }
     if (cache_) {
         world.ConsumeCache();
     } else {
@@ -215,12 +219,22 @@ void UpgradeDraft::Draw(App& app, const World& world) {
                   Align::Center, 0.05f);
         const char* level = owned == 0 ? "NEW" : TextFormat("LEVEL %d  >  %d", owned, owned + 1);
         if (info.maxStacks == 0) {
-            level = "INSTANT";
+            level = id == UpgradeId::Overcharge ? TextFormat("STACK %d", owned + 1) : "INSTANT";
+        }
+        if (info.category == UpgradeCategory::Evolution) {
+            level = "MODULE EVOLUTION";
         }
         text.Draw(FontId::BodyBold, level, {r.x + r.width * 0.5f, r.y + 278.0f}, 22.0f,
                   WithAlpha(owned == 0 ? palette::kUiGood : palette::kUiDim, alpha), Align::Center, 0.1f);
         text.DrawWrapped(FontId::Body, UpgradeLevelText(id, owned), {r.x + 26.0f, r.y + 336.0f}, r.width - 52.0f,
                          27.0f, WithAlpha(palette::kUiText, alpha), 1.12f, Align::Center);
+        if (const EvolutionRecipe* recipe = EvolutionForModule(id); recipe != nullptr) {
+            // Teach the synergy: which catalyst evolves this module at level 5.
+            const bool hasCatalyst = world.Inventory().Stacks(recipe->catalyst) > 0;
+            const char* hint = TextFormat("EVOLVES WITH %s", GetUpgradeInfo(recipe->catalyst).name);
+            text.Draw(FontId::BodyBold, hint, {r.x + r.width * 0.5f, r.y + r.height - 72.0f}, 19.0f,
+                      WithAlpha(hasCatalyst ? palette::kUiGood : palette::kElite, alpha * 0.9f), Align::Center, 0.06f);
+        }
         if (app.In().LastDevice() == InputDevice::KeyboardMouse) {
             text.Draw(FontId::Heading, TextFormat("%d", i + 1), {r.x + r.width * 0.5f, r.y + r.height - 38.0f}, 20.0f,
                       WithAlpha(palette::kUiFaint, alpha), Align::Center);

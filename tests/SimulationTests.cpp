@@ -4,6 +4,8 @@
 
 #include <doctest/doctest.h>
 
+#include <algorithm>
+
 using namespace gb;
 
 namespace {
@@ -167,4 +169,27 @@ TEST_CASE("Bosses can be spawned and defeated") {
         world.Update(1.0f / 60.0f, PlayerInput{});
         CHECK(world.Record().bossesKilled == 1);
     }
+}
+
+TEST_CASE("Evolutions unlock from a maxed module plus its catalyst") {
+    RunConfig config;
+    World world(config);
+    const auto canOffer = [&](UpgradeId id) {
+        return world.Inventory().CanOffer(id, world.Stats(), world.GetPlayer().hp);
+    };
+    CHECK_FALSE(canOffer(UpgradeId::SawStorm));
+    for (int i = 0; i < 5; ++i) {
+        world.ApplyUpgrade(UpgradeId::OrbitBlades);
+    }
+    CHECK_FALSE(canOffer(UpgradeId::SawStorm));  // catalyst missing
+    world.ApplyUpgrade(UpgradeId::Thrusters);
+    CHECK(canOffer(UpgradeId::SawStorm));
+
+    const auto offers = world.RollOffers(3);
+    CHECK(std::find(offers.begin(), offers.end(), UpgradeId::SawStorm) != offers.end());
+
+    world.ApplyUpgrade(UpgradeId::SawStorm);
+    CHECK(world.Stats().Evolved(ModuleId::OrbitBlades));
+    CHECK(world.OrbitBladeCount() == 12);
+    CHECK_FALSE(canOffer(UpgradeId::SawStorm));  // only once
 }

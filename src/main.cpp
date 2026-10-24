@@ -81,7 +81,8 @@ int main(int argc, char** argv) {
         const gb::LaunchOptions& options = a.Options();
         const std::string& scene = options.startScene;
         // Automated runs and "--scene game|draft|pause" jump straight into a run.
-        if (options.autotestSeconds > 0.0f || scene == "game" || scene == "draft" || scene == "pause") {
+        if (options.autotestSeconds > 0.0f || scene == "game" || scene == "draft" || scene == "evolution" ||
+            scene == "pause") {
             gb::RunConfig config;
             config.seed = options.seed != 0 ? options.seed : 1234u;
             config.meta = a.Progress().Bonuses();

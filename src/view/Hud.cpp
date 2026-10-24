@@ -316,7 +316,14 @@ void Hud::DrawModules(App& app, const GameView& view) const {
     for (int i = 0; i < count; ++i) {
         const Vector2 c{x + static_cast<float>(i) * 64.0f, y};
         neon.RegularPolygon(c, 6, 27.0f, kPi / 6.0f, 1.5f, WithAlpha(palette::kUiBorder, 0.9f));
-        shapes::DrawUpgradeIcon(neon, slots[static_cast<std::size_t>(i)].id, c, 30.0f, palette::kUiGood, time_);
+        UpgradeId icon = slots[static_cast<std::size_t>(i)].id;
+        Color iconColor = palette::kUiGood;
+        if (const EvolutionRecipe* recipe = EvolutionForModule(icon);
+            recipe != nullptr && world.Inventory().Stacks(recipe->evolution) > 0) {
+            icon = recipe->evolution;
+            iconColor = palette::kElite;
+        }
+        shapes::DrawUpgradeIcon(neon, icon, c, 30.0f, iconColor, time_);
         for (int pip = 0; pip < 5; ++pip) {
             const Vector2 pp{c.x - 16.0f + static_cast<float>(pip) * 8.0f, c.y + 34.0f};
             const bool lit = pip < slots[static_cast<std::size_t>(i)].level;

@@ -94,8 +94,10 @@ void World::RecomputeStats() {
 
     // Keep the drone wing in sync with the module level.
     static constexpr std::array<int, 6> kDroneCount{0, 1, 2, 2, 3, 3};
-    const auto drones = static_cast<std::size_t>(kDroneCount[static_cast<std::size_t>(
-        std::clamp(stats_.Module(ModuleId::Drones), 0, 5))]);
+    const auto drones = stats_.Evolved(ModuleId::Drones)
+                            ? std::size_t{6}
+                            : static_cast<std::size_t>(kDroneCount[static_cast<std::size_t>(
+                                  std::clamp(stats_.Module(ModuleId::Drones), 0, 5))]);
     while (drones_.size() < drones) {
         Drone d;
         d.position = player_.position;
@@ -1047,10 +1049,19 @@ void World::ApplyGravityWells(float dt) {
 }
 
 int World::OrbitBladeCount() const {
+    if (stats_.Evolved(ModuleId::OrbitBlades)) {
+        return 12;
+    }
     static constexpr std::array<int, 6> kBlades{0, 2, 3, 3, 4, 6};
     return kBlades[static_cast<std::size_t>(std::clamp(stats_.Module(ModuleId::OrbitBlades), 0, 5))];
 }
 
-float World::OrbitRadius() const { return stats_.Module(ModuleId::OrbitBlades) >= 3 ? 125.0f : 100.0f; }
+float World::OrbitRadius() const {
+    if (stats_.Evolved(ModuleId::OrbitBlades)) {
+        // The saw storm breathes in and out.
+        return 150.0f + 55.0f * std::sin(orbitAngle_ * 0.35f);
+    }
+    return stats_.Module(ModuleId::OrbitBlades) >= 3 ? 125.0f : 100.0f;
+}
 
 } // namespace gb

@@ -12,6 +12,7 @@ float UpgradeScore(const World& world, UpgradeId id) {
     float score = 1.0f + static_cast<float>(info.rarity) * 0.6f;
     switch (info.category) {
     case UpgradeCategory::Module: score += owned > 0 ? 2.5f : 2.0f; break;
+    case UpgradeCategory::Evolution: score += 10.0f; break;
     case UpgradeCategory::Weapon: score += 1.5f; break;
     case UpgradeCategory::Defense: score += 0.8f; break;
     default: break;

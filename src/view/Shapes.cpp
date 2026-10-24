@@ -456,6 +456,21 @@ void DrawUpgradeIcon(NeonRenderer& neon, UpgradeId id, Vector2 c, float s, Color
         arrow({-0.3f, 0.4f}, {-0.3f, -0.15f});
         arrow({0.3f, 0.4f}, {0.3f, -0.15f});
         break;
+    case UpgradeId::SawStorm:
+    case UpgradeId::HiveSwarm:
+    case UpgradeId::StormCore:
+    case UpgradeId::ClusterBarrage:
+    case UpgradeId::ShockReactor:
+    case UpgradeId::GravityMines:
+    case UpgradeId::SpectrumCannon:
+        // Evolutions: the base module glyph inside a radiant star.
+        for (const EvolutionRecipe& recipe : AllEvolutions()) {
+            if (recipe.evolution == id) {
+                DrawUpgradeIcon(neon, recipe.module, c, s * 0.72f, color, time);
+            }
+        }
+        Star(neon, c, 8, s * 0.52f, s * 0.44f, time * 0.4f, w * 0.8f, WithAlpha(color, 0.8f));
+        break;
     case UpgradeId::Count: break;
     }
 }

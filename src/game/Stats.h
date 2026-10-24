@@ -56,8 +56,11 @@ struct PlayerStats {
 
     std::array<int, static_cast<std::size_t>(ModuleId::Count)> moduleLevel{};
 
+    std::array<bool, static_cast<std::size_t>(ModuleId::Count)> evolved{};
+
     int Module(ModuleId id) const { return moduleLevel[static_cast<std::size_t>(id)]; }
     void SetModule(ModuleId id, int level) { moduleLevel[static_cast<std::size_t>(id)] = level; }
+    bool Evolved(ModuleId id) const { return evolved[static_cast<std::size_t>(id)]; }
 };
 
 } // namespace gb

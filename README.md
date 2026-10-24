@@ -54,11 +54,17 @@ Prompts adapt automatically to whichever device you used last.
   auto-repair), mobility, utility and seven levelled **weapon modules**: Orbit
   Blades, Wingmen drones, Arc Coil chain lightning, Swarm Missiles, Pulse Nova,
   Proximity Mines and the Prism Lance. You can run up to four modules at once.
+* **Evolutions.** Max out a module while owning its catalyst upgrade and a
+  legendary evolution appears: Orbit Blades + Thrusters become *Saw Storm*,
+  Wingmen + Split Shot become *Hive Swarm*, and five more to discover. Module
+  cards tell you which catalyst they need.
 * **Routing.** After each guardian you choose a protocol for the next sector:
   more enemies for more experience, tougher enemies for more score, a free
   upgrade cache, or a breather.
 * **Score attack.** Chain kills to build a combo multiplier (up to x10). Getting
   hit resets it.
+* **Challenges.** Sixteen goals (beat each guardian, flawless sectors, huge
+  combos...) pay out bonus credits.
 * **Meta-progression.** Runs earn credits. Spend them in the **Hangar** to unlock
   five more ships (each with its own weapon and starting kit) and permanent
   firmware upgrades.

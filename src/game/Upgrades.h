@@ -59,10 +59,29 @@ enum class UpgradeId : std::uint8_t {
     OverdriveCore,
     // Filler that never runs out (keeps late/endless drafts full)
     Overcharge,
+    // Evolutions: a level 5 module plus its catalyst upgrade
+    SawStorm,
+    HiveSwarm,
+    StormCore,
+    ClusterBarrage,
+    ShockReactor,
+    GravityMines,
+    SpectrumCannon,
     Count
 };
 
-enum class UpgradeCategory : std::uint8_t { Weapon, Defense, Mobility, Utility, Module };
+enum class UpgradeCategory : std::uint8_t { Weapon, Defense, Mobility, Utility, Module, Evolution };
+
+// Recipe for an evolution: which module (at max level) and catalyst unlock it.
+struct EvolutionRecipe {
+    UpgradeId evolution;
+    UpgradeId module;
+    UpgradeId catalyst;
+};
+
+std::span<const EvolutionRecipe> AllEvolutions();
+// The evolution a module card leads to (nullptr for non-modules).
+const EvolutionRecipe* EvolutionForModule(UpgradeId module);
 
 struct UpgradeInfo {
     UpgradeId id;

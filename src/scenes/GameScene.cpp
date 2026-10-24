@@ -60,10 +60,14 @@ void GameScene::ApplyDebugLaunchOptions() {
 
     // Debug entry points used for UI screenshots ("--scene draft|pause").
     const std::string& debugScene = options.startScene;
-    if (debugScene == "draft") {
+    if (debugScene == "draft" || debugScene == "evolution") {
         World& world = view_.GetWorld();
-        world.ApplyUpgrade(UpgradeId::OrbitBlades);
-        world.ApplyUpgrade(UpgradeId::Overclock);
+        const int blades = debugScene == "evolution" ? 5 : 1;
+        for (int i = 0; i < blades; ++i) {
+            world.ApplyUpgrade(UpgradeId::OrbitBlades);
+        }
+        world.ApplyUpgrade(debugScene == "evolution" ? UpgradeId::Thrusters : UpgradeId::Overclock);
+        world.ApplyUpgrade(UpgradeId::Drones);
         draft_.Open(app_, world, false);
         overlay_ = Overlay::Draft;
     } else if (debugScene == "pause") {
