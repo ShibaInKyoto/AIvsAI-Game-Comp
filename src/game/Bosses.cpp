@@ -52,6 +52,11 @@ void World::BehaveBoss(Enemy& e, float dt) {
         e.state = 0;
         e.timer = -1.0f;
         e.counter = 0;
+        // Never strand a boss mid-attack in a vulnerable-state change (e.g. teleport).
+        if (e.kind != EnemyKind::BossCore) {
+            e.invulnerable = false;
+        }
+        e.contactDamage = true;
         Emit(EventType::BossPhase, e.position, GetEnemyInfo(e.kind).color, static_cast<float>(phase), {}, phase,
              e.kind);
     }

@@ -23,6 +23,7 @@ constexpr int kMaxEnemyBullets = 2500;
 constexpr int kMaxPickups = 600;
 constexpr float kPickupCollectRadius = 16.0f;
 constexpr float kShardAutoCollectAge = 9.0f;
+constexpr float kNovaPerThreat = 0.0032f;  // ~300 basic kills per nova
 constexpr float kBulletHitboxScale = 0.55f;  // forgiving: bullets must hit the ship's core
 constexpr float kBodyHitboxScale = 0.75f;
 constexpr Color kPlayerBulletColor{255, 240, 140, 255};
@@ -861,8 +862,8 @@ void World::KillEnemy(Enemy& e, bool dropLoot) {
         }
         const float scoreScale = tuning_.scoreMultiplier * director_.ScoreMultiplier() * (e.elite ? 4.0f : 1.0f);
         AddScore(static_cast<long long>(static_cast<float>(info.score * ComboMultiplier()) * scoreScale));
-        player_.novaCharge = std::min(1.0f, player_.novaCharge + 0.0085f * std::max(info.threat, 0.4f) *
-                                                                     stats_.novaChargeRate * (e.elite ? 6.0f : 1.0f));
+        player_.novaCharge = std::min(1.0f, player_.novaCharge + kNovaPerThreat * std::max(info.threat, 0.4f) *
+                                                                     stats_.novaChargeRate * (e.elite ? 8.0f : 1.0f));
     }
     if (e.elite) {
         runStats_.elitesKilled++;

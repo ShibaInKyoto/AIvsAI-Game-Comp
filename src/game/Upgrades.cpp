@@ -61,6 +61,8 @@ constexpr std::array<UpgradeInfo, static_cast<std::size_t>(UpgradeId::Count)> kU
     {U::BulletStorm, "BULLET STORM", "+2 projectiles and +25% fire rate.", R::Legendary, C::Weapon, 1, kNoModule},
     {U::OverdriveCore, "OVERDRIVE CORE", "Nova charges twice as fast and hits harder.", R::Legendary, C::Utility, 1,
      kNoModule},
+    {U::Overcharge, "OVERCHARGE", "+6% damage and +4% fire rate. Stacks forever.", R::Common, C::Weapon, 0,
+     kNoModule},
 }};
 
 constexpr std::array<float, static_cast<std::size_t>(Rarity::Count)> kRarityWeights{60.0f, 28.0f, 10.0f, 2.5f};
@@ -246,6 +248,10 @@ void ApplyUpgradeStack(UpgradeId id, int stack, PlayerStats& s) {
         s.fireRate *= 1.25f;
         break;
     case U::OverdriveCore: s.novaChargeRate *= 2.0f; break;
+    case U::Overcharge:
+        s.damage *= 1.06f;
+        s.fireRate *= 1.04f;
+        break;
     case U::Count: break;
     }
 }
@@ -297,6 +303,10 @@ std::vector<UpgradeId> UpgradeInventory::RollOffers(Rng& rng, int count, const P
         // Already-owned modules are favoured so builds can actually come together.
         if (info.category == UpgradeCategory::Module && Stacks(info.id) > 0) {
             w *= 2.2f;
+        }
+        // Overcharge is a filler: rare while the pool is rich, common once it thins out.
+        if (info.id == U::Overcharge) {
+            w *= 0.12f;
         }
         // Repairs become likelier the more damaged the player is.
         if (info.id == U::NanoRepair) {

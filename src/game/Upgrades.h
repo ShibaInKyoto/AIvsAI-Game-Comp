@@ -57,6 +57,8 @@ enum class UpgradeId : std::uint8_t {
     GlassCannon,
     BulletStorm,
     OverdriveCore,
+    // Filler that never runs out (keeps late/endless drafts full)
+    Overcharge,
     Count
 };
 

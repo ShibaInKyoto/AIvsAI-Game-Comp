@@ -451,6 +451,11 @@ void DrawUpgradeIcon(NeonRenderer& neon, UpgradeId id, Vector2 c, float s, Color
         Star(neon, c, 8, s * 0.45f, s * 0.25f, time, w, color);
         neon.Glow(c, s * 0.25f, color);
         break;
+    case UpgradeId::Overcharge:
+        arrow({0.0f, 0.4f}, {0.0f, -0.42f});
+        arrow({-0.3f, 0.4f}, {-0.3f, -0.15f});
+        arrow({0.3f, 0.4f}, {0.3f, -0.15f});
+        break;
     case UpgradeId::Count: break;
     }
 }
