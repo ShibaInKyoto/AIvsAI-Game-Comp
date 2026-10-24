@@ -14,7 +14,7 @@ constexpr std::array<DifficultyTuning, static_cast<std::size_t>(Difficulty::Coun
     // hp     speed  spawn  bullets score  bonusHp
     {0.75f, 0.88f, 0.75f, 0.85f, 0.6f, 2},  // Relaxed
     {1.00f, 1.00f, 1.00f, 1.00f, 1.0f, 0},  // Standard
-    {1.35f, 1.12f, 1.25f, 1.15f, 1.6f, 0},  // Overclocked
+    {1.6f, 1.15f, 1.4f, 1.2f, 1.6f, 0},     // Overclocked
 }};
 
 constexpr float kComboWindow = 3.0f;

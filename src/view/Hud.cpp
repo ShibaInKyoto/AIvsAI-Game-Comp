@@ -67,6 +67,13 @@ void Hud::Update(const GameView& view, float dt) {
     xpFill_ = Damp(xpFill_, xp, 0.06f, dt);
     levelFlash_ = std::max(0.0f, levelFlash_ - dt * 1.5f);
 
+    const int multiplier = world.ComboMultiplier();
+    if (multiplier > lastMultiplier_) {
+        multiplierPop_ = 1.0f;
+    }
+    lastMultiplier_ = multiplier;
+    multiplierPop_ = std::max(0.0f, multiplierPop_ - dt * 3.0f);
+
     const int hp = world.GetPlayer().hp;
     if (lastHp_ >= 0 && hp < lastHp_) {
         hpFlash_ = 1.0f;
@@ -187,7 +194,9 @@ void Hud::DrawScore(App& app, const GameView& view) const {
     const int combo = world.Combo();
     if (combo > 0) {
         const Color c = multiplier >= 5 ? palette::kUiWarn : palette::kUiAccent;
-        text.Draw(FontId::BodyBold, TextFormat("x%d", multiplier), {right, 72.0f}, 38.0f, c, Align::Right);
+        const float pop = 1.0f + 0.5f * EaseOutCubic(multiplierPop_);
+        text.Draw(FontId::BodyBold, TextFormat("x%d", multiplier), {right, 72.0f - 8.0f * (pop - 1.0f)}, 38.0f * pop,
+                  LerpColor(c, WHITE, multiplierPop_), Align::Right);
         text.Draw(FontId::BodyBold, TextFormat("%d COMBO", combo), {right - 60.0f, 82.0f}, 22.0f, palette::kUiDim,
                   Align::Right);
         const float t = Saturate(world.ComboTimer() / 3.0f);

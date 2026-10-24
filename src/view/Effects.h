@@ -64,6 +64,14 @@ private:
     Rumble& rumble_;
     const Settings& settings_;
 
+    // Cosmetic explosions queued to go off later (boss death chains).
+    struct ScheduledBurst {
+        float delay;
+        Vector2 position;
+        Color color;
+        float size;
+    };
+    std::vector<ScheduledBurst> scheduled_;
     std::vector<FloatingText> texts_;
     float hitStop_ = 0.0f;
     float slowMo_ = 0.0f;

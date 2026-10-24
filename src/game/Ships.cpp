@@ -56,7 +56,7 @@ PlayerStats ShipBaseStats(ShipId id) {
         s.projectiles = 6;
         s.spread = 0.13f;
         s.inaccuracy = 0.06f;
-        s.damage = 7.5f;
+        s.damage = 8.5f;
         s.fireRate = 3.2f;
         s.bulletSpeed = 1250.0f;
         s.bulletLifetime = 0.36f;
@@ -64,7 +64,7 @@ PlayerStats ShipBaseStats(ShipId id) {
     case ShipId::Warden:
         s.maxHp = 6;
         s.damage = 9.0f;
-        s.fireRate = 6.0f;
+        s.fireRate = 7.0f;
         break;
     case ShipId::Specter:
         s.maxHp = 4;

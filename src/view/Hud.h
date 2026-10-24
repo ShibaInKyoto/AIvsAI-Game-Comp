@@ -48,6 +48,8 @@ private:
     int lastHp_ = -1;
     int lastLevel_ = 1;
     float levelFlash_ = 0.0f;
+    int lastMultiplier_ = 1;
+    float multiplierPop_ = 0.0f;
     float time_ = 0.0f;
 };
 

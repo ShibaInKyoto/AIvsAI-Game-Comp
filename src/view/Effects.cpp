@@ -134,6 +134,14 @@ void EffectsDirector::Process(const World& world, const std::vector<GameEvent>& 
             break;
         }
         case EventType::BossDefeated: {
+            // A rolling chain of blasts across the hull before the final burst.
+            for (int i = 0; i < 9; ++i) {
+                const float delay = 0.12f + 0.11f * static_cast<float>(i);
+                const Vector2 offset = rng.InCircle(ev.magnitude * 1.6f);
+                scheduled_.push_back({delay, ev.position + offset, i % 2 == 0 ? ev.color : WHITE,
+                                      rng.Range(40.0f, 90.0f)});
+            }
+            scheduled_.push_back({1.25f, ev.position, ev.color, 260.0f});
             particles_.Burst(ev.position, 220, ev.color, 300.0f, 1600.0f, 0.6f, 2.0f, 30.0f, 4.0f);
             particles_.Burst(ev.position, 120, WHITE, 200.0f, 900.0f, 0.5f, 1.4f, 20.0f, 3.0f);
             for (int i = 0; i < 4; ++i) {
@@ -348,6 +356,24 @@ void EffectsDirector::Update(const World& world, float realDt) {
     const float dt = realDt * TimeScale();
     const Player& p = world.GetPlayer();
     Rng& rng = particles_.Random();
+
+    // Scheduled cosmetic bursts run on real time so slow motion doesn't stall them.
+    for (ScheduledBurst& burst : scheduled_) {
+        burst.delay -= realDt;
+        if (burst.delay <= 0.0f) {
+            particles_.Burst(burst.position, static_cast<int>(burst.size * 0.6f), burst.color, 150.0f,
+                             300.0f + burst.size * 5.0f, 0.3f, 0.8f, 18.0f, 3.0f);
+            particles_.ShockRing(burst.position, burst.size * 0.2f, burst.size * 1.8f, 0.35f, burst.color);
+            particles_.GlowPuff(burst.position, burst.size * 1.4f, 0.3f, burst.color);
+            grid_.ApplyExplosiveForce(burst.size * 0.4f, burst.position, burst.size * 3.0f);
+            PlaySfx(burst.size > 200.0f ? SfxId::BossDeath : SfxId::Explosion, burst.size > 200.0f ? 0.6f : 0.45f,
+                    rng.Range(0.85f, 1.15f), Pan(burst.position));
+            Shake(burst.size > 200.0f ? 0.7f : 0.2f);
+        }
+    }
+    scheduled_.erase(std::remove_if(scheduled_.begin(), scheduled_.end(),
+                                    [](const ScheduledBurst& b) { return b.delay <= 0.0f; }),
+                     scheduled_.end());
 
     // Engine exhaust.
     exhaustTimer_ -= dt;
