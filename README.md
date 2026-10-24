@@ -24,6 +24,9 @@ That's it: a single executable with every asset compiled in. No installer, no
 runtimes and no DLLs. Any GPU with OpenGL 3.3 works, which covers every
 integrated or discrete GPU from roughly the last decade.
 
+The executable is not code-signed, so Windows SmartScreen may show "Windows
+protected your PC" on first launch: click **More info**, then **Run anyway**.
+
 Settings and progress are stored in `%APPDATA%\Gridbreaker`.
 
 ## Controls
