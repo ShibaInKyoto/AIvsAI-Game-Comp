@@ -49,13 +49,17 @@ endless mode after that. Short runs (15–20 min), lots of build variety.
   real-time adaptive music sequencer on the audio thread.
 
 ## Code map
-- `src/core`   — app loop, scenes, input, settings, storage, math, RNG
-- `src/render` — neon batcher, post FX, warp grid, particles, camera, text
-- `src/audio`  — synthesiser, sound bank, music engine
-- `src/game`   — simulation: world, player, enemies, bosses, upgrades, director
-- `src/scenes` — title, hangar, game, settings, results
-- `src/ui`     — widgets and HUD
-- `tests`      — doctest unit tests (simulation runs headless)
+- `src/core`     — app loop, scene base, input, settings, storage, math, RNG, embedded assets
+- `src/render`   — neon batcher, HDR post FX, warp grid, particles, camera, text
+- `src/audio`    — sound-effect synthesiser, real-time music engine, audio system
+- `src/game`     — simulation: world, enemies, bosses, modules, upgrades, ships,
+                   director, challenges, profile, bot
+- `src/view`     — presentation of the simulation: renderer, effects, HUD, shapes, backdrop
+- `src/ui`       — widgets, upgrade draft, settings panel
+- `src/scenes`   — boot, title, hangar, game, results
+- `src/platform` — OS-specific bits (XInput rumble)
+- `tests`        — doctest unit tests (simulation runs headless)
+- `tools`        — balance simulator, audio dump
 
 ## Status (living section)
 
