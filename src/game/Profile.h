@@ -92,6 +92,14 @@ public:
     // Codex discovery: enemies met and upgrades drafted in any run.
     bool EnemyDiscovered(EnemyKind kind) const { return (seenEnemies_ >> static_cast<unsigned>(kind)) & 1u; }
     bool UpgradeDiscovered(UpgradeId id) const { return (seenUpgrades_ >> static_cast<unsigned>(id)) & 1u; }
+    // True when entries were decoded since the codex was last opened.
+    bool CodexHasNews() const {
+        return (seenEnemies_ & ~viewedEnemies_) != 0 || (seenUpgrades_ & ~viewedUpgrades_) != 0;
+    }
+    void MarkCodexViewed() {
+        viewedEnemies_ = seenEnemies_;
+        viewedUpgrades_ = seenUpgrades_;
+    }
 
     bool TutorialSeen() const { return tutorialSeen_; }
     void SetTutorialSeen() { tutorialSeen_ = true; }
@@ -138,6 +146,8 @@ private:
     std::uint32_t challenges_ = 0;
     std::uint32_t seenEnemies_ = 0;
     std::uint64_t seenUpgrades_ = 0;
+    std::uint32_t viewedEnemies_ = 0;
+    std::uint64_t viewedUpgrades_ = 0;
     std::vector<RunRecord> recentRuns_;
 };
 

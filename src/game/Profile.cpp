@@ -108,6 +108,8 @@ bool Profile::Load() {
     challenges_ = static_cast<std::uint32_t>(doc.GetInt("challenges", 0));
     seenEnemies_ = static_cast<std::uint32_t>(doc.GetInt("codex_enemies", 0));
     seenUpgrades_ = static_cast<std::uint64_t>(doc.GetInt("codex_upgrades", 0));
+    viewedEnemies_ = static_cast<std::uint32_t>(doc.GetInt("codex_viewed_enemies", 0));
+    viewedUpgrades_ = static_cast<std::uint64_t>(doc.GetInt("codex_viewed_upgrades", 0));
     recentRuns_.clear();
     for (std::size_t i = 0; i < kRecentRuns; ++i) {
         if (const auto line = doc.Get("recent_" + std::to_string(i))) {
@@ -150,6 +152,8 @@ bool Profile::Save() const {
     doc.SetInt("challenges", challenges_);
     doc.SetInt("codex_enemies", seenEnemies_);
     doc.SetInt("codex_upgrades", static_cast<long long>(seenUpgrades_));
+    doc.SetInt("codex_viewed_enemies", viewedEnemies_);
+    doc.SetInt("codex_viewed_upgrades", static_cast<long long>(viewedUpgrades_));
     for (std::size_t i = 0; i < recentRuns_.size(); ++i) {
         doc.Set("recent_" + std::to_string(i), EncodeRun(recentRuns_[i]));
     }

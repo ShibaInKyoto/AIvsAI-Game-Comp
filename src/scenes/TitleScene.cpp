@@ -31,6 +31,7 @@ enum TitleItem {
 
 TitleScene::TitleScene(App& app) : Scene(app) {
     menu_.SetItems({{"PLAY"}, {"DAILY RUN"}, {"HANGAR"}, {"RECORDS"}, {"CODEX"}, {"SETTINGS"}, {"QUIT"}});
+    menu_.SetValue(ItemCodex, app.Progress().CodexHasNews() ? "NEW" : "");
     ResetDemo();
     // Debug entry points for screenshots.
     showRecords_ = app.Options().startScene == "records";
@@ -151,6 +152,9 @@ void TitleScene::Update(float dt) {
     case ItemCodex:
         app_.Audio().Play(SfxId::UiConfirm, 0.8f);
         codex_.Open(app_);
+        app_.Progress().MarkCodexViewed();
+        app_.Progress().Save();
+        menu_.SetValue(ItemCodex, "");
         break;
     case ItemSettings:
         app_.Audio().Play(SfxId::UiConfirm, 0.8f);
